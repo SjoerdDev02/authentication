@@ -1,0 +1,182 @@
+@import '@/styles/label';
+@import '@/styles/variables';
+
+:root {
+  /* Gaps */
+  --gap-100: 0.2rem;
+  --gap-200: 0.4rem;
+  --gap-300: 0.6rem;
+  --gap-400: 0.8rem; 
+  --gap-500: 1rem;  
+  --gap-600: 1.2rem;  
+  --gap-700: 1.4rem;
+  --gap-800: 1.6rem; 
+  --gap-900: 1.8rem;
+
+  /* Font Sizes */
+  --font-size-100: 0.8rem;
+  --font-size-200: 1rem;
+  --font-size-300: 1.2rem;
+  --font-size-400: 1.4rem;
+  --font-size-500: 1.6rem;
+  --font-size-600: 1.8rem;
+  --font-size-700: 2rem;
+  --font-size-800: 2.2rem;
+  --font-size-900: 2.4rem;
+
+  /* Paddings */
+  --padding-100: 0.2rem;
+  --padding-200: 0.4rem;
+  --padding-300: 0.6rem;
+  --padding-400: 0.8rem;
+  --padding-500: 1rem;
+  --padding-600: 1.2rem;
+  --padding-700: 1.4rem;
+  --padding-800: 1.6rem;
+  --padding-900: 1.8rem;
+
+  /* Font Weights */
+  --font-weight-100: 100;
+  --font-weight-200: 200;
+  --font-weight-300: 300;
+  --font-weight-400: 400; /* Normal */
+  --font-weight-500: 500;
+  --font-weight-600: 600; /* Semi-bold */
+  --font-weight-700: 700; /* Bold */
+  --font-weight-800: 800;
+  --font-weight-900: 900;
+
+  /* Border Radii */
+  --border-radius-0: 0;
+  --border-radius-100: 4px;
+  --border-radius-200: 8px;
+  --border-radius-300: 12px;
+  --border-radius-400: 16px;
+  --border-radius-500: 20px;
+  --border-radius-round: 50%;
+
+  /* Transition Durations */
+  --transition-duration-short: 0.3s;
+  --transition-duration-medium: 0.5s;
+  --transition-duration-long: 1s;
+
+    /* Primary Colors */
+    --color-primary-100: hsl(200, 30%, 90%);
+    --color-primary-200: hsl(200, 39%, 80%);
+    --color-primary-300: hsl(200, 48%, 70%);
+    --color-primary-400: hsl(200, 56%, 65%);
+    --color-primary-500: hsl(200, 65%, 60%);
+    --color-primary-600: hsl(200, 74%, 50%);
+    --color-primary-700: hsl(200, 82%, 40%);
+    --color-primary-800: hsl(200, 91%, 35%);
+    --color-primary-900: hsl(200, 100%, 30%);
+
+    /* Grayscale Colors */
+    --color-grayscale-50: hsl(0, 0%, 100%);
+    --color-grayscale-100: hsl(0, 0%, 94%);
+    --color-grayscale-200: hsl(0, 0%, 88%);
+    --color-grayscale-300: hsl(0, 0%, 76%);
+    --color-grayscale-400: hsl(0, 0%, 64%);
+    --color-grayscale-500: hsl(0, 0%, 52%);
+    --color-grayscale-600: hsl(0, 0%, 42%);
+    --color-grayscale-700: hsl(0, 0%, 32%);
+    --color-grayscale-800: hsl(0, 0%, 16%);
+    --color-grayscale-900: hsl(0, 0%, 0%);
+
+    /* Success Colors */
+    --color-success-100: hsl(150, 30%, 90%);
+    --color-success-200: hsl(150, 39%, 80%);
+    --color-success-300: hsl(150, 48%, 70%);
+    --color-success-400: hsl(150, 56%, 65%);
+    --color-success-500: hsl(150, 65%, 60%);
+    --color-success-600: hsl(150, 74%, 50%);
+    --color-success-700: hsl(150, 82%, 40%);
+    --color-success-800: hsl(150, 91%, 35%);
+    --color-success-900: hsl(150, 100%, 30%);
+
+    /* Warning Colors */
+    --color-warning-100: hsl(35, 30%, 90%);
+    --color-warning-200: hsl(35, 39%, 80%);
+    --color-warning-300: hsl(35, 48%, 70%);
+    --color-warning-400: hsl(35, 56%, 65%);
+    --color-warning-500: hsl(35, 65%, 60%);
+    --color-warning-600: hsl(35, 74%, 50%);
+    --color-warning-700: hsl(35, 82%, 40%);
+    --color-warning-800: hsl(35, 91%, 35%);
+    --color-warning-900: hsl(35, 100%, 30%);
+
+    /* Error Colors */
+    --color-error-100: hsl(0, 30%, 90%);
+    --color-error-200: hsl(0, 39%, 80%);
+    --color-error-300: hsl(0, 48%, 70%);
+    --color-error-400: hsl(0, 56%, 65%);
+    --color-error-500: hsl(0, 65%, 60%);
+    --color-error-600: hsl(0, 74%, 50%);
+    --color-error-700: hsl(0, 82%, 40%);
+    --color-error-800: hsl(0, 91%, 35%);
+    --color-error-900: hsl(0, 100%, 30%);
+
+    /* Glass background */
+    --color-glass-grayscale: rgba(255, 255, 255, .6);
+
+    /* Box shadow */
+    --box-shadow: 0px 4px 8px rgba(0, 0, 0, .1);
+    --box-shadow-small: 0px 2px 4px rgba(0, 0, 0, .1);
+
+    /* Responsiveness */
+    /* These are the max-width values. Everything above medium is considered desktop */
+    --medium: 1024px; /* tablet */
+    --small: 1024px; /* mobile */
+}
+
+[data-theme="dark"] {
+    /* Primary Colors */
+    --color-primary-100: hsl(200, 100%, 30%);
+    --color-primary-200: hsl(200, 91%, 35%);
+    --color-primary-300: hsl(200, 82%, 40%);
+    --color-primary-400: hsl(200, 74%, 50%);
+    --color-primary-500: hsl(200, 65%, 60%);
+    --color-primary-600: hsl(200, 56%, 65%);
+    --color-primary-700: hsl(200, 48%, 70%);
+    --color-primary-800: hsl(200, 39%, 80%);
+    --color-primary-900: hsl(200, 30%, 90%);
+
+    /* Grayscale Colors */
+    --color-grayscale-50: hsl(0, 0%, 0%);
+    --color-grayscale-100: hsl(0, 0%, 16%);
+    --color-grayscale-200: hsl(0, 0%, 32%);
+    --color-grayscale-300: hsl(0, 0%, 42%);
+    --color-grayscale-400: hsl(0, 0%, 52%);
+    --color-grayscale-500: hsl(0, 0%, 64%);
+    --color-grayscale-600: hsl(0, 0%, 76%);
+    --color-grayscale-700: hsl(0, 0%, 88%);
+    --color-grayscale-800: hsl(0, 0%, 94%);
+    --color-grayscale-900: hsl(0, 0%, 100%);
+
+    /* Glass background */
+    --color-glass-grayscale: rgba(0, 0, 0, .6);
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  height: 100vh;
+  width: 100vw;
+
+  .prevent-scroll {
+    overflow: hidden;
+  }
+
+  @media (max-width: 1024px) {
+    height: unset;
+    min-height: 100vh;
+  }
+}
+
+.prevent-scroll {
+  overflow: hidden;
+}

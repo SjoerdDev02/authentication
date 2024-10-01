@@ -1,0 +1,40 @@
+.checkbox {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+    border-radius: var(--border-radius-100);
+    border: 2px solid var(--color-primary-500);
+    position: relative;
+    outline: none;
+    transition: background-color var(--transition-duration-short) ease-in-out, border-color var(--transition-duration-short) ease-in-out;
+
+    &:checked {
+        background-color: var(--color-primary-500);
+    }
+
+    &:checked::after {
+        content: '';
+        position: absolute;
+        left: 3px;
+        top: -1px;
+        width: 3px;
+        height: 9px;
+        border: solid #FFF;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    &:hover {
+        box-shadow: 0 0 0 3px rgba(87, 175, 219, 0.1);
+    }
+
+    &:active {
+        box-shadow: 0 0 0 5px rgba(87, 175, 219, 0.2);
+    }
+
+    &::-moz-focus-inner {
+        border: 0;
+    }
+}      

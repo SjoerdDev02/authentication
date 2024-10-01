@@ -1,0 +1,19 @@
+{
+  "extends": "next/core-web-vitals",
+  "plugins": [
+    "@stylistic",
+    "simple-import-sort"
+  ],
+  "rules": {
+    "no-unused-vars": "error",
+    "semi": "error",
+    "indent": ["error", "tab"],
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "prefer-template": "error",
+    "@stylistic/no-trailing-spaces": "error",
+    "@stylistic/jsx-sort-props": "error",
+    "@stylistic/jsx-quotes": ["error", "prefer-double"],
+    "@stylistic/comma-spacing": ["error", { "before": false, "after": true }]
+  }
+}

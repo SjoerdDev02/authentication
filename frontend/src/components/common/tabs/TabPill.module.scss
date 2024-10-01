@@ -1,0 +1,56 @@
+.tab-pill {
+    $self: &;
+
+    background-color: var(--color-grayscale-100);
+    box-shadow: var(--box-shadow-small);
+    position: relative;
+
+    &__indicator {
+        position: absolute;
+        width: calc(100% / var(--items-count));
+        background-color: red;
+        height: calc(100% - var(--padding-200));
+        top: var(--padding-100);
+        left: calc(var(--padding-100));
+        transform: translateX((calc((100% - var(--padding-100)) * var(--active-item-index))));
+        background-color: var(--color-grayscale-50);
+        border-radius: var(--border-radius-500);
+        transition: all var(--transition-duration-short) ease-in;
+    }
+
+    &__item,
+    &__item-label {
+        cursor: pointer;
+    }
+
+    &__item {
+        $item: &;
+
+        height: 100%;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+        padding-block: var(--padding-300);
+        border-radius: var(--border-radius-500);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &--active {
+            #{$self}__item-label {
+                font-weight: var(--font-weight-400);
+            }
+        }
+
+        &:not(#{$item}--active) {
+            &:hover {
+                background-color: var(--color-grayscale-200);
+            }
+        }
+    }
+
+    &__item-label {
+        transition: all var(--transition-duration-short) ease-in;
+    }
+}
