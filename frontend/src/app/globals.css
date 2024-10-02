@@ -1,5 +1,5 @@
-@import '@/styles/label';
-@import '@/styles/variables';
+/* @import '@/styles/label'; */
+/* @import '@/styles/variables'; */
 
 :root {
   /* Gaps */
@@ -126,7 +126,7 @@
     /* Responsiveness */
     /* These are the max-width values. Everything above medium is considered desktop */
     --medium: 1024px; /* tablet */
-    --small: 1024px; /* mobile */
+    --small: 768px; /* mobile */
 }
 
 [data-theme="dark"] {

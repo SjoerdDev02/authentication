@@ -1,0 +1,24 @@
+.flex {
+    display: var(--flex-display);
+    justify-content: var(--flex-justify-content);
+    flex-direction: var(--flex-flex-direction);
+    flex-grow: var(--flex-flex-grow);
+    flex-basis: var(--flex-flex-basis);
+    flex-shrink: var(--flex-flex-shrink);
+    flex-wrap: var(--flex-flex-wrap);
+    flex: var(--flex-flex);
+    align-items: var(--flex-align-items);
+    gap: var(--flex-gap);
+    margin: var(--flex-margin);
+    padding: var(--flex-padding);
+    padding-left: var(--flex-padding-left);
+    padding-right: var(--flex-padding-right);
+    padding-top: var(--flex-padding-top);
+    padding-bottom: var(--flex-padding-bottom);
+    border-radius: var(--flex-border-radius);
+    width: var(--flex-width);
+    height: var(--flex-height);
+    max-width: var(--flex-max-width);
+    max-height: var(--flex-max-height);
+}
+  
