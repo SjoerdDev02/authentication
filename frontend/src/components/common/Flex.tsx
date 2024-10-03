@@ -87,8 +87,8 @@ type FlexProps = {
 
 	/****** Common Layout Props ********/
 	padding?: keyof typeof paddingMapping;
-	paddingX?: keyof typeof paddingMapping;
-	paddingY?: keyof typeof paddingMapping;
+	paddingInline?: keyof typeof paddingMapping;
+	paddingBlock?: keyof typeof paddingMapping;
 	borderRadius?: keyof typeof borderRadiusMapping;
 	margin?: string;
 	width?: string;
@@ -102,26 +102,24 @@ export const Flex = (props: FlexProps) => {
 
 	const flexStyleVariables = {
 		'--flex-display': 'flex',
-		'--flex-justify-content': props.justifyContent,
-		'--flex-flex-direction': props.flexDirection,
-		'--flex-flex-grow': props.flexGrow,
-		'--flex-flex-basis': props.flexBasis,
-		'--flex-flex-shrink': props.flexShrink,
-		'--flex-flex-wrap': props.flexWrap,
-		'--flex-flex': props.flex,
-		'--flex-align-items': props.alignItems,
-		'--flex-gap': props.gap !== undefined ? gapMapping[props.gap] : undefined,
-		'--flex-margin': props.margin,
-		'--flex-padding': props.padding !== undefined ? paddingMapping[props.padding] : undefined,
-		'--flex-padding-left': props.paddingX !== undefined ? paddingMapping[props.paddingX] : undefined,
-		'--flex-padding-right': props.paddingX !== undefined ? paddingMapping[props.paddingX] : undefined,
-		'--flex-padding-top': props.paddingY !== undefined ? paddingMapping[props.paddingY] : undefined,
-		'--flex-padding-bottom': props.paddingY !== undefined ? paddingMapping[props.paddingY] : undefined,
-		'--flex-border-radius': props.borderRadius !== undefined ? borderRadiusMapping[props.borderRadius] : undefined,
-		'--flex-width': props.width === 'fill' ? '100%' : props.width,
-		'--flex-height': props.height === 'fill' ? '100%' : props.height,
-		'--flex-max-width': props.maxWidth,
-		'--flex-max-height': props.maxHeight,
+		...props.justifyContent && { '--flex-justify-content': props.justifyContent },
+		...props.flexDirection && { '--flex-flex-direction': props.flexDirection },
+		...props.flexGrow && { '--flex-flex-grow': props.flexGrow },
+		...props.flexBasis && { '--flex-flex-basis': props.flexBasis },
+		...props.flexShrink && { '--flex-flex-shrink': props.flexShrink },
+		...props.flexWrap && { '--flex-flex-wrap': props.flexWrap },
+		...props.flex && { '--flex-flex': props.flex },
+		...props.alignItems && { '--flex-align-items': props.alignItems },
+		...props.gap !== undefined && { '--flex-gap': gapMapping[props.gap] },
+		...props.margin && { '--flex-margin': props.margin },
+		...props.padding !== undefined && { '--flex-padding': paddingMapping[props.padding] },
+		...props.paddingInline !== undefined && { '--flex-padding-inline': paddingMapping[props.paddingInline] },
+		...props.paddingBlock !== undefined && { '--flex-padding-block': paddingMapping[props.paddingBlock] },
+		...props.borderRadius !== undefined && { '--flex-border-radius': borderRadiusMapping[props.borderRadius] },
+		...props.width !== undefined && { '--flex-width': props.width === 'fill' ? '100%' : props.width },
+		...props.height !== undefined && { '--flex-height': props.height === 'fill' ? '100%' : props.height },
+		...props.maxWidth && { '--flex-max-width': props.maxWidth },
+		...props.maxHeight && { '--flex-max-height': props.maxHeight }
 	};
 
 	return (

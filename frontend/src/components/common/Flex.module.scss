@@ -11,10 +11,8 @@
     gap: var(--flex-gap);
     margin: var(--flex-margin);
     padding: var(--flex-padding);
-    padding-left: var(--flex-padding-left);
-    padding-right: var(--flex-padding-right);
-    padding-top: var(--flex-padding-top);
-    padding-bottom: var(--flex-padding-bottom);
+    padding-inline: var(--flex-padding-inline);
+    padding-top: var(--flex-padding-block);
     border-radius: var(--flex-border-radius);
     width: var(--flex-width);
     height: var(--flex-height);
