@@ -1,11 +1,13 @@
 'use client';
 
 import { CSSProperties, ReactNode, useLayoutEffect, useRef, useState } from 'react';
+import { useFormStatus } from 'react-dom';
 
 import Loader from '../loaders/Loader';
 import styles from './Button.module.scss';
 
 type ButtonColorType = 'primary' | 'grayscale' | 'success' | 'warning' | 'error' | 'blank';
+type ButtonType = 'button' | 'submit';
 
 type ButtonProps = {
 	children: ReactNode;
@@ -16,9 +18,12 @@ type ButtonProps = {
 	label?: string;
 	loading?: boolean;
 	onClick?: () => void;
+	type?: ButtonType;
 };
 
 const Button = (props: ButtonProps) => {
+	const { pending } = useFormStatus();
+
 	const buttonRef = useRef<HTMLButtonElement>(null);
 
 	const [buttonDimdensions, setbuttonDimdensions] = useState<{ width: number, height: number } | null>(null);
@@ -48,8 +53,9 @@ const Button = (props: ButtonProps) => {
 				'--button-width': buttonDimdensions?.width ? `${buttonDimdensions.width}px` : 'auto',
 				'--button-height': buttonDimdensions?.height ? `${buttonDimdensions.height}px` : 'auto'
 			} as CSSProperties}
+			type={props.type}
 		>
-			{props.loading ? (
+			{(pending || props.loading) ? (
 				<Loader color="grayscale" size="sm" />
 			) : (
 				<>

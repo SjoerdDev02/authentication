@@ -167,6 +167,7 @@ html {
   height: 100vh;
   width: 100vw;
 
+  /* TODO: Check which one is neede */
   .prevent-scroll {
     overflow: hidden;
   }
@@ -177,6 +178,16 @@ html {
   }
 }
 
+/* TODO: Fix that the body does not overflow */
+body, main {
+  height: 100%;
+}
+
+main {
+  background-color: var(--color-grayscale-100);
+}
+
+/* TODO: Check which one is neede */
 .prevent-scroll {
   overflow: hidden;
 }

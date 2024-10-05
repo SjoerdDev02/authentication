@@ -1,5 +1,6 @@
 .page {
-  background-color: red;
+  height: 100%;
+  background-color: var(--color-grayscale-100);
 }
 
 .flex {

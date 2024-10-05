@@ -11,7 +11,6 @@ export type TabPillItemType = {
 type TabPillProps = {
 	activeValue: any;
 	items: TabPillItemType[];
-    layoutIdLabel: string;
 	onChangeValue: (value: any) => void;
 };
 
@@ -31,8 +30,8 @@ const TabPill = (props: TabPillProps) => {
 			borderRadius={5}
 			className={styles['tab-pill']}
 			justifyContent="space-between"
-			paddingX={1}
-			paddingY={1}
+			paddingBlock={1}
+			paddingInline={1}
 			style={{
 				'--items-count': props.items.length,
 				'--active-item-index': activeItemIndex
