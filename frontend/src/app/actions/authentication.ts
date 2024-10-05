@@ -43,7 +43,7 @@ export async function loginUser(prevState: any, formData: FormData) {
 	}
 }
 
-export async function deleteUser(prevState: any) {
+export async function deleteUser() {
 	await new Promise(resolve => setTimeout(resolve, 1000));
 
 	const userId = 50;

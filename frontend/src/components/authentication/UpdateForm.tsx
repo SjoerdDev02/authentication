@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useFormState } from 'react-dom';
 
-import { updateUser } from "@/app/actions/authentication";
+import { deleteUser, updateUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/UpdateForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 
@@ -103,6 +103,10 @@ const EntryForm = () => {
 					</div>
 				)}
 			</form>
+
+			<Button color="warning" onClick={deleteUser}>
+				<span>Delete account</span>
+			</Button>
 		</Flex>
 	);
 };
