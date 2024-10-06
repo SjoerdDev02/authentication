@@ -1,7 +1,16 @@
-use axum::{routing::post, Router};
+use axum::{routing::post, Json, Router};
+use sqlx::MySqlPool;
 
-use crate::services::auth_service;
+use crate::{models::auth_models::{LoginUser, RegisterUser}, services::auth_service::{login, register}};
 
-pub async fn app() -> Router {
-    Router::new().route("/login", post(auth_service::login))
+pub fn app(db: MySqlPool) -> Router {
+    Router::new()
+    .route(
+        "/register",
+        post(|data: Json<RegisterUser>| register(data, &db)),
+    )
+    .route(
+        "/login", 
+        post(|data: Json<LoginUser>| login(data, &db)),
+    )
 }

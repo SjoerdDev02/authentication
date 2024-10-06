@@ -1,166 +1,86 @@
-use axum::{
-    body::Body,
-    extract::{Json, Request},
-    http,
-    http::{Response, StatusCode},
-    middleware::Next,
-    response::IntoResponse,
-};
-use bcrypt::{hash, verify, DEFAULT_COST};
-use chrono::{Duration, Utc};
-use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, TokenData, Validation};
-use serde::{Deserialize, Serialize};
-use serde_json::json;
+use crate::models::auth_models::{LoginResponse, LoginUser, RegisterUser};
+use crate::utils::auth_utils::{encode_jwt, hash_password, verify_password};
+use axum::{extract::Json, http::StatusCode};
+use sqlx::MySqlPool;
 
-#[derive(Serialize, Deserialize)]
-pub struct Cliams {
-    pub exp: usize,
-    pub iat: usize,
-    pub email: String,
-}
-
-pub struct AuthError {
-    message: String,
-    status_code: StatusCode,
-}
-
-pub fn verify_password(password: &str, hash: &str) -> Result<bool, bcrypt::BcryptError> {
-    verify(password, hash)
-}
-
-pub fn hash_password(password: &str) -> Result<String, bcrypt::BcryptError> {
-    let hash = hash(password, DEFAULT_COST)?;
-    Ok(hash)
-}
-
-impl IntoResponse for AuthError {
-    fn into_response(self) -> Response<Body> {
-        let body = Json(json!({
-            "error": self.message,
-        }));
-
-        (self.status_code, body).into_response()
+pub async fn register(
+    Json(user_data): Json<RegisterUser>,
+    db: &MySqlPool,
+) -> Result<Json<LoginResponse>, StatusCode> {
+    if user_data.password != user_data.password_confirm {
+        return Err(StatusCode::BAD_REQUEST);
     }
-}
 
-pub fn encode_jwt(email: String) -> Result<String, StatusCode> {
-    let jwt_token: String = "randomstring".to_string();
-
-    let now = Utc::now();
-    let expire: chrono::TimeDelta = Duration::hours(24);
-    let exp: usize = (now + expire).timestamp() as usize;
-    let iat: usize = now.timestamp() as usize;
-
-    let claim = Cliams { iat, exp, email };
-    let secret = jwt_token.clone();
-
-    encode(
-        &Header::default(),
-        &claim,
-        &EncodingKey::from_secret(secret.as_ref()),
-    )
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
-}
-
-pub fn decode_jwt(jwt: String) -> Result<TokenData<Cliams>, StatusCode> {
-    let secret = "randomstring".to_string();
-
-    let result: Result<TokenData<Cliams>, StatusCode> = decode(
-        &jwt,
-        &DecodingKey::from_secret(secret.as_ref()),
-        &Validation::default(),
-    )
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR);
-    result
-}
-
-#[derive(Clone)]
-pub struct CurrentUser {
-    pub email: String,
-    pub first_name: String,
-    pub last_name: String,
-    pub password_hash: String,
-}
-
-pub async fn authorize(mut req: Request, next: Next) -> Result<Response<Body>, AuthError> {
-    let auth_header = req.headers_mut().get(http::header::AUTHORIZATION);
-
-    let auth_header = match auth_header {
-        Some(header) => header.to_str().map_err(|_| AuthError {
-            message: "Empty header is not allowed".to_string(),
-            status_code: StatusCode::FORBIDDEN,
-        })?,
-        None => {
-            return Err(AuthError {
-                message: "Please add the JWT token to the header".to_string(),
-                status_code: StatusCode::FORBIDDEN,
-            })
-        }
+    let password_hash = match hash_password(&user_data.password) {
+        Ok(hash) => hash,
+        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
     };
 
-    let mut header = auth_header.split_whitespace();
+    let create_user_query = r#"
+        INSERT INTO users (name, email, password_hash)
+        VALUES (?, ?, ?)
+    "#;
 
-    let (bearer, token) = (header.next(), header.next());
+    let result = sqlx::query(create_user_query)
+        .bind(&user_data.name)
+        .bind(&user_data.email)
+        .bind(&password_hash)
+        .execute(db)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    let token_data = match decode_jwt(token.unwrap().to_string()) {
-        Ok(data) => data,
-        Err(_) => {
-            return Err(AuthError {
-                message: "Unable to decode token".to_string(),
-                status_code: StatusCode::UNAUTHORIZED,
-            })
-        }
+    let user_id = result.last_insert_id();
+
+    let select_user_query = "SELECT id, name, email FROM users WHERE id = ?;";
+
+    let user = sqlx::query_as::<_, (i32, String, String)>(select_user_query)
+        .bind(&user_id)
+        .fetch_one(db)
+        .await
+        .map_err(|_| StatusCode::UNAUTHORIZED)?;
+
+    let (id, name, email) = user;
+
+    let token = encode_jwt(&user_data.email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    let response = LoginResponse {
+        id,
+        token,
+        name,
+        email,
     };
 
-    // Fetch the user details from the database
-    let current_user = match retrieve_user_by_email(&token_data.claims.email) {
-        Some(user) => user,
-        None => {
-            return Err(AuthError {
-                message: "You are not an authorized user".to_string(),
-                status_code: StatusCode::UNAUTHORIZED,
-            })
-        }
-    };
-
-    req.extensions_mut().insert(current_user);
-    Ok(next.run(req).await)
+    Ok(Json(response))
 }
 
-#[derive(Deserialize)]
-pub struct SignInData {
-    pub email: String,
-    pub password: String,
-}
+pub async fn login(
+    Json(user_data): Json<LoginUser>,
+    db: &MySqlPool,
+) -> Result<Json<LoginResponse>, StatusCode> {
+    let user_query = "SELECT id, name, email, password_hash FROM users WHERE email = ?;";
 
-pub async fn login(Json(user_data): Json<SignInData>) -> Result<Json<String>, StatusCode> {
-    // 1. Retrieve user from the database
-    let user = match retrieve_user_by_email(&user_data.email) {
-        Some(user) => user,
-        None => return Err(StatusCode::UNAUTHORIZED), // User not found
-    };
+    let user = sqlx::query_as::<_, (i32, String, String, String)>(user_query)
+        .bind(&user_data.email)
+        .fetch_one(db)
+        .await
+        .map_err(|_| StatusCode::UNAUTHORIZED)?;
 
-    // 2. Compare the password
-    if !verify_password(&user_data.password, &user.password_hash)
+    let (id, name, email, password_hash) = user;
+
+    if !verify_password(&user_data.password, &password_hash)
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
-    // Handle bcrypt errors
     {
-        return Err(StatusCode::UNAUTHORIZED); // Wrong password
+        return Err(StatusCode::UNAUTHORIZED);
     }
 
-    // 3. Generate JWT
-    let token = encode_jwt(user.email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let token = encode_jwt(&email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    // 4. Return the token
-    Ok(Json(token))
-}
-
-fn retrieve_user_by_email(email: &str) -> Option<CurrentUser> {
-    let current_user: CurrentUser = CurrentUser {
-        email: "myemail@gmail.com".to_string(),
-        first_name: "Eze".to_string(),
-        last_name: "Sunday".to_string(),
-        password_hash: "$2b$12$Gwf0uvxH3L7JLfo0CC/NCOoijK2vQ/wbgP.LeNup8vj6gg31IiFkm".to_string(),
+    let response = LoginResponse {
+        id,
+        token,
+        name,
+        email,
     };
-    Some(current_user)
+
+    Ok(Json(response))
 }
