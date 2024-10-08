@@ -1,6 +1,4 @@
 extern crate backend;
-use axum::{routing::post, Router};
-use backend::services::auth_service::{login, register};
 use dotenv::dotenv;
 use sqlx::mysql::MySqlPoolOptions;
 
@@ -20,10 +18,7 @@ async fn main() {
         .await
         .expect("can't connect to database");
 
-    let app = Router::new()
-        .route("/register", post(register))
-        .route("/login", post(login))
-        .with_state(pool);
+    let app = backend::routes::auth_routes::app(pool);
 
     let listener = TcpListener::bind("127.0.0.1:8080")
         .await
