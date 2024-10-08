@@ -14,6 +14,18 @@ pub async fn register(
         return Err(StatusCode::BAD_REQUEST);
     }
 
+    let user_exists_query = "SELECT id FROM users WHERE email = ?;";
+
+    let existing_user = sqlx::query(user_exists_query)
+    .bind(&user_data.email)
+    .fetch_optional(&db) // Use fetch_optional to handle 0 or 1 result
+    .await
+    .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR))?;
+
+    if existing_user.is_some() {
+        return Err(StatusCode::CONFLICT);
+    }
+
     let password_hash = match hash_password(&user_data.password) {
         Ok(hash) => hash,
         Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
