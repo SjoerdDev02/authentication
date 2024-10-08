@@ -1,11 +1,14 @@
 use crate::models::auth_models::{LoginResponse, LoginUser, RegisterUser};
 use crate::utils::auth_utils::{encode_jwt, hash_password, verify_password};
-use axum::{extract::Json, http::StatusCode};
+use axum::{
+    extract::{Json, State},
+    http::StatusCode,
+};
 use sqlx::MySqlPool;
 
 pub async fn register(
+    State(db): State<MySqlPool>,
     Json(user_data): Json<RegisterUser>,
-    db: &MySqlPool,
 ) -> Result<Json<LoginResponse>, StatusCode> {
     if user_data.password != user_data.password_confirm {
         return Err(StatusCode::BAD_REQUEST);
@@ -25,7 +28,7 @@ pub async fn register(
         .bind(&user_data.name)
         .bind(&user_data.email)
         .bind(&password_hash)
-        .execute(db)
+        .execute(&db)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
@@ -35,7 +38,7 @@ pub async fn register(
 
     let user = sqlx::query_as::<_, (i32, String, String)>(select_user_query)
         .bind(&user_id)
-        .fetch_one(db)
+        .fetch_one(&db)
         .await
         .map_err(|_| StatusCode::UNAUTHORIZED)?;
 
@@ -54,14 +57,14 @@ pub async fn register(
 }
 
 pub async fn login(
+    State(db): State<MySqlPool>,
     Json(user_data): Json<LoginUser>,
-    db: &MySqlPool,
 ) -> Result<Json<LoginResponse>, StatusCode> {
     let user_query = "SELECT id, name, email, password_hash FROM users WHERE email = ?;";
 
     let user = sqlx::query_as::<_, (i32, String, String, String)>(user_query)
         .bind(&user_data.email)
-        .fetch_one(db)
+        .fetch_one(&db)
         .await
         .map_err(|_| StatusCode::UNAUTHORIZED)?;
 

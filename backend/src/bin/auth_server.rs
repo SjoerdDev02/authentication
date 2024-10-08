@@ -1,18 +1,29 @@
 extern crate backend;
-use backend::{models::auth_models::{LoginUser, RegisterUser}, services::auth_service::{login, register}};
+use axum::{routing::post, Router};
+use backend::services::auth_service::{login, register};
 use dotenv::dotenv;
-use axum::{routing::post, Json, Router};
+use sqlx::mysql::MySqlPoolOptions;
 
 use axum;
+use std::env;
 use tokio::net::TcpListener;
 
 #[tokio::main]
 async fn main() {
     dotenv().ok();
 
-    let db = backend::db::Db::new()
+    let database_url = env::var("DATABASE_URL")
+        .unwrap_or_else(|_| "mysql://name:password@localhost:3306/todo_list".to_string());
+
+    let pool = MySqlPoolOptions::new()
+        .connect(&database_url)
         .await
-        .expect("Failed to connect to the database");
+        .expect("can't connect to database");
+
+    let app = Router::new()
+        .route("/register", post(register))
+        .route("/login", post(login))
+        .with_state(pool);
 
     let listener = TcpListener::bind("127.0.0.1:8080")
         .await
@@ -20,9 +31,7 @@ async fn main() {
 
     println!("Listening on {}", listener.local_addr().unwrap());
 
-    let routes = backend::routes::auth_routes::routes(db);
-
-    axum::serve(listener, routes)
+    axum::serve(listener, app)
         .await
         .expect("Error serving application");
 }
