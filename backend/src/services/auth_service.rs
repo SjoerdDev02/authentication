@@ -1,4 +1,4 @@
-use crate::models::auth_models::{LoginResponse, LoginUser, RegisterUser};
+use crate::models::auth_models::{LoginResponse, LoginUser, RegisterUser, UpdateUser};
 use crate::utils::auth_utils::{encode_jwt, hash_password, verify_password};
 use axum::{
     extract::{Json, State},
@@ -98,4 +98,101 @@ pub async fn login(
     };
 
     Ok(Json(response))
+}
+
+pub async fn update(
+    State(db): State<MySqlPool>,
+    Json(user_data): Json<UpdateUser>,
+) -> Result<Json<LoginResponse>, StatusCode> {
+    let mut updated_user;
+
+    // Update name and email if provided
+    if !user_data.email.is_empty() && !user_data.name.is_empty() {
+        let user_query = r#"
+        UPDATE users 
+        SET email = ?, name = ?
+        WHERE id = ?;
+        "#;
+
+        updated_user = sqlx::query_as::<_, (i32, String, String, String)>(user_query)
+            .bind(&user_data.email)
+            .bind(&user_data.name)
+            .bind(&user_data.id)
+            .execute(&db)
+            .await
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    }
+
+    // Check and update the password if fields are provided
+    if !user_data.previous_password.is_empty() && !user_data.password.is_empty() && !user_data.password_confirm.is_empty() {
+        let previous_password_hash_query = "SELECT password_hash FROM users WHERE id = ?;";
+
+        let previous_password_hash = sqlx::query(previous_password_hash_query)
+            .bind(&user_data.id)
+            .fetch_one(&db)
+            .await
+            .map_err(|_| StatusCode::UNAUTHORIZED)?;
+
+        if !verify_password(&user_data.previous_password, &previous_password_hash.password_hash)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)? {
+            return Err(StatusCode::UNAUTHORIZED);
+        }
+
+        // Ensure new passwords match
+        if user_data.password != user_data.password_confirm {
+            return Err(StatusCode::BAD_REQUEST);
+        }
+
+        // Hash the new password
+        let password_hash = match hash_password(&user_data.password) {
+            Ok(hash) => hash,
+            Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
+        };
+
+        // Update password hash in database
+        let password_update_query = r#"
+        UPDATE users 
+        SET password_hash = ?
+        WHERE id = ?;
+        "#;
+
+        updated_user = sqlx::query_as::<_, (i32, String, String, String)>(password_update_query)
+            .bind(password_hash)
+            .bind(&user_data.id)
+            .execute(&db)
+            .await
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    }
+
+    // Generate a new JWT token after the update
+    let token = encode_jwt(&user_data.email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    // Return updated user info along with the token
+    let response = LoginResponse {
+        id: user_data.id,
+        token,
+        name: user_data.name.clone(),
+        email: user_data.email.clone(),
+    };
+
+    Ok(Json(response))
+}
+
+pub async fn delete(
+    State(db): State<MySqlPool>,
+    Json(user_id: i32): Json<i32>,
+    // Path(user_id): Path<i32>,
+) -> Result<StatusCode, StatusCode> {
+    let delete_query = r#"
+    DELETE FROM users 
+    WHERE id = ?;
+    "#;
+
+    sqlx::query(delete_query)
+        .bind(user_id)
+        .execute(&db)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    Ok(StatusCode::NO_CONTENT)
 }

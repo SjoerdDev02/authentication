@@ -12,17 +12,27 @@ pub struct CurrentUser {
 }
 
 #[derive(Serialize, Deserialize)]
+pub struct RegisterUser {
+    pub email: String,
+    pub name: String,
+    pub password: String,
+    pub password_confirm: String,
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct LoginUser {
     pub email: String,
     pub password: String,
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct RegisterUser {
-    pub email: String,
-    pub name: String,
-    pub password: String,
-    pub password_confirm: String,
+pub struct UpdateUser {
+    pub id: i32,
+    pub email: Option<String>,
+    pub name: Option<String>,
+    pub previous_password: Option<String>,
+    pub password: Option<String>,
+    pub password_confirm: Option<String>,
 }
 
 // Structure for holding claims data used in JWT tokens
