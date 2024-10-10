@@ -5,8 +5,9 @@ use axum::{
     http::StatusCode,
 };
 use sqlx::MySqlPool;
+use sqlx::Row;
 
-pub async fn register(
+pub async fn register_user(
     State(db): State<MySqlPool>,
     Json(user_data): Json<RegisterUser>,
 ) -> Result<Json<LoginResponse>, StatusCode> {
@@ -17,10 +18,10 @@ pub async fn register(
     let user_exists_query = "SELECT id FROM users WHERE email = ?;";
 
     let existing_user = sqlx::query(user_exists_query)
-    .bind(&user_data.email)
-    .fetch_optional(&db) // Use fetch_optional to handle 0 or 1 result
-    .await
-    .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR))?;
+        .bind(&user_data.email)
+        .fetch_optional(&db) // Use fetch_optional to handle 0 or 1 result
+        .await
+        .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR))?;
 
     if existing_user.is_some() {
         return Err(StatusCode::CONFLICT);
@@ -68,7 +69,7 @@ pub async fn register(
     Ok(Json(response))
 }
 
-pub async fn login(
+pub async fn login_user(
     State(db): State<MySqlPool>,
     Json(user_data): Json<LoginUser>,
 ) -> Result<Json<LoginResponse>, StatusCode> {
@@ -100,88 +101,97 @@ pub async fn login(
     Ok(Json(response))
 }
 
-pub async fn update(
+pub async fn update_user(
     State(db): State<MySqlPool>,
     Json(user_data): Json<UpdateUser>,
 ) -> Result<Json<LoginResponse>, StatusCode> {
-    let mut updated_user;
+    let mut updated_user: Option<(i32, String, String)> = None;
 
-    // Update name and email if provided
-    if !user_data.email.is_empty() && !user_data.name.is_empty() {
+    if user_data.email.is_some() && user_data.name.is_some() {
         let user_query = r#"
         UPDATE users 
         SET email = ?, name = ?
         WHERE id = ?;
         "#;
 
-        updated_user = sqlx::query_as::<_, (i32, String, String, String)>(user_query)
-            .bind(&user_data.email)
-            .bind(&user_data.name)
-            .bind(&user_data.id)
-            .execute(&db)
-            .await
-            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        updated_user = Some(
+            sqlx::query_as::<_, (i32, String, String)>(user_query)
+                .bind(&user_data.email)
+                .bind(&user_data.name)
+                .bind(&user_data.id)
+                .fetch_one(&db)
+                .await
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?,
+        );
     }
 
-    // Check and update the password if fields are provided
-    if !user_data.previous_password.is_empty() && !user_data.password.is_empty() && !user_data.password_confirm.is_empty() {
+    if let (Some(previous_password), Some(password), Some(password_confirm)) = (
+        &user_data.previous_password,
+        &user_data.password,
+        &user_data.password_confirm,
+    ) {
         let previous_password_hash_query = "SELECT password_hash FROM users WHERE id = ?;";
 
-        let previous_password_hash = sqlx::query(previous_password_hash_query)
+        let row = sqlx::query(previous_password_hash_query)
             .bind(&user_data.id)
             .fetch_one(&db)
             .await
             .map_err(|_| StatusCode::UNAUTHORIZED)?;
 
-        if !verify_password(&user_data.previous_password, &previous_password_hash.password_hash)
-            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)? {
+        let previous_password_hash: String = row
+            .try_get("password_hash")
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+        if !verify_password(previous_password, &previous_password_hash)
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        {
             return Err(StatusCode::UNAUTHORIZED);
         }
 
-        // Ensure new passwords match
-        if user_data.password != user_data.password_confirm {
+        if password != password_confirm {
             return Err(StatusCode::BAD_REQUEST);
         }
 
-        // Hash the new password
-        let password_hash = match hash_password(&user_data.password) {
+        let password_hash = match hash_password(password) {
             Ok(hash) => hash,
             Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
         };
 
-        // Update password hash in database
         let password_update_query = r#"
         UPDATE users 
         SET password_hash = ?
         WHERE id = ?;
         "#;
 
-        updated_user = sqlx::query_as::<_, (i32, String, String, String)>(password_update_query)
-            .bind(password_hash)
-            .bind(&user_data.id)
-            .execute(&db)
-            .await
-            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        updated_user = Some(
+            sqlx::query_as::<_, (i32, String, String)>(password_update_query)
+                .bind(password_hash)
+                .bind(&user_data.id)
+                .fetch_one(&db)
+                .await
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?,
+        );
     }
 
-    // Generate a new JWT token after the update
-    let token = encode_jwt(&user_data.email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    if let Some((id, name, email)) = updated_user {
+        let token = encode_jwt(&email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    // Return updated user info along with the token
-    let response = LoginResponse {
-        id: user_data.id,
-        token,
-        name: user_data.name.clone(),
-        email: user_data.email.clone(),
-    };
+        let response = LoginResponse {
+            id,
+            token,
+            name,
+            email,
+        };
 
-    Ok(Json(response))
+        Ok(Json(response))
+    } else {
+        Err(StatusCode::BAD_REQUEST)
+    }
 }
 
-pub async fn delete(
+pub async fn delete_user(
     State(db): State<MySqlPool>,
-    Json(user_id: i32): Json<i32>,
-    // Path(user_id): Path<i32>,
+    Json(user_id): Json<i32>,
 ) -> Result<StatusCode, StatusCode> {
     let delete_query = r#"
     DELETE FROM users 
