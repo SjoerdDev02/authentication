@@ -22,7 +22,7 @@ async fn main() {
 
     let listener = TcpListener::bind("127.0.0.1:8080")
         .await
-        .expect("Unable to conne to connect to the server");
+        .expect("Unable to connect to connect to the server");
 
     println!("Listening on {}", listener.local_addr().unwrap());
 

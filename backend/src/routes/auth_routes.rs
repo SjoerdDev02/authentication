@@ -1,9 +1,10 @@
-use axum::{routing::post, routing::patch, routing::delete, Router};
+use axum::{routing::delete, routing::patch, routing::post, Router};
 use sqlx::MySqlPool;
 
-use crate::services::auth_service::{login_user, register_user, update_user, delete_user};
+use crate::services::auth_service::{delete_user, login_user, register_user, update_user};
 
 pub fn app(pool: MySqlPool) -> Router {
+    println!("In the routerrr");
     let routes = Router::new()
         .route("/register", post(register_user))
         .route("/login", post(login_user))
