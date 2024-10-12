@@ -1,5 +1,9 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
+use redis::aio::Connection;
+use sqlx::MySqlPool;
+use std::sync::Arc;
+use tokio::sync::Mutex;
 
 #[derive(Serialize, Deserialize)]
 pub struct CurrentUser {
@@ -53,4 +57,10 @@ pub struct LoginResponse {
     pub id: i32,
     pub name: String,
     pub email: String,
+}
+
+#[derive(Clone)]
+pub struct AuthState {
+    pub db_pool: MySqlPool,
+    pub redis: Arc<Mutex<Connection>>,
 }

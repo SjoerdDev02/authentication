@@ -1,10 +1,12 @@
 extern crate backend;
+use backend::models::auth_models::AuthState;
 use dotenv::dotenv;
 use sqlx::mysql::MySqlPoolOptions;
 
 use axum;
-use std::env;
-use tokio::net::TcpListener;
+use std::{env, sync::Arc};
+use tokio::{net::TcpListener, sync::Mutex};
+use redis::Client;
 
 #[tokio::main]
 async fn main() {
@@ -16,9 +18,23 @@ async fn main() {
     let pool = MySqlPoolOptions::new()
         .connect(&database_url)
         .await
-        .expect("can't connect to database");
+        .expect("Unable to connect to database");
 
-    let app = backend::routes::auth_routes::app(pool);
+        let redis_client = Client::open("redis://127.0.0.1/").expect("Unable to connect to Redis");
+
+    let redis_connection = redis_client
+        .get_tokio_connection()
+        .await
+        .expect("Unable to connect to Redis");
+
+    let redis_connection = Arc::new(Mutex::new(redis_connection));
+
+    let state = AuthState {
+        db_pool: pool,
+        redis: redis_connection
+    };
+
+    let app = backend::routes::auth_routes::app(state);
 
     let listener = TcpListener::bind("127.0.0.1:8080")
         .await
