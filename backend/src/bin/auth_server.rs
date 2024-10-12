@@ -4,9 +4,9 @@ use dotenv::dotenv;
 use sqlx::mysql::MySqlPoolOptions;
 
 use axum;
+use redis::Client;
 use std::{env, sync::Arc};
 use tokio::{net::TcpListener, sync::Mutex};
-use redis::Client;
 
 #[tokio::main]
 async fn main() {
@@ -20,7 +20,7 @@ async fn main() {
         .await
         .expect("Unable to connect to database");
 
-        let redis_client = Client::open("redis://127.0.0.1/").expect("Unable to connect to Redis");
+    let redis_client = Client::open("redis://127.0.0.1/").expect("Unable to connect to Redis");
 
     let redis_connection = redis_client
         .get_tokio_connection()
@@ -31,7 +31,7 @@ async fn main() {
 
     let state = AuthState {
         db_pool: pool,
-        redis: redis_connection
+        redis: redis_connection,
     };
 
     let app = backend::routes::auth_routes::app(state);

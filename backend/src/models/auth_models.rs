@@ -1,6 +1,6 @@
 use chrono::NaiveDateTime;
-use serde::{Deserialize, Serialize};
 use redis::aio::Connection;
+use serde::{Deserialize, Serialize};
 use sqlx::MySqlPool;
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -41,6 +41,7 @@ pub struct UpdateUser {
 #[derive(Deserialize)]
 pub struct DeleteUser {
     pub id: i32,
+    pub jwt: String,
 }
 
 // Structure for holding claims data used in JWT tokens
@@ -52,7 +53,7 @@ pub struct Claims {
 }
 
 #[derive(Serialize)]
-pub struct LoginResponse {
+pub struct AuthResponse {
     pub token: String,
     pub id: i32,
     pub name: String,
