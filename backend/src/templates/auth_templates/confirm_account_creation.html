@@ -1,37 +1,66 @@
-<!doctype html>
-<html lang="en" class="no-js">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive HTML5 Page Layout Template</title>
+    <title>Account Authentication</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        footer {
+            text-align: center;
+            padding-top: 20px;
+            color: #7f8c8d;
+            font-size: 12px;
+        }
     </style>
 </head>
-
 <body>
-	<header>
-		<h1>Cr8s Daily digest</h1>
-	</header>
-	<section>
-		<strong>Please find below a list with the crates that were created the past 24hours.</strong>
-	</section>
-	<section id="pageContent">
-		<main role="main">
-      {% for crate in crates %}
-			<article>
-				<h2>{{ crate.name }} - <code>{{ crate.code }} {{ crate.version }}</code></h2>
-				<p>{{ crate.description }}</p>
-				<small>{{ crate.created_at }}</small>
-			</article>
-      {% endfor %}
-		</main>
-	</section>
-	<footer>
-		<p>&copy; {{ year }} Generated and sent by cr8s rust app</p>
-	</footer>
-
-
+    <div class="container">
+        <header>
+            <h1>Hello, {{ name }}!</h1>
+        </header>
+        <section>
+            <p>Thank you for registering. Please confirm your account by clicking the link below:</p>
+            <a href="{{ link }}" class="button">Confirm Account</a>
+        </section>
+        <footer>
+            <p>If you did not create this account, please ignore this email.</p>
+            <p>&copy; {{ year }} Your Company Name</p>
+        </footer>
+    </div>
 </body>
-
 </html>

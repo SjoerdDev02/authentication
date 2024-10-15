@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Deletion Notice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+        }
+        h1 {
+            color: #e74c3c;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        footer {
+            text-align: center;
+            padding-top: 20px;
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Account Deletion Confirmation</h1>
+        </header>
+        <section>
+            <p>Hello, {{ name }},</p>
+            <p>We are sorry to see you go! Your account has been successfully deleted. If this was a mistake or you would like to restore your account, you can do so by clicking the button below within the next 30 days:</p>
+            <a href="{{ link }}" class="button">Revive My Account</a>
+        </section>
+        <footer>
+            <p>If you did not request account deletion or have any concerns, please contact our support team.</p>
+            <p>&copy; {{ year }} Your Company Name</p>
+        </footer>
+    </div>
+</body>
+</html>
