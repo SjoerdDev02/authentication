@@ -2,10 +2,12 @@ use crate::constants::auth_constants::JWT_EXPIRATION_SECONDS;
 use crate::models::auth_models::{
     AuthResponse, AuthState, DeleteUser, LoginUser, RegisterUser, UpdateUser,
 };
+use crate::templates::auth_templates::generate_confirm_account_creation_email;
 use crate::utils::auth_utils::{
     create_user, delete_user_by_id, encode_jwt, format_jwt_token_key, get_user_by_email,
     get_user_by_id, update_user_email_and_name, update_user_password, verify_password,
 };
+use crate::utils::emails::send_email_with_template;
 use crate::utils::redis_utils::{get_token, set_token};
 use axum::{
     extract::{Json, State},
@@ -54,6 +56,12 @@ pub async fn register_user(
     let token = encode_jwt(&user_data.email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     set_token(&state, &jwt_key, &token, JWT_EXPIRATION_SECONDS).await;
+
+    let email_body = generate_confirm_account_creation_email(&name);
+
+    if let Err(_) = send_email_with_template(&email, "Confirm your account", &email_body).await {
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    }
 
     let response = AuthResponse {
         id,
