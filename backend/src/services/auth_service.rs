@@ -7,9 +7,7 @@ use crate::models::auth_models::{
 };
 use crate::templates::auth_templates::CONFIRM_ACCOUNT_CREATION_TEMPLATE;
 use crate::utils::auth_utils::{
-    create_otc, create_user, delete_user_by_id, encode_jwt, format_jwt_token_key, format_otc_key,
-    get_user_by_email, get_user_by_id, hash_password, update_user_email_and_name,
-    update_user_password, verify_password,
+    confirm_user, create_otc, create_user, delete_user_by_id, encode_jwt, format_jwt_token_key, format_otc_key, get_user_by_email, get_user_by_id, hash_password, update_user_email_and_name, update_user_password, verify_password
 };
 use crate::utils::emails::send_email_with_template;
 use crate::utils::redis_utils::{get_token, remove_token, set_token};
@@ -62,7 +60,22 @@ pub async fn register_user(
 
     set_token(&state, &jwt_key, &token, JWT_EXPIRATION_SECONDS).await;
 
-    let confirmation_code = create_otc();
+    let otc = create_otc();
+    let otc_key = format_otc_key(&otc);
+
+    let otc_payload = OtcPayload {
+        otc: otc.to_string(),
+        user_id: id,
+        action: "update_password".to_string(),
+        name: None,
+        email: None,
+        password_hash: None,
+    };
+
+    let otc_payload_json = serde_json::to_string(&otc_payload)
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
     template_variables.insert(
@@ -76,14 +89,14 @@ pub async fn register_user(
         "code_description",
         "Enter this code to confirm your account".to_string(),
     );
-    template_variables.insert("otc", confirmation_code.to_string());
+    template_variables.insert("otc", otc.to_string());
     template_variables.insert(
         "link_title",
         "You can also enter this link to confirm your account".to_string(),
     );
     template_variables.insert(
         "otc_link",
-        format!("http://example.com/confirm/{}", confirmation_code),
+        format!("http://example.com/confirm/{}", otc),
     );
     template_variables.insert(
         "footer_note",
@@ -158,6 +171,11 @@ pub async fn otc_user(
                 .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
         }
+        "confirm_user" => {
+            confirm_user(&state, &user_id)
+                .await
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        }
         _ => return Err(StatusCode::BAD_REQUEST),
     }
 
@@ -204,7 +222,7 @@ pub async fn login_user(
 pub async fn update_user(
     State(state): State<AuthState>,
     Json(user_data): Json<UpdateUser>,
-) -> Result<Json<AuthResponse>, StatusCode> {
+) -> Result<StatusCode, StatusCode> {
     let otc = create_otc();
     let otc_key = format_otc_key(&otc);
 
@@ -212,28 +230,26 @@ pub async fn update_user(
         let otc_payload = OtcPayload {
             otc: otc.to_string(),
             user_id: user_data.id,
-            action: "update_password".to_string(),
+            action: "update_name_and_email".to_string(),
             name: Some(name.to_string()),
             email: Some(email.to_string()),
             password_hash: None,
         };
 
         let otc_payload_json = serde_json::to_string(&otc_payload)
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-        set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
+        set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS)
+            .await;
     }
 
     if let (Some(password), Some(password_confirm)) = (&user_data.password, &user_data.password_confirm) {
         if password != password_confirm {
             return Err(StatusCode::BAD_REQUEST);
         }
-    
-        let password_hash = match hash_password(password) {
-            Ok(hash) => hash,
-            Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
-        };
-    
+
+        let password_hash = hash_password(password).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
         let otc_payload = OtcPayload {
             otc: otc.to_string(),
             user_id: user_data.id,
@@ -242,30 +258,40 @@ pub async fn update_user(
             email: None,
             password_hash: Some(password_hash),
         };
-    
+
         let otc_payload_json = serde_json::to_string(&otc_payload)
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    
-        set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
-    }    
 
-    let updated_user = match get_user_by_id(&state, &user_data.id).await {
+        set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS)
+            .await;
+    }
+
+    let old_user = match get_user_by_id(&state, &user_data.id).await {
         Ok(user) => user,
         Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
     };
 
-    let (id, name, email) = updated_user;
+    let (_, _, email) = old_user;
 
-    let token = encode_jwt(&email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let mut template_variables: HashMap<&str, String> = HashMap::new();
+    template_variables.insert("header_title", "Account Update Code".to_string());
+    template_variables.insert("code_description", "Enter this code to confirm you want to update your account".to_string());
+    template_variables.insert("otc", otc.to_string());
+    template_variables.insert("link_title", "You can also enter this link to confirm your account update".to_string());
+    template_variables.insert("otc_link", format!("http://example.com/confirm/{}", otc));
+    template_variables.insert("footer_note", "If you did not update your account, please ignore this email.".to_string());
 
-    let response = AuthResponse {
-        id,
-        token,
-        name,
-        email,
-    };
+    let email_body = generate_template(
+        CONFIRM_ACCOUNT_CREATION_TEMPLATE,
+        "Confirm account update",
+        template_variables,
+    ).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    Ok(Json(response))
+    if let Err(_) = send_email_with_template(&email, "Confirm your account action", &email_body).await {
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    }
+
+    Ok(StatusCode::OK)
 }
 
 pub async fn delete_user(

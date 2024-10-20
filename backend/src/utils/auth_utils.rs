@@ -1,8 +1,7 @@
 use crate::{
     models::auth_models::{AuthState, Claims},
     queries::auth_queries::{
-        CREATE_USER, DELETE_USER, GET_USER_BY_EMAIL, GET_USER_BY_ID, UPDATE_USER_EMAIL_AND_NAME,
-        UPDATE_USER_PASSWORD,
+        CONFIRM_USER, CREATE_USER, DELETE_USER, GET_USER_BY_EMAIL, GET_USER_BY_ID, UPDATE_USER_EMAIL_AND_NAME, UPDATE_USER_PASSWORD
     },
 };
 use axum::http::StatusCode;
@@ -149,17 +148,7 @@ pub async fn update_user_password(
     state: &AuthState,
     id: &i32,
     password_hash: &str,
-    // password_confirm: &str,
 ) -> Result<MySqlQueryResult, StatusCode> {
-    // if password != password_confirm {
-    //     return Err(StatusCode::BAD_REQUEST);
-    // }
-
-    // let password_hash = match hash_password(password) {
-    //     Ok(hash) => hash,
-    //     Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
-    // };
-
     let update_user_result = sqlx::query(UPDATE_USER_PASSWORD)
         .bind(password_hash)
         .bind(id)
@@ -181,4 +170,17 @@ pub async fn delete_user_by_id(
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR);
 
     delete_user_result
+}
+
+pub async fn confirm_user(
+    state: &AuthState,
+    id: &i32,
+) -> Result<MySqlQueryResult, StatusCode> {
+    let confirm_user_result = sqlx::query(CONFIRM_USER)
+        .bind(id)
+        .execute(&state.db_pool)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR);
+
+    confirm_user_result
 }
