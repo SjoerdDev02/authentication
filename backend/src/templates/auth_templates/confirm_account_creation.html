@@ -3,64 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Authentication</title>
+    <title>{{ header_title }}</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-            color: #333;
+        :root {
+            /* Spacers */
+            --spacer-100: 4px;
+            --spacer-200: 8px;
+            --spacer-300: 12px;
+            --spacer-400: 16px; 
+            --spacer-500: 20px;  
+            --spacer-600: 24px;  
+            --spacer-700: 28px;
+            --spacer-800: 32px; 
+            --spacer-900: 36px;
+
+            /* Font Sizes */
+            --font-size-100: 0.8rem;
+            --font-size-200: 1rem;
+            --font-size-300: 1.2rem;
+            --font-size-400: 1.4rem;
+            --font-size-500: 1.6rem;
+            --font-size-600: 1.8rem;
+            --font-size-700: 2rem;
+            --font-size-800: 2.2rem;
+            --font-size-900: 2.4rem;
+
+            /* Font Weights */
+            --font-weight-100: 100;
+            --font-weight-200: 200;
+            --font-weight-300: 300;
+            --font-weight-400: 400; /* Normal */
+            --font-weight-500: 500;
+            --font-weight-600: 600; /* Semi-bold */
+            --font-weight-700: 700; /* Bold */
+            --font-weight-800: 800;
+            --font-weight-900: 900;
+
+            /* Border Radii */
+            --border-radius-0: 0;
+            --border-radius-100: 4px;
+            --border-radius-200: 8px;
+            --border-radius-300: 12px;
+            --border-radius-400: 16px;
+            --border-radius-500: 20px;
+            --border-radius-round: 50%;
+
+            /* Transition Durations */
+            --transition-duration-short: 0.3s;
+            --transition-duration-medium: 0.5s;
+            --transition-duration-long: 1s;
+
+            /* Primary Colors */
+            --color-primary-100: hsl(200, 30%, 90%);
+            --color-primary-200: hsl(200, 39%, 80%);
+            --color-primary-300: hsl(200, 48%, 70%);
+            --color-primary-400: hsl(200, 56%, 65%);
+            --color-primary-500: hsl(200, 65%, 60%);
+            --color-primary-600: hsl(200, 74%, 50%);
+            --color-primary-700: hsl(200, 82%, 40%);
+            --color-primary-800: hsl(200, 91%, 35%);
+            --color-primary-900: hsl(200, 100%, 30%);
+
+            /* Grayscale Colors */
+            --color-grayscale-50: hsl(0, 0%, 100%);
+            --color-grayscale-100: hsl(0, 0%, 94%);
+            --color-grayscale-200: hsl(0, 0%, 88%);
+            --color-grayscale-300: hsl(0, 0%, 76%);
+            --color-grayscale-400: hsl(0, 0%, 64%);
+            --color-grayscale-500: hsl(0, 0%, 52%);
+            --color-grayscale-600: hsl(0, 0%, 42%);
+            --color-grayscale-700: hsl(0, 0%, 32%);
+            --color-grayscale-800: hsl(0, 0%, 16%);
+            --color-grayscale-900: hsl(0, 0%, 0%);
+
+            /* Success Colors */
+            --color-success-100: hsl(150, 30%, 90%);
+            --color-success-200: hsl(150, 39%, 80%);
+            --color-success-300: hsl(150, 48%, 70%);
+            --color-success-400: hsl(150, 56%, 65%);
+            --color-success-500: hsl(150, 65%, 60%);
+            --color-success-600: hsl(150, 74%, 50%);
+            --color-success-700: hsl(150, 82%, 40%);
+            --color-success-800: hsl(150, 91%, 35%);
+            --color-success-900: hsl(150, 100%, 30%);
+
+            /* Warning Colors */
+            --color-warning-100: hsl(35, 30%, 90%);
+            --color-warning-200: hsl(35, 39%, 80%);
+            --color-warning-300: hsl(35, 48%, 70%);
+            --color-warning-400: hsl(35, 56%, 65%);
+            --color-warning-500: hsl(35, 65%, 60%);
+            --color-warning-600: hsl(35, 74%, 50%);
+            --color-warning-700: hsl(35, 82%, 40%);
+            --color-warning-800: hsl(35, 91%, 35%);
+            --color-warning-900: hsl(35, 100%, 30%);
+
+            /* Error Colors */
+            --color-error-100: hsl(0, 30%, 90%);
+            --color-error-200: hsl(0, 39%, 80%);
+            --color-error-300: hsl(0, 48%, 70%);
+            --color-error-400: hsl(0, 56%, 65%);
+            --color-error-500: hsl(0, 65%, 60%);
+            --color-error-600: hsl(0, 74%, 50%);
+            --color-error-700: hsl(0, 82%, 40%);
+            --color-error-800: hsl(0, 91%, 35%);
+            --color-error-900: hsl(0, 100%, 30%);
+
+            /* Box shadow */
+            --box-shadow: 0px 4px 8px rgba(0, 0, 0, .1);
+            --box-shadow-small: 0px 2px 4px rgba(0, 0, 0, .1);
         }
+
         .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            padding: 20px;
-            border: 1px solid #e0e0e0;
+            display: flex;
+            gap: var(--spacer-500);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
-        h1 {
-            color: #2c3e50;
+
+        .container--sub {
+            gap: var(--spacer-200);
         }
-        p {
-            font-size: 16px;
-            line-height: 1.5;
+
+        .container--primary {
+            gap: var(--spacer-200);
+            background-color: var(--color-primary-500);
         }
-        a {
-            color: #3498db;
-            text-decoration: none;
-            font-weight: bold;
+
+        .container--outlined {
+            gap: var(--spacer-200);
+            border: 1px solid var(--color-grayscale-700);
         }
-        .button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 20px;
-            background-color: #3498db;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
+
+        .link {
+            font-size: var(--font-size-200);
+            font-weight: var(--font-weight-500);
+            color: var(--color-grayscale-500);
         }
-        footer {
-            text-align: center;
-            padding-top: 20px;
-            color: #7f8c8d;
-            font-size: 12px;
+
+        .link--xs {
+            font-size: var(--font-size-100);
+        }
+
+        .link--lg {
+            font-size: var(--font-size-300);
+        }
+
+        .link--primary {
+            color: var(--color-primary-500);
+        }
+
+        .link--thin {
+            font-weight: var(--font-weight-200);
+        }
+
+        .link--bold {
+            font-weight: var(--font-weight-700);
+        }
+
+        .divider {
+            height: 1px;
+            width: 100%;
+            background-color: var(--color-grayscale-500);
+        }
+
+        .divider--primary {
+            background-color: var(--color-primary-500);
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Hello, {{ name }}!</h1>
-        </header>
-        <section>
-            <p>Thank you for registering. Please confirm your account by clicking the link below:</p>
-            <a href="{{ link }}" class="button">Confirm Account</a>
-        </section>
-        <footer>
-            <p>If you did not create this account, please ignore this email.</p>
-            <p>&copy; {{ year }} { company_name }</p>
-        </footer>
+<body class="container">
+    <header class="header">
+        <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" clip-rule="evenodd" d="M3.17157 5.17157C2 6.34315 2 8.22876 2 12C2 15.7712 2 17.6569 3.17157 18.8284C4.34315 20 6.22876 20 10 20H14C17.7712 20 19.6569 20 20.8284 18.8284C22 17.6569 22 15.7712 22 12C22 8.22876 22 6.34315 20.8284 5.17157C19.6569 4 17.7712 4 14 4H10C6.22876 4 4.34315 4 3.17157 5.17157ZM12.7502 10C12.7502 9.58579 12.4144 9.25 12.0002 9.25C11.586 9.25 11.2502 9.58579 11.2502 10V10.7012L10.6428 10.3505C10.2841 10.1434 9.8254 10.2663 9.61829 10.625C9.41119 10.9837 9.53409 11.4424 9.89281 11.6495L10.4997 11.9999L9.89258 12.3505C9.53386 12.5576 9.41095 13.0163 9.61806 13.375C9.82517 13.7337 10.2839 13.8566 10.6426 13.6495L11.2502 13.2987V14C11.2502 14.4142 11.586 14.75 12.0002 14.75C12.4144 14.75 12.7502 14.4142 12.7502 14V13.2993L13.3569 13.6495C13.7156 13.8566 14.1743 13.7337 14.3814 13.375C14.5885 13.0163 14.4656 12.5576 14.1069 12.3505L13.4997 11.9999L14.1067 11.6495C14.4654 11.4424 14.5883 10.9837 14.3812 10.625C14.1741 10.2663 13.7154 10.1434 13.3567 10.3505L12.7502 10.7006V10Z" fill="#1C274C"/>
+        </svg>
+
+        <h1 class="header-title">{{ header_title }}</h1>
+    </header>
+
+    <hr class="divider" />
+
+    <div class="container container--sub">
+        <span class="label">{{ code_description }}</span>
+
+        <div class="container container--outlined">
+            <span>{{ otc }}</span>
+        </div>
     </div>
+
+    <div class="container container--sub">
+        <span class="label">{{ link_title }}</span>
+
+        <div class="container container--primary">
+            <a class="label label--primary">{{ otc_link }}</a>
+        </div>
+    </div>
+
+    <hr class="divider" />
+
+    <footer class="container container--sub">
+        <span class="label label--xs">{{ footer_note }}</span>
+        <span class="label label--xs">&copy; {{ year }} { company_name }</span>
+    </footer>
 </body>
 </html>

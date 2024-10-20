@@ -5,7 +5,7 @@ use tera::{Context, Tera};
 pub fn generate_template(
     template: &str,
     template_name: &str,
-    variables: HashMap<&str, &str>,
+    variables: HashMap<&str, String>,
 ) -> Result<String, tera::Error> {
     let mut tera = Tera::new("templates/**/*")?;
 
@@ -16,7 +16,7 @@ pub fn generate_template(
     context.insert("company_name", "Authentication Inc.");
 
     for (key, value) in variables {
-        context.insert(key, value);
+        context.insert(key, &value);
     }
 
     let rendered = tera.render(template_name, &context)?;

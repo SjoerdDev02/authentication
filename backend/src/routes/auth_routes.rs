@@ -2,7 +2,7 @@ use axum::{routing::delete, routing::patch, routing::post, Router};
 
 use crate::{
     models::auth_models::AuthState,
-    services::auth_service::{delete_user, login_user, register_user, update_user},
+    services::auth_service::{delete_user, login_user, otc_user, register_user, update_user},
 };
 
 pub fn app(state: AuthState) -> Router {
@@ -11,6 +11,7 @@ pub fn app(state: AuthState) -> Router {
         .route("/login", post(login_user))
         .route("/update", patch(update_user))
         .route("/delete", delete(delete_user))
+        .route("/otc", patch(otc_user))
         .with_state(state);
 
     return routes;

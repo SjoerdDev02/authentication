@@ -9,6 +9,8 @@ use axum::http::StatusCode;
 use bcrypt::{hash, verify, DEFAULT_COST};
 use chrono::{Duration, Utc};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, TokenData, Validation};
+use rand::distributions::Alphanumeric;
+use rand::{thread_rng, Rng};
 use sqlx::mysql::MySqlQueryResult;
 
 pub fn verify_password(password: &str, hash: &str) -> Result<bool, bcrypt::BcryptError> {
@@ -59,6 +61,23 @@ pub fn format_jwt_token_key(id: &i32) -> String {
     let token = format!("jwt:{}", id);
 
     token
+}
+
+pub fn format_otc_key(otc: &str) -> String {
+    let otc_key = format!("otc:{}", otc);
+
+    otc_key
+}
+
+pub fn create_otc() -> String {
+    let otc: String = thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(6)
+        .map(char::from)
+        .map(|c| c.to_ascii_uppercase())
+        .collect();
+
+    otc
 }
 
 pub async fn get_user_by_email(
@@ -129,17 +148,17 @@ pub async fn update_user_email_and_name(
 pub async fn update_user_password(
     state: &AuthState,
     id: &i32,
-    password: &str,
-    password_confirm: &str,
+    password_hash: &str,
+    // password_confirm: &str,
 ) -> Result<MySqlQueryResult, StatusCode> {
-    if password != password_confirm {
-        return Err(StatusCode::BAD_REQUEST);
-    }
+    // if password != password_confirm {
+    //     return Err(StatusCode::BAD_REQUEST);
+    // }
 
-    let password_hash = match hash_password(password) {
-        Ok(hash) => hash,
-        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
-    };
+    // let password_hash = match hash_password(password) {
+    //     Ok(hash) => hash,
+    //     Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
+    // };
 
     let update_user_result = sqlx::query(UPDATE_USER_PASSWORD)
         .bind(password_hash)

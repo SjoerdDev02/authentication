@@ -13,7 +13,7 @@ async fn main() {
     dotenv().ok();
 
     let database_url = env::var("DATABASE_URL")
-        .unwrap_or_else(|_| "mysql://name:password@localhost:3306/todo_list".to_string());
+        .unwrap_or_else(|_| "mysql://name:password@localhost:3306/authentication".to_string());
 
     let pool = MySqlPoolOptions::new()
         .connect(&database_url)

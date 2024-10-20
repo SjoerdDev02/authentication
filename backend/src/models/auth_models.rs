@@ -11,14 +11,15 @@ pub struct CurrentUser {
     pub name: String,
     pub email: String,
     pub password_hash: String,
+    pub is_confirmed: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct RegisterUser {
-    pub email: String,
     pub name: String,
+    pub email: String,
     pub password: String,
     pub password_confirm: String,
 }
@@ -32,8 +33,8 @@ pub struct LoginUser {
 #[derive(Serialize, Deserialize)]
 pub struct UpdateUser {
     pub id: i32,
-    pub email: Option<String>,
     pub name: Option<String>,
+    pub email: Option<String>,
     pub password: Option<String>,
     pub password_confirm: Option<String>,
 }
@@ -52,10 +53,31 @@ pub struct Claims {
     pub email: String, // Email associated with the token
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct Otc {
+    pub otc: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct OtcPayload {
+    pub otc: String,
+    pub user_id: i32,
+    pub action: String,
+    pub email: Option<String>,
+    pub name: Option<String>,
+    pub password_hash: Option<String>,
+}
+
 #[derive(Serialize)]
 pub struct AuthResponse {
     pub token: String,
     pub id: i32,
+    pub name: String,
+    pub email: String,
+}
+
+#[derive(Serialize)]
+pub struct MinifiedAuthResponse {
     pub name: String,
     pub email: String,
 }
