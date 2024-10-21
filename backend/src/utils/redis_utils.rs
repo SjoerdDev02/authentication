@@ -1,4 +1,5 @@
 use crate::models::auth_models::AuthState;
+use axum::http::StatusCode;
 use redis::AsyncCommands;
 
 pub async fn set_token(state: &AuthState, key: &str, value: &str, expiration_seconds: i32) {
@@ -27,4 +28,15 @@ pub async fn remove_token(state: &AuthState, key: &str) -> Result<(), redis::Red
     let _: () = redis_con.del(key).await?;
 
     Ok(())
+}
+
+pub async fn verify_token(state: &AuthState, key: &str) -> Result<(), StatusCode> {
+    let token = get_token(state, key)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    match token {
+        Some(_) => Ok(()),
+        None => Err(StatusCode::UNAUTHORIZED),
+    }
 }

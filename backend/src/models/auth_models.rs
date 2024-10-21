@@ -63,8 +63,8 @@ pub struct OtcPayload {
     pub otc: String,
     pub user_id: i32,
     pub action: String,
-    pub email: Option<String>,
     pub name: Option<String>,
+    pub email: Option<String>,
     pub password_hash: Option<String>,
 }
 
