@@ -5,7 +5,9 @@ use crate::models::auth_models::{
     AuthResponse, AuthState, DeleteUser, LoginUser, MinifiedAuthResponse, Otc, OtcPayload,
     RegisterUser, UpdateUser,
 };
-use crate::templates::auth_templates::CONFIRM_ACCOUNT_CREATION_TEMPLATE;
+use crate::templates::auth_templates::{
+    VERIFICATION_CODE_SUCCESS_TEMPLATE, VERIFICATION_CODE_TEMPLATE,
+};
 use crate::utils::auth_utils::{
     confirm_user, create_otc, create_user, delete_user_by_id, encode_jwt, format_jwt_token_key,
     format_otc_key, get_user_by_email, get_user_by_id, hash_password, update_user_email_and_name,
@@ -103,7 +105,7 @@ pub async fn register_user(
     );
 
     let email_body = generate_template(
-        CONFIRM_ACCOUNT_CREATION_TEMPLATE,
+        VERIFICATION_CODE_TEMPLATE,
         "Confirm account creation",
         template_variables,
     )
@@ -150,12 +152,29 @@ pub async fn otc_user(
     let name = token_payload.name;
     let password_hash = token_payload.password_hash;
 
+    let mut template_variables: HashMap<&str, String> = HashMap::new();
+    let mut template_name = "";
+
     match action.as_str() {
         "update_name_and_email" => {
             if let (Some(name), Some(email)) = (&name, &email) {
                 update_user_email_and_name(&state, &user_id, name, email)
                     .await
                     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+                template_name = "Successfully updated account";
+
+                template_variables.insert(
+                    "header_title",
+                    format!(
+                        "Congratulations {}! You've successfully updated your account",
+                        name
+                    ),
+                );
+                template_variables.insert(
+                    "footer_note",
+                    "If you did not create this account, please ignore this email.".to_string(),
+                );
             }
         }
         "update_password" => {
@@ -163,17 +182,51 @@ pub async fn otc_user(
                 update_user_password(&state, &user_id, password_hash)
                     .await
                     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+                template_name = "Successfully updated account";
+
+                template_variables.insert(
+                    "header_title",
+                    "Congratulations! You've successfully updated your account".to_string(),
+                );
+                template_variables.insert(
+                    "footer_note",
+                    "If you did not update this account, please contact us.".to_string(),
+                );
             }
         }
         "delete_account" => {
             delete_user_by_id(&state, &user_id)
                 .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+            template_name = "Successfully deleted account";
+
+            template_variables.insert(
+                "header_title",
+                "We're sorry to see you go {}. You've successfully deleted your account"
+                    .to_string(),
+            );
+            template_variables.insert(
+                "footer_note",
+                "If you did not delete your account, please contact us.".to_string(),
+            );
         }
         "confirm_account" => {
             confirm_user(&state, &user_id)
                 .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+            template_name = "Successfully confirmed account";
+
+            template_variables.insert(
+                "header_title",
+                "Congratulations {}! You've successfully confirmed your account".to_string(),
+            );
+            template_variables.insert(
+                "footer_note",
+                "If you did not confirm your account, please contact us.".to_string(),
+            );
         }
         _ => return Err(StatusCode::BAD_REQUEST),
     }
@@ -182,6 +235,17 @@ pub async fn otc_user(
         Ok(user) => user,
         Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
     };
+
+    let email_body = generate_template(
+        VERIFICATION_CODE_SUCCESS_TEMPLATE,
+        &template_name,
+        template_variables,
+    )
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    if let Err(_) = send_email_with_template(&email, &template_name, &email_body).await {
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    }
 
     Ok(Json(MinifiedAuthResponse { name, email }))
 }
@@ -287,18 +351,18 @@ pub async fn update_user(
     template_variables.insert("otc_link", format!("http://example.com/confirm/{}", otc));
     template_variables.insert(
         "footer_note",
-        "If you did not update your account, please ignore this email.".to_string(),
+        "If you did not intend to update your account, please ignore this email.".to_string(),
     );
 
     let email_body = generate_template(
-        CONFIRM_ACCOUNT_CREATION_TEMPLATE,
+        VERIFICATION_CODE_TEMPLATE,
         "Confirm account update",
         template_variables,
     )
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     if let Err(_) =
-        send_email_with_template(&email, "Confirm your account action", &email_body).await
+        send_email_with_template(&email, "Confirm your account update", &email_body).await
     {
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     }
@@ -342,28 +406,27 @@ pub async fn delete_user(
     template_variables.insert("header_title", "Account Update Code".to_string());
     template_variables.insert(
         "code_description",
-        "Enter this code to confirm you want to update your account".to_string(),
+        "Enter this code to confirm you want to delete your account".to_string(),
     );
     template_variables.insert("otc", otc.to_string());
     template_variables.insert(
         "link_title",
-        "You can also enter this link to confirm your account update".to_string(),
+        "You can also enter this link to delete your account".to_string(),
     );
     template_variables.insert("otc_link", format!("http://example.com/confirm/{}", otc));
     template_variables.insert(
         "footer_note",
-        "If you did not update your account, please ignore this email.".to_string(),
+        "If you did not intend to delete your account, please ignore this email.".to_string(),
     );
 
     let email_body = generate_template(
-        CONFIRM_ACCOUNT_CREATION_TEMPLATE,
-        "Confirm account update",
+        VERIFICATION_CODE_TEMPLATE,
+        "Confirm account deletion",
         template_variables,
     )
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    if let Err(_) =
-        send_email_with_template(&email, "Confirm your account action", &email_body).await
+    if let Err(_) = send_email_with_template(&email, "Confirm account deletion", &email_body).await
     {
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     }
