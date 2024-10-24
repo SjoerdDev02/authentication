@@ -4,147 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ header_title }}</title>
-    <style>
-        /* Spacers */
-        .spacer-100 { padding: 4px; }
-        .spacer-200 { padding: 8px; }
-        .spacer-300 { padding: 12px; }
-        .spacer-400 { padding: 16px; }
-        .spacer-500 { padding: 20px; }
-        .spacer-600 { padding: 24px; }
-        .spacer-700 { padding: 28px; }
-        .spacer-800 { padding: 32px; }
-
-        /* Font Sizes */
-        .font-size-100 { font-size: 0.8rem; }
-        .font-size-200 { font-size: 1rem; }
-        .font-size-300 { font-size: 1.2rem; }
-
-        /* Font Weights */
-        .font-weight-200 { font-weight: 200; }
-        .font-weight-500 { font-weight: 500; }
-        .font-weight-700 { font-weight: 700; }
-
-        /* Colors */
-        .color-primary-500 { color: hsl(200, 65%, 60%); }
-        .color-grayscale-500 { color: hsl(0, 0%, 52%); }
-        .bg-primary-500 { background-color: hsl(200, 65%, 60%); }
-        .bg-grayscale-500 { background-color: hsl(0, 0%, 52%); }
-
-        /* Border */
-        .border-grayscale-700 { border: 1px solid rgb(82, 82, 82); }
-
-        /* Box Shadows */
-        .box-shadow { box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); }
-
-        /* Divider */
-        .divider {
-            height: 1px;
-            width: 100%;
-        }
-
-        .divider--grayscale {
-            background-color: rgb(133, 133, 133);
-        }
-
-        /* Table layout */
-        .container {
-            width: 100%;
-            text-align: center;
-        }
-
-        .container table {
-            margin: 0 auto;
-        }
-
-        .container--sub table,
-        .container--outlined table {
-            margin-bottom: 8px;
-        }
-
-        .container--outlined {
-            border: 1px solid rgb(82, 82, 82);
-            padding: 8px;
-        }
-
-        .container--primary {
-            background-color: rgb(87, 175, 219);
-            padding: 8px;
-        }
-
-        .link {
-            font-size: 1rem;
-            font-weight: 500;
-        }
-
-        .link--grayscale {
-            color: rgb(133, 133, 133);
-        }
-
-        .link--primary {
-            color: rgb(87, 175, 219);
-        }
-    </style>
 </head>
-<body class="container">
-    <header class="container">
-        <table>
-            <tr>
-                <td>
-                    <img src="{{ image_url }}" alt="Verification Image">
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <h1>{{ header_title }}</h1>
-                </td>
-            </tr>
-        </table>
-    </header>
+<body style="margin:0; padding:0; background-color:#EADDD2; text-align:center; width:100%;">
+    
+    <!-- Header -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#EADDD2; text-align:center; padding: 12px;">
+        <tr>
+            <td>
+                <img src="{{ image_url }}" alt="Verification Image" style="max-width:100%; height:auto;" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h1 style="font-size:1.2rem; color:#252525;">{{ header_title }}</h1>
+            </td>
+        </tr>
+    </table>
 
-    <hr class="divider divider--grayscale" />
+    <!-- Divider -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#252525; height:1px;">
+        <tr><td></td></tr>
+    </table>
 
-    <div class="container container--sub">
-        <table>
-            <tr>
-                <td>
-                    <span class="label">{{ code_description }}</span>
-                </td>
-            </tr>
-            <tr>
-                <td class="container--outlined">
-                    <span>{{ otc }}</span>
-                </td>
-            </tr>
-        </table>
-    </div>
+    <!-- Content Block -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#EADDD2; text-align:center; padding: 12px;">
+        <tr>
+            <td style="padding:8px 0;">
+                <span style="font-size:0.8rem; color:#252525;">{{ code_description }}</span>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding:8px 0;">
+                <span style="font-size:1rem; font-weight: 700; color:#252525;">{{ otc }}</span>
+            </td>
+        </tr>
+    </table>
 
-    <div class="container container--sub">
-        <table>
-            <tr>
-                <td>
-                    <span class="label">{{ link_title }}</span>
-                </td>
-            </tr>
-            <tr>
-                <td class="container--primary">
-                    <a href="#" class="label link link--primary">{{ otc_link }}</a>
-                </td>
-            </tr>
-        </table>
-    </div>
+    <!-- Button Section -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#EADDD2; text-align:center; padding: 12px;">
+        <tr>
+            <td style="padding:8px 0;">
+                <span style="font-size:0.8rem; color:#252525;">{{ link_title }}</span>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding:8px 0;">
+                <table cellpadding="0" cellspacing="0" border="0" align="center" style="background-color:#252525; padding:8px;">
+                    <tr>
+                        <td>
+                            <a href="{{ otc_link }}" style="font-size:1rem; font-weight: 700; color:#EADDD2; text-decoration:none;">{{ otc_link }}</a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
 
-    <hr class="divider divider--grayscale" />
+    <!-- Divider -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#252525; height:1px;">
+        <tr><td></td></tr>
+    </table>
 
-    <footer class="container container--sub">
-        <table>
-            <tr>
-                <td class="font-size-100">{{ footer_note }}</td>
-            </tr>
-            <tr>
-                <td class="font-size-100">&copy; {{ year }} {{ company_name }}</td>
-            </tr>
-        </table>
-    </footer>
+    <!-- Footer -->
+    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#EADDD2; text-align:center; padding: 12px;">
+        <tr>
+            <td style="padding:8px 0; font-size:0.8rem; color:#252525;">
+                {{ footer_note }}
+            </td>
+        </tr>
+        <tr>
+            <td style="padding:8px 0; font-size:0.8rem; color:#252525;">
+                &copy; {{ year }} {{ company_name }}
+            </td>
+        </tr>
+    </table>
+
 </body>
 </html>
