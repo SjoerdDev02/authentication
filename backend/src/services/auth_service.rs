@@ -82,6 +82,7 @@ pub async fn register_user(
     set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
+    template_variables.insert("image_url", "/static/images/code_image.png".to_string());
     template_variables.insert(
         "header_title",
         format!(
