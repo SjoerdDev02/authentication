@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::Read;
 
 use crate::constants::auth_constants::{JWT_EXPIRATION_SECONDS, OTC_EXPIRATION_SECONDS};
 use crate::models::auth_models::{
@@ -20,6 +22,8 @@ use axum::{
     extract::{Json, State},
     http::StatusCode,
 };
+use base64::prelude::BASE64_STANDARD;
+use base64::Engine;
 
 pub async fn register_user(
     State(state): State<AuthState>,
@@ -82,7 +86,12 @@ pub async fn register_user(
     set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
-    template_variables.insert("image_url", "/static/images/code_image.png".to_string());
+    let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
+    let mut image_data = Vec::new();
+    image_file.read_to_end(&mut image_data).expect("Failed to read image");
+    let base64_image = BASE64_STANDARD.encode(&image_data);
+    let image_data_url = format!("data:image/png;base64,{}", base64_image);
+    template_variables.insert("image_url", image_data_url);
     template_variables.insert(
         "header_title",
         format!(
@@ -111,6 +120,8 @@ pub async fn register_user(
         template_variables,
     )
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    println!("{}", email_body);
 
     if let Err(_) = send_email_with_template(&email, "Confirm your account", &email_body).await {
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
