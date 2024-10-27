@@ -1,5 +1,5 @@
 # Use Node image compatible with ARM (for M1/M2 Macs)
-FROM --platform=linux/amd64 node:18-alpine
+FROM node:18-alpine
 
 # Set working directory in container
 WORKDIR /app

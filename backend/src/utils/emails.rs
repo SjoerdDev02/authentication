@@ -23,8 +23,8 @@ pub async fn send_email_with_template(
         .body(body.to_string())
         .unwrap();
 
-    let env_email = env::var("MY_EMAIL").map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    let env_password = env::var("MY_PASSWORD").map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let env_email = env::var("EMAIL_USER").map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let env_password = env::var("EMAIL_PASSWORD").map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     let creds = Credentials::new(env_email, env_password);
 
