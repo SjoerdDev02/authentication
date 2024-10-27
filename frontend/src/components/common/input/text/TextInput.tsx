@@ -5,6 +5,7 @@ import styles from './TextInput.module.scss';
 type TextInputProps = {
     disabled?: boolean;
     name?: string;
+	// eslint-disable-next-line no-unused-vars
     onChange: (value: string) => void;
     placeholder?: string;
     value: string;

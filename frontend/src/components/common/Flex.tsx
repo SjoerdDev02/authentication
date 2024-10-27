@@ -66,6 +66,7 @@ type AlignItemsOptions =
 type FlexWrapOptions = 'wrap' | 'nowrap' | 'wrap-reverse';
 
 type FlexProps = {
+	// eslint-disable-next-line no-unused-vars
 	onClick?: (item?: any) => void;
 	style?: CSSProperties;
 	as?: keyof JSX.IntrinsicElements;

@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 import { KeyboardKeys } from '@/types/KeyboardKeys';
 
+// eslint-disable-next-line no-unused-vars
 export function useTriggerOnKeydown(key: KeyboardKeys, callbackFunction: (e: KeyboardEvent) => void, constraint: boolean = true) {
 	useEffect(() => {
 		const confirmOnKeydown = (e: KeyboardEvent) => {

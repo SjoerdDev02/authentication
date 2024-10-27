@@ -11,6 +11,7 @@ export type TabPillItemType = {
 type TabPillProps = {
 	activeValue: any;
 	items: TabPillItemType[];
+	// eslint-disable-next-line no-unused-vars
 	onChangeValue: (value: any) => void;
 };
 

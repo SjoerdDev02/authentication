@@ -5,6 +5,7 @@ import styles from './RangeInput.module.scss';
 type RangeInputPropsType = {
     maxValue: number;
     minValue: number;
+	// eslint-disable-next-line no-unused-vars
     onChange: (e: ChangeEvent<HTMLInputElement>) => void;
     value: number;
 }
