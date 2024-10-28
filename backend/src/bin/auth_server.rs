@@ -1,7 +1,7 @@
 extern crate backend;
 use backend::models::auth_models::AuthState;
 use dotenv::dotenv;
-use sqlx::{migrate, mysql::MySqlPoolOptions};
+use sqlx::mysql::MySqlPoolOptions;
 
 use axum;
 use redis::Client;
@@ -23,11 +23,6 @@ async fn main() {
         .connect(&database_url)
         .await
         .expect("Unable to connect to database");
-
-        // sqlx::migrate!("../migrations")
-        // .run(&pool)
-        // .await
-        // .expect("Unable to run database migrations");
 
     // Use Docker service name "redis" to reference Redis
     // let redis_client = Client::open("redis://127.0.0.1/").expect("Unable to connect to Redis");

@@ -114,7 +114,8 @@ pub async fn register_user(
     println!("16");
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
-    let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
+    // let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
+    let mut image_file = File::open("/app/src/static/images/code_image.png").expect("Image file not found");
     let mut image_data = Vec::new();
     image_file.read_to_end(&mut image_data).expect("Failed to read image");
     let base64_image = BASE64_STANDARD.encode(&image_data);
