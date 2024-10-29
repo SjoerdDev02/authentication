@@ -19,8 +19,11 @@ RUN cargo build --release
 FROM debian:bookworm-slim
 WORKDIR /app
 
-# Update packages and install OpenSSL 3
-RUN apt-get update && apt-get install -y libssl3 && rm -rf /var/lib/apt/lists/*
+# Update packages, install CA certificates, and OpenSSL 3
+RUN apt-get update && apt-get install -y libssl3 ca-certificates && rm -rf /var/lib/apt/lists/*
+
+# Configure SSL certificates
+RUN update-ca-certificates
 
 # Copy the built binary and migration files from the builder stage
 COPY --from=builder /backend/target/release/auth_server /app/auth_server
