@@ -160,12 +160,16 @@ pub async fn register_user(
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     }
 
+    println!("25");
+
     let response = AuthResponse {
         id,
         token,
         name,
         email,
     };
+
+    println!("26");
 
     Ok(Json(response))
 }

@@ -10,7 +10,11 @@ pub async fn send_email_with_template(
     subject: &str,
     body: &str,
 ) -> Result<(), StatusCode> {
+    println!("19");
+
     dotenv().ok();
+
+    println!("20");
 
     let email = Message::builder()
         .from("NoBody <nobody@domain.tld>".parse().unwrap())
@@ -23,15 +27,23 @@ pub async fn send_email_with_template(
         .body(body.to_string())
         .unwrap();
 
+        println!("21");
+
     let env_email = env::var("EMAIL_USER").map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     let env_password = env::var("EMAIL_PASSWORD").map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
+    println!("22");
+
     let creds = Credentials::new(env_email, env_password);
+
+    println!("23");
 
     let mailer = SmtpTransport::relay("smtp.gmail.com")
         .unwrap()
         .credentials(creds)
         .build();
+
+        println!("24");
 
     match mailer.send(&email) {
         Ok(_) => Ok(()),
