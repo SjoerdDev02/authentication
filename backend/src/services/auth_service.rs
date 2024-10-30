@@ -29,22 +29,15 @@ pub async fn register_user(
     State(state): State<AuthState>,
     Json(user_data): Json<RegisterUser>,
 ) -> Result<Json<AuthResponse>, StatusCode> {
-    println!("1");
     if user_data.password != user_data.password_confirm {
         return Err(StatusCode::BAD_REQUEST);
     }
 
-    println!("2");
-
     let existing_user = get_user_by_email(&state, &user_data.email).await;
-    
-    println!("3");
 
     if existing_user.is_ok() {
         return Err(StatusCode::CONFLICT);
     }
-
-    println!("4");
 
     let create_user_result = match create_user(
         &state,
@@ -58,40 +51,25 @@ pub async fn register_user(
         Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
     };
 
-    println!("5");
-
     let user_id: i32 = match create_user_result.last_insert_id().try_into() {
         Ok(id) => id,
         Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
     };
-
-    println!("6");
 
     let user = match get_user_by_id(&state, &user_id).await {
         Ok(user) => user,
         Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
     };
 
-    println!("7");
-
     let (id, name, email) = user;
 
-    println!("8");
-
     let jwt_key = format_jwt_token_key(&id);
-    println!("9");
     let token = encode_jwt(&user_data.email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-    println!("10");
 
     set_token(&state, &jwt_key, &token, JWT_EXPIRATION_SECONDS).await;
 
-    println!("11");
-
     let otc = create_otc();
-    println!("12");
     let otc_key = format_otc_key(&otc);
-    println!("13");
 
     let otc_payload = OtcPayload {
         otc: otc.to_string(),
@@ -102,16 +80,10 @@ pub async fn register_user(
         password_hash: None,
     };
 
-    println!("14");
-
     let otc_payload_json =
         serde_json::to_string(&otc_payload).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    println!("15");
-
     set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
-
-    println!("16");
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
     // let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
@@ -143,8 +115,6 @@ pub async fn register_user(
         "If you did not create this account, please ignore this email.".to_string(),
     );
 
-    println!("17");
-
     let email_body = generate_template(
         VERIFICATION_CODE_TEMPLATE,
         "Confirm account creation",
@@ -152,15 +122,9 @@ pub async fn register_user(
     )
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    println!("18");
-
-    println!("{}", email_body);
-
     if let Err(_) = send_email_with_template(&email, "Confirm your account", &email_body).await {
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     }
-
-    println!("25");
 
     let response = AuthResponse {
         id,
@@ -168,8 +132,6 @@ pub async fn register_user(
         name,
         email,
     };
-
-    println!("26");
 
     Ok(Json(response))
 }
@@ -202,6 +164,13 @@ pub async fn otc_user(
     let password_hash = token_payload.password_hash;
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
+    // let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
+    let mut image_file = File::open("/app/src/static/images/code_image.png").expect("Image file not found");
+    let mut image_data = Vec::new();
+    image_file.read_to_end(&mut image_data).expect("Failed to read image");
+    let base64_image = BASE64_STANDARD.encode(&image_data);
+    let image_data_url = format!("data:image/png;base64,{}", base64_image);
+    template_variables.insert("image_url", image_data_url);
     let mut template_name = "";
 
     match action.as_str() {
