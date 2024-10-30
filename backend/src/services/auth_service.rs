@@ -356,6 +356,13 @@ pub async fn update_user(
     let (_, _, email) = old_user;
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
+    // let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
+    let mut image_file = File::open("/app/src/static/images/code_image.png").expect("Image file not found");
+    let mut image_data = Vec::new();
+    image_file.read_to_end(&mut image_data).expect("Failed to read image");
+    let base64_image = BASE64_STANDARD.encode(&image_data);
+    let image_data_url = format!("data:image/png;base64,{}", base64_image);
+    template_variables.insert("image_url", image_data_url);
     template_variables.insert("header_title", "Account Update Code".to_string());
     template_variables.insert(
         "code_description",
@@ -421,6 +428,13 @@ pub async fn delete_user(
     let (_, _, email) = old_user;
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
+    // let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
+    let mut image_file = File::open("/app/src/static/images/code_image.png").expect("Image file not found");
+    let mut image_data = Vec::new();
+    image_file.read_to_end(&mut image_data).expect("Failed to read image");
+    let base64_image = BASE64_STANDARD.encode(&image_data);
+    let image_data_url = format!("data:image/png;base64,{}", base64_image);
+    template_variables.insert("image_url", image_data_url);
     template_variables.insert("header_title", "Account Update Code".to_string());
     template_variables.insert(
         "code_description",
