@@ -57,8 +57,8 @@ pub fn decode_jwt(jwt: String) -> Result<TokenData<Claims>, StatusCode> {
     result
 }
 
-pub fn format_jwt_token_key(id: &i32) -> String {
-    let token = format!("jwt:{}", id);
+pub fn format_jwt_token_key(jwt: &str) -> String {
+    let token = format!("jwt:{}", jwt);
 
     token
 }

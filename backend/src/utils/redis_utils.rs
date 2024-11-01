@@ -30,13 +30,21 @@ pub async fn remove_token(state: &AuthState, key: &str) -> Result<(), redis::Red
     Ok(())
 }
 
-pub async fn verify_token(state: &AuthState, key: &str) -> Result<(), StatusCode> {
+pub async fn verify_token(state: &AuthState, key: &str, id: &i32) -> Result<(), StatusCode> {
     let token = get_token(state, key)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     match token {
-        Some(_) => Ok(()),
-        None => Err(StatusCode::UNAUTHORIZED),
+        Some(token_value) => {
+            if token_value == id.to_string() {
+                Ok(())
+            } else {
+                Err(StatusCode::UNAUTHORIZED)
+            }
+        },
+        None => {
+            Err(StatusCode::UNAUTHORIZED)
+        },
     }
 }

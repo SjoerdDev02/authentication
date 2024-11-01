@@ -28,7 +28,7 @@ use base64::Engine;
 pub async fn register_user(
     State(state): State<AuthState>,
     Json(user_data): Json<RegisterUser>,
-) -> Result<Json<AuthResponse>, StatusCode> {
+) -> Result<Json<MinifiedAuthResponse>, StatusCode> {
     if user_data.password != user_data.password_confirm {
         return Err(StatusCode::BAD_REQUEST);
     }
@@ -62,11 +62,6 @@ pub async fn register_user(
     };
 
     let (id, name, email) = user;
-
-    let jwt_key = format_jwt_token_key(&id);
-    let token = encode_jwt(&user_data.email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-    set_token(&state, &jwt_key, &token, JWT_EXPIRATION_SECONDS).await;
 
     let otc = create_otc();
     let otc_key = format_otc_key(&otc);
@@ -126,9 +121,7 @@ pub async fn register_user(
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     }
 
-    let response = AuthResponse {
-        id,
-        token,
+    let response = MinifiedAuthResponse {
         name,
         email,
     };
@@ -285,10 +278,12 @@ pub async fn login_user(
         return Err(StatusCode::UNAUTHORIZED);
     }
 
-    let jwt_key = format_jwt_token_key(&id);
     let token = encode_jwt(&user_data.email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let jwt_key = format_jwt_token_key(&token);
 
-    set_token(&state, &jwt_key, &token, JWT_EXPIRATION_SECONDS).await;
+    println!("key {}", jwt_key);
+
+    set_token(&state, &jwt_key, &id.to_string(), JWT_EXPIRATION_SECONDS).await;
 
     let response = AuthResponse {
         id,
@@ -399,7 +394,9 @@ pub async fn delete_user(
     State(state): State<AuthState>,
     Json(user_data): Json<DeleteUser>,
 ) -> Result<StatusCode, StatusCode> {
-    verify_token(&state, &user_data.jwt)
+    println!("1");
+    let formatted_jwt_token = format_jwt_token_key(&user_data.jwt);
+    verify_token(&state, &formatted_jwt_token, &user_data.id)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
