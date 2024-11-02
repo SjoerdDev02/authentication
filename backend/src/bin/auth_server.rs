@@ -16,7 +16,7 @@ async fn main() {
     let database_url = env::var("DATABASE_URL")
         // .unwrap_or_else(|_| "mysql://name:password@localhost:3306/authentication".to_string());
         .unwrap_or_else(|_| "mysql://root:root@db:3306/authentication".to_string());
-    
+
     let pool = MySqlPoolOptions::new()
         .connect(&database_url)
         .await

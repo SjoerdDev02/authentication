@@ -58,11 +58,19 @@ pub struct Otc {
     pub otc: String,
 }
 
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub enum OtcPayloadAction {
+    ConfirmAccount,
+    DeleteAccount,
+    UpdateNameAndEmail,
+    UpdatePassword,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct OtcPayload {
     pub otc: String,
     pub user_id: i32,
-    pub action: String,
+    pub action: OtcPayloadAction,
     pub name: Option<String>,
     pub email: Option<String>,
     pub password_hash: Option<String>,

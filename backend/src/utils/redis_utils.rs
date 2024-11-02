@@ -42,9 +42,7 @@ pub async fn verify_token(state: &AuthState, key: &str, id: &i32) -> Result<(), 
             } else {
                 Err(StatusCode::UNAUTHORIZED)
             }
-        },
-        None => {
-            Err(StatusCode::UNAUTHORIZED)
-        },
+        }
+        None => Err(StatusCode::UNAUTHORIZED),
     }
 }
