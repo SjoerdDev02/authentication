@@ -282,7 +282,11 @@ pub async fn login_user(
         Err(_) => return Err(StatusCode::UNAUTHORIZED),
     };
 
-    let (id, name, email, password_hash) = user;
+    let (id, name, email, password_hash, is_confirmed) = user;
+
+    if !is_confirmed {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
 
     if !verify_password(&user_data.password, &password_hash)
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?

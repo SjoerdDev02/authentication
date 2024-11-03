@@ -83,8 +83,8 @@ pub fn create_otc() -> String {
 pub async fn get_user_by_email(
     state: &AuthState,
     email: &str,
-) -> Result<(i32, String, String, String), StatusCode> {
-    let user = sqlx::query_as::<_, (i32, String, String, String)>(GET_USER_BY_EMAIL)
+) -> Result<(i32, String, String, String, bool), StatusCode> {
+    let user = sqlx::query_as::<_, (i32, String, String, String, bool)>(GET_USER_BY_EMAIL)
         .bind(email)
         .fetch_one(&state.db_pool)
         .await

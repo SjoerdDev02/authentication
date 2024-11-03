@@ -27,7 +27,7 @@ pub const UPDATE_USER_PASSWORD: &str = r#"
 "#;
 
 pub const GET_USER_BY_EMAIL: &str = r#"
-    SELECT id, name, email, password_hash
+    SELECT id, name, email, password_hash, is_confirmed
     FROM users
     WHERE email = ?;
 "#;
