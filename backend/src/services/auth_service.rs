@@ -294,7 +294,7 @@ pub async fn login_user(
         return Err(StatusCode::UNAUTHORIZED);
     }
 
-    let token = encode_jwt(&user_data.email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let token = encode_jwt(&id, &name, &email, &is_confirmed).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     let jwt_key = format_jwt_token_key(&token);
 
     set_token(&state, &jwt_key, &id.to_string(), JWT_EXPIRATION_SECONDS).await;

@@ -50,7 +50,10 @@ pub struct DeleteUser {
 pub struct Claims {
     pub exp: usize,    // Expiry time of the token
     pub iat: usize,    // Issued at time of the token
+    pub id: i32,
+    pub name: String,
     pub email: String, // Email associated with the token
+    pub is_confirmed: bool,
 }
 
 #[derive(Serialize, Deserialize)]

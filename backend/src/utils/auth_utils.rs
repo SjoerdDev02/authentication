@@ -22,25 +22,32 @@ pub fn hash_password(password: &str) -> Result<String, bcrypt::BcryptError> {
     Ok(hash)
 }
 
-pub fn encode_jwt(email: &str) -> Result<String, StatusCode> {
-    let jwt_token: String = "randomstring".to_string();
+pub fn encode_jwt(
+    id: &i32,
+    name: &str,
+    email: &str,
+    is_confirmed: &bool,
+) -> Result<String, StatusCode> {
+    let jwt_secret = "randomstring".to_string();
 
     let now = Utc::now();
-    let expire: chrono::TimeDelta = Duration::hours(24);
-    let exp: usize = (now + expire).timestamp() as usize;
-    let iat: usize = now.timestamp() as usize;
+    let expire = Duration::hours(24);
+    let exp = (now + expire).timestamp() as usize;
+    let iat = now.timestamp() as usize;
 
     let claim = Claims {
         iat,
         exp,
         email: email.to_string(),
+        id: id.clone(),
+        name: name.to_string(),
+        is_confirmed: is_confirmed.clone(),
     };
-    let secret = jwt_token.clone();
 
     encode(
         &Header::default(),
         &claim,
-        &EncodingKey::from_secret(secret.as_ref()),
+        &EncodingKey::from_secret(jwt_secret.as_ref()),
     )
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
 }
@@ -54,6 +61,7 @@ pub fn decode_jwt(jwt: String) -> Result<TokenData<Claims>, StatusCode> {
         &Validation::default(),
     )
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR);
+
     result
 }
 
