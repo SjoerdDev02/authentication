@@ -19,7 +19,7 @@ use crate::utils::emails::send_email_with_template;
 use crate::utils::redis_utils::{get_token, remove_token, set_token, verify_token};
 use crate::utils::templates::generate_template;
 use axum::{
-    extract::{Json, State},
+    extract::{Json, State, Query},
     http::StatusCode,
 };
 use base64::prelude::BASE64_STANDARD;
@@ -107,7 +107,7 @@ pub async fn register_user(
         "link_title",
         "You can also enter this link to confirm your account".to_string(),
     );
-    template_variables.insert("otc_link", format!("http://example.com/confirm/{}", otc));
+    template_variables.insert("otc_link", format!("http://example.com/otc?otc={}", otc));
     template_variables.insert(
         "footer_note",
         "If you did not create this account, please ignore this email.".to_string(),
@@ -131,9 +131,9 @@ pub async fn register_user(
 
 pub async fn otc_user(
     State(state): State<AuthState>,
-    Json(user_data): Json<Otc>,
+    Query(params): Query<Otc>,
 ) -> Result<StatusCode, StatusCode> {
-    let otc_key = format_otc_key(&user_data.otc);
+    let otc_key = format_otc_key(&params.otc);
 
     let token_payload: Option<OtcPayload> = get_token(&state, &otc_key)
         .await
@@ -385,7 +385,7 @@ pub async fn update_user(
         "link_title",
         "You can also enter this link to confirm your account update".to_string(),
     );
-    template_variables.insert("otc_link", format!("http://example.com/confirm/{}", otc));
+    template_variables.insert("otc_link", format!("http://example.com/otc?otc={}", otc));
     template_variables.insert(
         "footer_note",
         "If you did not intend to update your account, please ignore this email.".to_string(),
@@ -461,7 +461,7 @@ pub async fn delete_user(
         "link_title",
         "You can also enter this link to delete your account".to_string(),
     );
-    template_variables.insert("otc_link", format!("http://example.com/confirm/{}", otc));
+    template_variables.insert("otc_link", format!("http://example.com/otc?otc={}", otc));
     template_variables.insert(
         "footer_note",
         "If you did not intend to delete your account, please ignore this email.".to_string(),
