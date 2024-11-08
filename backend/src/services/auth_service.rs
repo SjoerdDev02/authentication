@@ -5,21 +5,24 @@ use std::io::Read;
 use crate::constants::auth_constants::{JWT_EXPIRATION_SECONDS, OTC_EXPIRATION_SECONDS};
 use crate::models::auth_models::{
     AuthResponse, AuthState, DeleteUser, LoginUser, MinifiedAuthResponse, Otc, OtcPayload,
-    OtcPayloadAction, RegisterUser, UpdateUser,
+    OtcPayloadAction, Refresh, RegisterUser, UpdateUser,
 };
 use crate::templates::auth_templates::{
     VERIFICATION_CODE_SUCCESS_TEMPLATE, VERIFICATION_CODE_TEMPLATE,
 };
 use crate::utils::auth_utils::{
-    confirm_user, create_otc, create_user, delete_user_by_id, encode_jwt, format_jwt_token_key,
-    format_otc_key, get_user_by_email, get_user_by_id, hash_password, update_user_email_and_name,
-    update_user_password, verify_password,
+    confirm_user, create_otc, create_user, delete_user_by_id, format_otc_key, get_user_by_email,
+    get_user_by_id, hash_password, update_user_email_and_name, update_user_password,
+    verify_password,
 };
 use crate::utils::emails::send_email_with_template;
-use crate::utils::redis_utils::{get_token, remove_token, set_token, verify_token};
+use crate::utils::jwt_utils::{
+    encode_jwt, format_refresh_token_key, generate_refresh_token, verify_jwt,
+};
+use crate::utils::redis_utils::{get_token, remove_token, set_token};
 use crate::utils::templates::generate_template;
 use axum::{
-    extract::{Json, State, Query},
+    extract::{Json, Query, State},
     http::StatusCode,
 };
 use base64::prelude::BASE64_STANDARD;
@@ -127,6 +130,218 @@ pub async fn register_user(
     let response = MinifiedAuthResponse { name, email };
 
     Ok(Json(response))
+}
+
+pub async fn login_user(
+    State(state): State<AuthState>,
+    Json(user_data): Json<LoginUser>,
+) -> Result<Json<AuthResponse>, StatusCode> {
+    let user = match get_user_by_email(&state, &user_data.email).await {
+        Ok(user) => user,
+        Err(_) => return Err(StatusCode::UNAUTHORIZED),
+    };
+
+    let (id, name, email, password_hash, is_confirmed) = user;
+
+    if !is_confirmed {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+
+    if !verify_password(&user_data.password, &password_hash)
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+    {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+
+    let jwt = encode_jwt(&id, &name, &email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let refresh_token = generate_refresh_token();
+    let refresh_token_key = format_refresh_token_key(&refresh_token);
+
+    set_token(
+        &state,
+        &refresh_token_key,
+        &id.to_string(),
+        JWT_EXPIRATION_SECONDS,
+    )
+    .await;
+
+    let response = AuthResponse {
+        jwt: Some(jwt),
+        refresh: Some(refresh_token),
+        id,
+        name,
+        email,
+    };
+
+    Ok(Json(response))
+}
+
+pub async fn update_user(
+    State(state): State<AuthState>,
+    Json(user_data): Json<UpdateUser>,
+) -> Result<StatusCode, StatusCode> {
+    let otc = create_otc();
+    let otc_key = format_otc_key(&otc);
+
+    if let (Some(email), Some(name)) = (&user_data.email, &user_data.name) {
+        let otc_payload = OtcPayload {
+            otc: otc.to_string(),
+            user_id: user_data.id,
+            action: OtcPayloadAction::UpdateNameAndEmail,
+            name: Some(name.to_string()),
+            email: Some(email.to_string()),
+            password_hash: None,
+        };
+
+        let otc_payload_json =
+            serde_json::to_string(&otc_payload).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+        set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
+    }
+
+    if let (Some(password), Some(password_confirm)) =
+        (&user_data.password, &user_data.password_confirm)
+    {
+        if password != password_confirm {
+            return Err(StatusCode::BAD_REQUEST);
+        }
+
+        let password_hash =
+            hash_password(password).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+        let otc_payload = OtcPayload {
+            otc: otc.to_string(),
+            user_id: user_data.id,
+            action: OtcPayloadAction::UpdatePassword,
+            name: None,
+            email: None,
+            password_hash: Some(password_hash),
+        };
+
+        let otc_payload_json =
+            serde_json::to_string(&otc_payload).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+        set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
+    }
+
+    let old_user = match get_user_by_id(&state, &user_data.id).await {
+        Ok(user) => user,
+        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
+    };
+
+    let (_, _, email) = old_user;
+
+    let mut template_variables: HashMap<&str, String> = HashMap::new();
+    // let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
+    let mut image_file =
+        File::open("/app/src/static/images/code_image.png").expect("Image file not found");
+    let mut image_data = Vec::new();
+    image_file
+        .read_to_end(&mut image_data)
+        .expect("Failed to read image");
+    let base64_image = BASE64_STANDARD.encode(&image_data);
+    let image_data_url = format!("data:image/png;base64,{}", base64_image);
+    template_variables.insert("image_url", image_data_url);
+    template_variables.insert("header_title", "Account Update Code".to_string());
+    template_variables.insert(
+        "code_description",
+        "Enter this code to confirm you want to update your account".to_string(),
+    );
+    template_variables.insert("otc", otc.to_string());
+    template_variables.insert(
+        "link_title",
+        "You can also enter this link to confirm your account update".to_string(),
+    );
+    template_variables.insert("otc_link", format!("http://example.com/otc?otc={}", otc));
+    template_variables.insert(
+        "footer_note",
+        "If you did not intend to update your account, please ignore this email.".to_string(),
+    );
+
+    let email_body = generate_template(
+        VERIFICATION_CODE_TEMPLATE,
+        "Confirm account update",
+        template_variables,
+    )
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    if let Err(_) =
+        send_email_with_template(&email, "Confirm your account update", &email_body).await
+    {
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    }
+
+    Ok(StatusCode::OK)
+}
+
+pub async fn delete_user(
+    State(state): State<AuthState>,
+    Json(user_data): Json<DeleteUser>,
+) -> Result<StatusCode, StatusCode> {
+    let claims = match verify_jwt(&user_data.jwt, &user_data.id) {
+        Ok(claims) => claims,
+        Err(_) => return Err(StatusCode::UNAUTHORIZED),
+    };
+
+    let user_email = &claims.email;
+
+    let otc = create_otc();
+    let otc_key = format_otc_key(&otc);
+
+    let otc_payload = OtcPayload {
+        otc: otc.to_string(),
+        user_id: user_data.id,
+        action: OtcPayloadAction::DeleteAccount,
+        name: None,
+        email: None,
+        password_hash: None,
+    };
+
+    let otc_payload_json =
+        serde_json::to_string(&otc_payload).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
+
+    let mut template_variables: HashMap<&str, String> = HashMap::new();
+    let mut image_file =
+        File::open("/app/src/static/images/code_image.png").expect("Image file not found");
+    let mut image_data = Vec::new();
+    image_file
+        .read_to_end(&mut image_data)
+        .expect("Failed to read image");
+    let base64_image = BASE64_STANDARD.encode(&image_data);
+    let image_data_url = format!("data:image/png;base64,{}", base64_image);
+    template_variables.insert("image_url", image_data_url);
+    template_variables.insert("header_title", "Account Update Code".to_string());
+    template_variables.insert(
+        "code_description",
+        "Enter this code to confirm you want to delete your account".to_string(),
+    );
+    template_variables.insert("otc", otc.to_string());
+    template_variables.insert(
+        "link_title",
+        "You can also enter this link to delete your account".to_string(),
+    );
+    template_variables.insert("otc_link", format!("http://example.com/otc?otc={}", otc));
+    template_variables.insert(
+        "footer_note",
+        "If you did not intend to delete your account, please ignore this email.".to_string(),
+    );
+
+    let email_body = generate_template(
+        VERIFICATION_CODE_TEMPLATE,
+        "Confirm account deletion",
+        template_variables,
+    )
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    if let Err(_) =
+        send_email_with_template(user_email, "Confirm account deletion", &email_body).await
+    {
+        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+    }
+
+    Ok(StatusCode::NO_CONTENT)
 }
 
 pub async fn otc_user(
@@ -273,211 +488,56 @@ pub async fn otc_user(
     Ok(StatusCode::OK)
 }
 
-pub async fn login_user(
+pub async fn refresh(
     State(state): State<AuthState>,
-    Json(user_data): Json<LoginUser>,
-) -> Result<Json<AuthResponse>, StatusCode> {
-    let user = match get_user_by_email(&state, &user_data.email).await {
-        Ok(user) => user,
-        Err(_) => return Err(StatusCode::UNAUTHORIZED),
+    Query(params): Query<Refresh>,
+) -> Result<axum::Json<AuthResponse>, StatusCode> {
+    let refresh_token_key = &params.refresh;
+    let formatted_refresh_token_key = format_refresh_token_key(&refresh_token_key);
+
+    let token_payload_user_id = match get_token(&state, &formatted_refresh_token_key).await {
+        Ok(Some(user_id)) => user_id,
+
+        Ok(None) => return Err(StatusCode::UNAUTHORIZED),
+
+        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
     };
 
-    let (id, name, email, password_hash, is_confirmed) = user;
+    let token_payload_user_id: i32 = match token_payload_user_id.parse() {
+        Ok(id) => id,
+        Err(_) => return Err(StatusCode::BAD_REQUEST),
+    };
 
-    if !is_confirmed {
-        return Err(StatusCode::UNAUTHORIZED);
-    }
+    let user = match get_user_by_id(&state, &token_payload_user_id).await {
+        Ok(user) => user,
+        Err(_) => return Err(StatusCode::NOT_FOUND),
+    };
 
-    if !verify_password(&user_data.password, &password_hash)
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
-    {
-        return Err(StatusCode::UNAUTHORIZED);
-    }
+    let (id, name, email) = user;
 
-    let token = encode_jwt(&id, &name, &email, &is_confirmed).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    let jwt_key = format_jwt_token_key(&token);
+    let new_jwt = encode_jwt(&id, &name, &email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let new_refresh_token = generate_refresh_token();
+    let new_refresh_token_key = format_refresh_token_key(&new_refresh_token);
 
-    set_token(&state, &jwt_key, &id.to_string(), JWT_EXPIRATION_SECONDS).await;
+    set_token(
+        &state,
+        &new_refresh_token_key,
+        &token_payload_user_id.to_string(),
+        JWT_EXPIRATION_SECONDS,
+    )
+    .await;
+
+    remove_token(&state, &formatted_refresh_token_key)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     let response = AuthResponse {
+        jwt: Some(new_jwt),
+        refresh: Some(new_refresh_token),
         id,
-        token,
         name,
         email,
     };
 
     Ok(Json(response))
-}
-
-pub async fn update_user(
-    State(state): State<AuthState>,
-    Json(user_data): Json<UpdateUser>,
-) -> Result<StatusCode, StatusCode> {
-    let otc = create_otc();
-    let otc_key = format_otc_key(&otc);
-
-    if let (Some(email), Some(name)) = (&user_data.email, &user_data.name) {
-        let otc_payload = OtcPayload {
-            otc: otc.to_string(),
-            user_id: user_data.id,
-            action: OtcPayloadAction::UpdateNameAndEmail,
-            name: Some(name.to_string()),
-            email: Some(email.to_string()),
-            password_hash: None,
-        };
-
-        let otc_payload_json =
-            serde_json::to_string(&otc_payload).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-        set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
-    }
-
-    if let (Some(password), Some(password_confirm)) =
-        (&user_data.password, &user_data.password_confirm)
-    {
-        if password != password_confirm {
-            return Err(StatusCode::BAD_REQUEST);
-        }
-
-        let password_hash =
-            hash_password(password).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-        let otc_payload = OtcPayload {
-            otc: otc.to_string(),
-            user_id: user_data.id,
-            action: OtcPayloadAction::UpdatePassword,
-            name: None,
-            email: None,
-            password_hash: Some(password_hash),
-        };
-
-        let otc_payload_json =
-            serde_json::to_string(&otc_payload).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-        set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
-    }
-
-    let old_user = match get_user_by_id(&state, &user_data.id).await {
-        Ok(user) => user,
-        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
-    };
-
-    let (_, _, email) = old_user;
-
-    let mut template_variables: HashMap<&str, String> = HashMap::new();
-    // let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
-    let mut image_file =
-        File::open("/app/src/static/images/code_image.png").expect("Image file not found");
-    let mut image_data = Vec::new();
-    image_file
-        .read_to_end(&mut image_data)
-        .expect("Failed to read image");
-    let base64_image = BASE64_STANDARD.encode(&image_data);
-    let image_data_url = format!("data:image/png;base64,{}", base64_image);
-    template_variables.insert("image_url", image_data_url);
-    template_variables.insert("header_title", "Account Update Code".to_string());
-    template_variables.insert(
-        "code_description",
-        "Enter this code to confirm you want to update your account".to_string(),
-    );
-    template_variables.insert("otc", otc.to_string());
-    template_variables.insert(
-        "link_title",
-        "You can also enter this link to confirm your account update".to_string(),
-    );
-    template_variables.insert("otc_link", format!("http://example.com/otc?otc={}", otc));
-    template_variables.insert(
-        "footer_note",
-        "If you did not intend to update your account, please ignore this email.".to_string(),
-    );
-
-    let email_body = generate_template(
-        VERIFICATION_CODE_TEMPLATE,
-        "Confirm account update",
-        template_variables,
-    )
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-    if let Err(_) =
-        send_email_with_template(&email, "Confirm your account update", &email_body).await
-    {
-        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-    }
-
-    Ok(StatusCode::OK)
-}
-
-pub async fn delete_user(
-    State(state): State<AuthState>,
-    Json(user_data): Json<DeleteUser>,
-) -> Result<StatusCode, StatusCode> {
-    let formatted_jwt_token = format_jwt_token_key(&user_data.jwt);
-    verify_token(&state, &formatted_jwt_token, &user_data.id)
-        .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-    let otc = create_otc();
-    let otc_key = format_otc_key(&otc);
-
-    let otc_payload = OtcPayload {
-        otc: otc.to_string(),
-        user_id: user_data.id,
-        action: OtcPayloadAction::DeleteAccount,
-        name: None,
-        email: None,
-        password_hash: None,
-    };
-
-    let otc_payload_json =
-        serde_json::to_string(&otc_payload).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-    set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
-
-    let old_user = match get_user_by_id(&state, &user_data.id).await {
-        Ok(user) => user,
-        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
-    };
-
-    let (_, _, email) = old_user;
-
-    let mut template_variables: HashMap<&str, String> = HashMap::new();
-    // let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
-    let mut image_file =
-        File::open("/app/src/static/images/code_image.png").expect("Image file not found");
-    let mut image_data = Vec::new();
-    image_file
-        .read_to_end(&mut image_data)
-        .expect("Failed to read image");
-    let base64_image = BASE64_STANDARD.encode(&image_data);
-    let image_data_url = format!("data:image/png;base64,{}", base64_image);
-    template_variables.insert("image_url", image_data_url);
-    template_variables.insert("header_title", "Account Update Code".to_string());
-    template_variables.insert(
-        "code_description",
-        "Enter this code to confirm you want to delete your account".to_string(),
-    );
-    template_variables.insert("otc", otc.to_string());
-    template_variables.insert(
-        "link_title",
-        "You can also enter this link to delete your account".to_string(),
-    );
-    template_variables.insert("otc_link", format!("http://example.com/otc?otc={}", otc));
-    template_variables.insert(
-        "footer_note",
-        "If you did not intend to delete your account, please ignore this email.".to_string(),
-    );
-
-    let email_body = generate_template(
-        VERIFICATION_CODE_TEMPLATE,
-        "Confirm account deletion",
-        template_variables,
-    )
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-    if let Err(_) = send_email_with_template(&email, "Confirm account deletion", &email_body).await
-    {
-        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-    }
-
-    Ok(StatusCode::NO_CONTENT)
 }
