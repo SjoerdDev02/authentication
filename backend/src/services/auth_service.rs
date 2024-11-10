@@ -26,6 +26,8 @@ use axum::{
 };
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
+use axum::http::{header, Response};
+use axum::body::Body;
 
 pub async fn register_user(
     State(state): State<AuthState>,
@@ -335,7 +337,7 @@ pub async fn delete_user(
 pub async fn otc_user(
     State(state): State<AuthState>,
     Query(params): Query<Otc>,
-) -> Result<StatusCode, StatusCode> {
+) -> Result<Response<Body>, StatusCode> {
     let otc_key = format_otc_key(&params.otc);
 
     let token_payload: Option<OtcPayload> = get_token(&state, &otc_key)
@@ -351,21 +353,12 @@ pub async fn otc_user(
 
     let action = token_payload.action;
     let user_id = token_payload.user_id;
-    let email = match token_payload.email {
-        Some(email) => email,
-        None => "".to_string(),
-    };
-    let name = match token_payload.name {
-        Some(name) => name,
-        None => "".to_string(),
-    };
-    let password_hash = match token_payload.password_hash {
-        Some(password_hash) => password_hash,
-        None => "".to_string(),
-    };
+    let email = token_payload.email.unwrap_or_else(|| "".to_string());
+    let name = token_payload.name.unwrap_or_else(|| "".to_string());
+    let password_hash = token_payload.password_hash.unwrap_or_else(|| "".to_string());
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
-    // let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
+
     let mut image_file =
         File::open("/app/src/static/images/code_image.png").expect("Image file not found");
     let mut image_data = Vec::new();
@@ -375,6 +368,7 @@ pub async fn otc_user(
     let base64_image = BASE64_STANDARD.encode(&image_data);
     let image_data_url = format!("data:image/png;base64,{}", base64_image);
     template_variables.insert("image_url", image_data_url);
+
     let template_name;
 
     let confirm_mail_email = if action == OtcPayloadAction::UpdateNameAndEmail {
@@ -387,13 +381,14 @@ pub async fn otc_user(
         fetched_email
     };
 
+    let mut response = Response::new(Body::empty());
+
     match action {
         OtcPayloadAction::UpdateNameAndEmail => {
             update_user_email_and_name(&state, &user_id, &name, &email)
                 .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-                // TODO: new_jwt should be added to http cookies
             let new_jwt = encode_jwt(&user_id, &name, &email)
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
@@ -408,6 +403,13 @@ pub async fn otc_user(
             template_variables.insert(
                 "footer_note",
                 "If you did not create this account, please ignore this email.".to_string(),
+            );
+
+            response.headers_mut().append(
+                header::SET_COOKIE,
+                format!("JWT={}; HttpOnly; Secure; Path=/", new_jwt)
+                    .parse()
+                    .unwrap(),
             );
         }
         OtcPayloadAction::UpdatePassword => {
@@ -479,5 +481,5 @@ pub async fn otc_user(
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     }
 
-    Ok(StatusCode::OK)
+    Ok(response)
 }
