@@ -41,7 +41,7 @@ pub struct UpdateUser {
 
 #[derive(Deserialize)]
 pub struct DeleteUser {
-    pub id: i32
+    pub id: i32,
 }
 
 // Structure for holding JwtClaims data used in JWT tokens

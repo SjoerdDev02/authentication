@@ -4,7 +4,8 @@ use std::io::Read;
 
 use crate::constants::auth_constants::{JWT_EXPIRATION_SECONDS, OTC_EXPIRATION_SECONDS};
 use crate::models::auth_models::{
-    AuthResponse, AuthState, DeleteUser, JwtClaims, LoginUser, MinifiedAuthResponse, Otc, OtcPayload, OtcPayloadAction, RegisterUser, UpdateUser
+    AuthResponse, AuthState, DeleteUser, JwtClaims, LoginUser, MinifiedAuthResponse, Otc,
+    OtcPayload, OtcPayloadAction, RegisterUser, UpdateUser,
 };
 use crate::templates::auth_templates::{
     VERIFICATION_CODE_SUCCESS_TEMPLATE, VERIFICATION_CODE_TEMPLATE,
@@ -15,9 +16,7 @@ use crate::utils::auth_utils::{
     verify_password,
 };
 use crate::utils::emails::send_email_with_template;
-use crate::utils::jwt_utils::{
-    encode_jwt, format_refresh_token_key, generate_refresh_token, verify_jwt,
-};
+use crate::utils::jwt_utils::{format_refresh_token_key, generate_refresh_token};
 use crate::utils::redis_utils::{get_token, remove_token, set_token};
 use crate::utils::templates::generate_template;
 use axum::Extension;
@@ -164,11 +163,7 @@ pub async fn login_user(
     )
     .await;
 
-    let response = AuthResponse {
-        id,
-        name,
-        email,
-    };
+    let response = AuthResponse { id, name, email };
 
     Ok(Json(response))
 }
@@ -273,8 +268,8 @@ pub async fn update_user(
 
 pub async fn delete_user(
     State(state): State<AuthState>,
+    Extension(claims): Extension<JwtClaims>,
     Json(user_data): Json<DeleteUser>,
-    Extension(claims): Extension<JwtClaims>
 ) -> Result<StatusCode, StatusCode> {
     let user_email = &claims.email;
 
