@@ -41,18 +41,12 @@ pub struct UpdateUser {
 
 #[derive(Deserialize)]
 pub struct DeleteUser {
-    pub id: i32,
-    pub jwt: String,
+    pub id: i32
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct Refresh {
-    pub refresh: String,
-}
-
-// Structure for holding claims data used in JWT tokens
-#[derive(Serialize, Deserialize)]
-pub struct Claims {
+// Structure for holding JwtClaims data used in JWT tokens
+#[derive(Clone, Serialize, Deserialize)]
+pub struct JwtClaims {
     pub exp: usize, // Expiry time of the token
     pub iat: usize, // Issued at time of the token
     pub id: i32,
@@ -85,8 +79,6 @@ pub struct OtcPayload {
 
 #[derive(Serialize)]
 pub struct AuthResponse {
-    pub jwt: Option<String>,
-    pub refresh: Option<String>,
     pub id: i32,
     pub name: String,
     pub email: String,

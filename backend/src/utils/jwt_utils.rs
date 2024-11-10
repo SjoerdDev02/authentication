@@ -4,7 +4,7 @@ use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, TokenData, 
 use rand::distributions::Alphanumeric;
 use rand::{thread_rng, Rng};
 
-use crate::models::auth_models::Claims;
+use crate::models::auth_models::JwtClaims;
 
 pub fn encode_jwt(id: &i32, name: &str, email: &str) -> Result<String, StatusCode> {
     let jwt_secret = "randomstring".to_string();
@@ -14,7 +14,7 @@ pub fn encode_jwt(id: &i32, name: &str, email: &str) -> Result<String, StatusCod
     let exp = (now + expire).timestamp() as usize;
     let iat = now.timestamp() as usize;
 
-    let claims = Claims {
+    let claims = JwtClaims {
         exp,
         iat,
         id: id.clone(),
@@ -30,10 +30,10 @@ pub fn encode_jwt(id: &i32, name: &str, email: &str) -> Result<String, StatusCod
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)
 }
 
-pub fn decode_jwt(jwt: &str) -> Result<TokenData<Claims>, StatusCode> {
+pub fn decode_jwt(jwt: &str) -> Result<TokenData<JwtClaims>, StatusCode> {
     let secret = "randomstring".to_string();
 
-    let result: Result<TokenData<Claims>, StatusCode> = decode(
+    let result: Result<TokenData<JwtClaims>, StatusCode> = decode(
         &jwt,
         &DecodingKey::from_secret(secret.as_ref()),
         &Validation::default(),
@@ -43,10 +43,10 @@ pub fn decode_jwt(jwt: &str) -> Result<TokenData<Claims>, StatusCode> {
     result
 }
 
-pub fn verify_jwt(jwt: &str, expected_id: &i32) -> Result<Claims, StatusCode> {
+pub fn verify_jwt(jwt: &str, expected_id: &i32) -> Result<JwtClaims, StatusCode> {
     let secret = "your_secret_key";
 
-    let token_data = decode::<Claims>(
+    let token_data = decode::<JwtClaims>(
         jwt,
         &DecodingKey::from_secret(secret.as_ref()),
         &Validation::default(),

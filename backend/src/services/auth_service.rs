@@ -4,8 +4,7 @@ use std::io::Read;
 
 use crate::constants::auth_constants::{JWT_EXPIRATION_SECONDS, OTC_EXPIRATION_SECONDS};
 use crate::models::auth_models::{
-    AuthResponse, AuthState, DeleteUser, LoginUser, MinifiedAuthResponse, Otc, OtcPayload,
-    OtcPayloadAction, Refresh, RegisterUser, UpdateUser,
+    AuthResponse, AuthState, DeleteUser, JwtClaims, LoginUser, MinifiedAuthResponse, Otc, OtcPayload, OtcPayloadAction, RegisterUser, UpdateUser
 };
 use crate::templates::auth_templates::{
     VERIFICATION_CODE_SUCCESS_TEMPLATE, VERIFICATION_CODE_TEMPLATE,
@@ -21,6 +20,7 @@ use crate::utils::jwt_utils::{
 };
 use crate::utils::redis_utils::{get_token, remove_token, set_token};
 use crate::utils::templates::generate_template;
+use axum::Extension;
 use axum::{
     extract::{Json, Query, State},
     http::StatusCode,
@@ -153,7 +153,6 @@ pub async fn login_user(
         return Err(StatusCode::UNAUTHORIZED);
     }
 
-    let jwt = encode_jwt(&id, &name, &email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     let refresh_token = generate_refresh_token();
     let refresh_token_key = format_refresh_token_key(&refresh_token);
 
@@ -166,8 +165,6 @@ pub async fn login_user(
     .await;
 
     let response = AuthResponse {
-        jwt: Some(jwt),
-        refresh: Some(refresh_token),
         id,
         name,
         email,
@@ -277,12 +274,8 @@ pub async fn update_user(
 pub async fn delete_user(
     State(state): State<AuthState>,
     Json(user_data): Json<DeleteUser>,
+    Extension(claims): Extension<JwtClaims>
 ) -> Result<StatusCode, StatusCode> {
-    let claims = match verify_jwt(&user_data.jwt, &user_data.id) {
-        Ok(claims) => claims,
-        Err(_) => return Err(StatusCode::UNAUTHORIZED),
-    };
-
     let user_email = &claims.email;
 
     let otc = create_otc();
@@ -401,6 +394,7 @@ pub async fn otc_user(
 
     match action {
         OtcPayloadAction::UpdateNameAndEmail => {
+            // TODO: Create new JWT with new credentials here and overwrite the old one
             update_user_email_and_name(&state, &user_id, &name, &email)
                 .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
@@ -436,6 +430,7 @@ pub async fn otc_user(
             );
         }
         OtcPayloadAction::DeleteAccount => {
+            // TODO: Remove JWT and Refresh key here
             delete_user_by_id(&state, &user_id)
                 .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
@@ -486,58 +481,4 @@ pub async fn otc_user(
     }
 
     Ok(StatusCode::OK)
-}
-
-pub async fn refresh(
-    State(state): State<AuthState>,
-    Query(params): Query<Refresh>,
-) -> Result<axum::Json<AuthResponse>, StatusCode> {
-    let refresh_token_key = &params.refresh;
-    let formatted_refresh_token_key = format_refresh_token_key(&refresh_token_key);
-
-    let token_payload_user_id = match get_token(&state, &formatted_refresh_token_key).await {
-        Ok(Some(user_id)) => user_id,
-
-        Ok(None) => return Err(StatusCode::UNAUTHORIZED),
-
-        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
-    };
-
-    let token_payload_user_id: i32 = match token_payload_user_id.parse() {
-        Ok(id) => id,
-        Err(_) => return Err(StatusCode::BAD_REQUEST),
-    };
-
-    let user = match get_user_by_id(&state, &token_payload_user_id).await {
-        Ok(user) => user,
-        Err(_) => return Err(StatusCode::NOT_FOUND),
-    };
-
-    let (id, name, email) = user;
-
-    let new_jwt = encode_jwt(&id, &name, &email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    let new_refresh_token = generate_refresh_token();
-    let new_refresh_token_key = format_refresh_token_key(&new_refresh_token);
-
-    set_token(
-        &state,
-        &new_refresh_token_key,
-        &token_payload_user_id.to_string(),
-        JWT_EXPIRATION_SECONDS,
-    )
-    .await;
-
-    remove_token(&state, &formatted_refresh_token_key)
-        .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-    let response = AuthResponse {
-        jwt: Some(new_jwt),
-        refresh: Some(new_refresh_token),
-        id,
-        name,
-        email,
-    };
-
-    Ok(Json(response))
 }
