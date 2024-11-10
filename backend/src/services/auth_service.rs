@@ -16,7 +16,7 @@ use crate::utils::auth_utils::{
     verify_password,
 };
 use crate::utils::emails::send_email_with_template;
-use crate::utils::jwt_utils::{format_refresh_token_key, generate_refresh_token};
+use crate::utils::jwt_utils::{encode_jwt, format_refresh_token_key, generate_refresh_token};
 use crate::utils::redis_utils::{get_token, remove_token, set_token};
 use crate::utils::templates::generate_template;
 use axum::Extension;
@@ -389,13 +389,15 @@ pub async fn otc_user(
 
     match action {
         OtcPayloadAction::UpdateNameAndEmail => {
-            // TODO: Create new JWT with new credentials here and overwrite the old one
             update_user_email_and_name(&state, &user_id, &name, &email)
                 .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-            template_name = "Successfully updated account";
+                // TODO: new_jwt should be added to http cookies
+            let new_jwt = encode_jwt(&user_id, &name, &email)
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
+            template_name = "Successfully updated account".to_string();
             template_variables.insert(
                 "header_title",
                 format!(
@@ -413,8 +415,7 @@ pub async fn otc_user(
                 .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-            template_name = "Successfully updated account";
-
+            template_name = "Successfully updated account".to_string();
             template_variables.insert(
                 "header_title",
                 "Congratulations! You've successfully updated your account".to_string(),
@@ -425,13 +426,17 @@ pub async fn otc_user(
             );
         }
         OtcPayloadAction::DeleteAccount => {
-            // TODO: Remove JWT and Refresh key here
+            let refresh_token_key = format_refresh_token_key(&user_id.to_string());
+
+            remove_token(&state, &refresh_token_key)
+                .await
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
             delete_user_by_id(&state, &user_id)
                 .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-            template_name = "Successfully deleted account";
-
+            template_name = "Successfully deleted account".to_string();
             template_variables.insert(
                 "header_title",
                 "We're sorry to see you go. You've successfully deleted your account".to_string(),
@@ -446,8 +451,7 @@ pub async fn otc_user(
                 .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-            template_name = "Successfully confirmed account";
-
+            template_name = "Successfully confirmed account".to_string();
             template_variables.insert(
                 "header_title",
                 "Congratulations! You've successfully confirmed your account".to_string(),

@@ -67,7 +67,6 @@ pub async fn jwt_middleware(
 
         let (id, name, email) = user;
 
-        // Generate a new JWT and refresh token
         new_jwt =
             Some(encode_jwt(&id, &name, &email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?);
         claims = decode_jwt(new_jwt.as_ref().unwrap())
@@ -77,7 +76,6 @@ pub async fn jwt_middleware(
         new_refresh_token = Some(generate_refresh_token());
         let new_refresh_token_key = format_refresh_token_key(new_refresh_token.as_ref().unwrap());
 
-        // Store new refresh token and remove old one
         set_token(
             &state,
             &new_refresh_token_key,
@@ -91,13 +89,10 @@ pub async fn jwt_middleware(
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     }
 
-    // Insert claims for downstream handlers
     req.extensions_mut().insert(claims);
 
-    // Run the next handler in the middleware chain
     let mut response = next.run(req).await;
 
-    // Add new tokens as cookies if they were generated
     if let Some(jwt) = new_jwt {
         response.headers_mut().append(
             header::SET_COOKIE,
