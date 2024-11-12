@@ -1,14 +1,17 @@
+use std::time::Duration;
 use axum::{
     middleware,
     routing::{delete, patch, post},
     Router,
 };
+use tower::{buffer::BufferLayer, ServiceBuilder, limit::RateLimitLayer};
 
 use crate::{
     middleware::jwt_middleware::jwt_middleware,
     models::auth_models::AuthState,
     services::auth_service::{delete_user, login_user, otc_user, register_user, update_user},
 };
+use axum::{error_handling::HandleErrorLayer, http::StatusCode, BoxError};
 
 pub fn app(state: AuthState) -> Router {
     let routes = Router::new()
@@ -23,7 +26,18 @@ pub fn app(state: AuthState) -> Router {
             )),
         )
         .route("/otc", patch(otc_user))
-        .with_state(state);
+        .with_state(state)
+        .layer(
+            ServiceBuilder::new()
+                .layer(HandleErrorLayer::new(|err: BoxError| async move {
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        format!("Unhandled error: {}", err),
+                    )
+                }))
+                .layer(BufferLayer::new(1024))
+                .layer(RateLimitLayer::new(5, Duration::from_secs(1))),
+        );
 
-    return routes;
+    routes
 }
