@@ -54,3 +54,16 @@ export async function deleteUser() {
 		return { success: false, message: 'Invalid credentials' };
 	}
 }
+
+export async function otcUser(prevState: any, formData: FormData) {
+	await new Promise(resolve => setTimeout(resolve, 1000));
+
+	const name = formData.get('name');
+	const password = formData.get('password');
+
+	if (name && password) {
+		return { success: true, message: 'Login successful!' };
+	} else {
+		return { success: false, message: 'Invalid credentials' };
+	}
+}

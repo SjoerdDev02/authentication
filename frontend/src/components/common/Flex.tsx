@@ -102,7 +102,6 @@ export const Flex = (props: FlexProps) => {
 	const Component = props.as || 'div';
 
 	const flexStyleVariables = {
-		'--flex-display': 'flex',
 		...props.justifyContent && { '--flex-justify-content': props.justifyContent },
 		...props.flexDirection && { '--flex-flex-direction': props.flexDirection },
 		...props.flexGrow && { '--flex-flex-grow': props.flexGrow },

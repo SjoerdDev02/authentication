@@ -1,12 +1,11 @@
-import EntryForm from "@/components/authentication/EntryForm";
+import styles from '@/app/update/update.module.scss';
+import UpdateForm from "@/components/authentication/UpdateForm";
 import { Flex } from "@/components/common/Flex";
-
-import styles from "./page.module.css";
 
 export default function Home() {
 	return (
 		<Flex alignItems="center" className={styles.page} justifyContent="center">
-			<EntryForm />
+			<UpdateForm />
 		</Flex>
 	);
 }

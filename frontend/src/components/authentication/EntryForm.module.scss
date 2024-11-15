@@ -1,4 +1,6 @@
 .user-entry {
+    width: 50vw !important;
+
     &__form {
         gap: var(--gap-3);
         flex-direction: column;

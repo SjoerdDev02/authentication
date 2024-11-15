@@ -8,26 +8,13 @@ import styles from '@/components/authentication/UpdateForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 
 import { Flex } from "../common/Flex";
-import TabPill from "../common/tabs/TabPill";
+import TextInput from "../common/input/text/TextInput";
 
 const EntryForm = () => {
 	const initialState = {
 		success: true,
 		message: ''
 	};
-
-	const tabItems = [
-		{
-			label: 'Login',
-			value: false
-		},
-		{
-			label: 'Register',
-			value: true
-		}
-	];
-
-	const [isRegistering, setIsRegistering] = useState(false);
 
 	const [state, formAction] = useFormState(updateUser, initialState);
 
@@ -42,51 +29,41 @@ const EntryForm = () => {
 			flexDirection="column"
 			gap={2}
 		>
-			<TabPill
-				activeValue={isRegistering}
-				items={tabItems}
-				onChangeValue={setIsRegistering}
-			/>
-
 			<form
 				action={formAction}
 				className={styles['update-user__form']}
 			>
-				{isRegistering && (
-					<input
-						name="email"
-						onChange={(e) => setEmail(e.target.value)}
-						placeholder="Email address"
-						type="email"
-						value={email}
-					/>
-				)}
+				<TextInput
+					name="email"
+					onChange={(e) => setEmail(e)}
+					placeholder="Email address"
+					type="email"
+					value={email}
+				 />
 
-				<input
+				<TextInput
 					name="name"
-					onChange={(e) => setName(e.target.value)}
-					placeholder="Username or Email"
+					onChange={(e) => setName(e)}
+					placeholder="Name"
 					type="text"
 					value={name}
-				/>
+				 	/>
 
-				<input
+				<TextInput
 					name="password"
-					onChange={(e) => setPassword(e.target.value)}
+					onChange={(e) => setPassword(e)}
 					placeholder="Password"
 					type="password"
 					value={password}
-				/>
+				 />
 
-				{isRegistering && (
-					<input
-						name="passwordConfirmation"
-						onChange={(e) => setPasswordConfirmation(e.target.value)}
-						placeholder="Confirm password"
-						type="password"
-						value={passwordConfirmation}
-					/>
-				)}
+				<TextInput
+					name="passwordConfirmation"
+					onChange={(e) => setPasswordConfirmation(e)}
+					placeholder="Confirm password"
+					type="password"
+					value={passwordConfirmation}
+				 	/>
 
 				<Button
 					color="primary"

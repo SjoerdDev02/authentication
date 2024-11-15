@@ -8,6 +8,7 @@ import styles from '@/components/authentication/EntryForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 
 import { Flex } from "../common/Flex";
+import TextInput from "../common/input/text/TextInput";
 import TabPill from "../common/tabs/TabPill";
 
 const EntryForm = () => {
@@ -55,40 +56,40 @@ const EntryForm = () => {
 				action={formAction}
 				className={styles['user-entry__form']}
 			>
+				<TextInput
+					name="email"
+					onChange={(e) => setEmail(e)}
+					placeholder="Email address"
+					type="email"
+					value={email}
+				 />
+
 				{isRegistering && (
-					<input
-						name="email"
-						onChange={(e) => setEmail(e.target.value)}
-						placeholder="Email address"
-						type="email"
-						value={email}
-					/>
+					<TextInput
+						name="name"
+						onChange={(e) => setName(e)}
+						placeholder="Name"
+						type="text"
+						value={name}
+				 	/>
 				)}
 
-				<input
-					name="name"
-					onChange={(e) => setName(e.target.value)}
-					placeholder="Username or Email"
-					type="text"
-					value={name}
-				/>
-
-				<input
+				<TextInput
 					name="password"
-					onChange={(e) => setPassword(e.target.value)}
+					onChange={(e) => setPassword(e)}
 					placeholder="Password"
 					type="password"
 					value={password}
-				/>
+				 />
 
 				{isRegistering && (
-					<input
+					<TextInput
 						name="passwordConfirmation"
-						onChange={(e) => setPasswordConfirmation(e.target.value)}
+						onChange={(e) => setPasswordConfirmation(e)}
 						placeholder="Confirm password"
 						type="password"
 						value={passwordConfirmation}
-					/>
+				 	/>
 				)}
 
 				<Button

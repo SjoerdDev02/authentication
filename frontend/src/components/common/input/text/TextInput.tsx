@@ -1,4 +1,4 @@
-import { ChangeEvent } from 'react';
+import { ChangeEvent, HTMLInputTypeAttribute } from 'react';
 
 import styles from './TextInput.module.scss';
 
@@ -9,6 +9,7 @@ type TextInputProps = {
     onChange: (value: string) => void;
     placeholder?: string;
     value: string;
+	type?: HTMLInputTypeAttribute;
 }
 
 const TextInput = (props: TextInputProps) => {
@@ -24,7 +25,7 @@ const TextInput = (props: TextInputProps) => {
 			name={props.name}
 			onChange={handleChange}
 			placeholder={props.placeholder}
-			type="text"
+			type={props.type || "text"}
 			value={props.value}
 		/>
 	);
