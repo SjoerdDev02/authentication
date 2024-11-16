@@ -1,69 +1,95 @@
-'use server';
+import axios from 'axios';
 
 export async function registerUser(prevState: any, formData: FormData) {
-	await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+        const email = formData.get('email');
+        const name = formData.get('name');
+        const password = formData.get('password');
+        const passwordConfirmation = formData.get('passwordConfirmation');
 
-	const email = formData.get('email');
-	const name = formData.get('name');
-	const password = formData.get('password');
-	const passwordConfirmation = formData.get('passwordConfirmation');
+        if (!email || !name || !password || !passwordConfirmation) {
+            return { success: false, message: 'Invalid credentials' };
+        }
 
-	if (email && name && password && passwordConfirmation) {
-		return { success: true, message: 'Registered successful!' };
-	} else {
-		return { success: false, message: 'Invalid credentials' };
-	}
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/register`, {
+            email,
+            name,
+            password,
+            passwordConfirmation
+        });
+
+        return { success: true, message: response.data.message };
+    } catch (error: any) {
+        return { success: false, message: error.response?.data?.message || 'An error occurred' };
+    }
 }
 
 export async function updateUser(prevState: any, formData: FormData) {
-	await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+        const email = formData.get('email');
+        const name = formData.get('name');
+        const password = formData.get('password');
+        const passwordConfirmation = formData.get('passwordConfirmation');
 
-	const email = formData.get('email');
-	const name = formData.get('name');
-	const password = formData.get('password');
-	const passwordConfirmation = formData.get('passwordConfirmation');
+        if (!email || !name || !password || !passwordConfirmation) {
+            return { success: false, message: 'Invalid credentials' };
+        }
 
-	if (email && name && password && passwordConfirmation) {
-		return { success: true, message: 'Updated successful!' };
-	} else {
-		return { success: false, message: 'Invalid credentials' };
-	}
+        const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/update`, {
+            email,
+            name,
+            password,
+            passwordConfirmation
+        });
+
+        return { success: true, message: response.data.message };
+    } catch (error: any) {
+        return { success: false, message: error.response?.data?.message || 'An error occurred' };
+    }
 }
 
 export async function loginUser(prevState: any, formData: FormData) {
-	await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+        const name = formData.get('name');
+        const password = formData.get('password');
 
-	const name = formData.get('name');
-	const password = formData.get('password');
+        if (!name || !password) {
+            return { success: false, message: 'Invalid credentials' };
+        }
 
-	if (name && password) {
-		return { success: true, message: 'Login successful!' };
-	} else {
-		return { success: false, message: 'Invalid credentials' };
-	}
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/login`, { name, password });
+
+        return { success: true, message: response.data.message };
+    } catch (error: any) {
+        return { success: false, message: error.response?.data?.message || 'An error occurred' };
+    }
 }
 
 export async function deleteUser() {
-	await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+        const userId = 50;
 
-	const userId = 50;
+        const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/delete/${userId}`);
 
-	if (userId) {
-		return { success: true, message: 'Deleted successful!' };
-	} else {
-		return { success: false, message: 'Invalid credentials' };
-	}
+        return { success: true, message: response.data.message };
+    } catch (error: any) {
+        return { success: false, message: error.response?.data?.message || 'An error occurred' };
+    }
 }
 
 export async function otcUser(prevState: any, formData: FormData) {
-	await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+        const name = formData.get('name');
+        const password = formData.get('password');
 
-	const name = formData.get('name');
-	const password = formData.get('password');
+        if (!name || !password) {
+            return { success: false, message: 'Invalid credentials' };
+        }
 
-	if (name && password) {
-		return { success: true, message: 'Login successful!' };
-	} else {
-		return { success: false, message: 'Invalid credentials' };
-	}
+        const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/otc`, { name, password });
+
+        return { success: true, message: response.data.message };
+    } catch (error: any) {
+        return { success: false, message: error.response?.data?.message || 'An error occurred' };
+    }
 }

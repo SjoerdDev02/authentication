@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from "react";
-import { useFormState } from 'react-dom';
+import { useActionState, useState } from "react";
 
 import { loginUser, registerUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/EntryForm.module.scss';
@@ -30,7 +29,7 @@ const EntryForm = () => {
 
 	const [isRegistering, setIsRegistering] = useState(false);
 
-	const [state, formAction] = useFormState(
+	const [state, formAction, isPending] = useActionState(
 		isRegistering ? registerUser : loginUser,
 		initialState
 	);
@@ -95,6 +94,7 @@ const EntryForm = () => {
 				<Button
 					color="primary"
 					type="submit"
+					loading={isPending}
 				>
 					<span>
           				Login

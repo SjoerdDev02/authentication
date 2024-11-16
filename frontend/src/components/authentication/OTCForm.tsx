@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from "react";
-import { useFormState } from 'react-dom';
+import { useActionState, useState } from "react";
 
 import { otcUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/OTCForm.module.scss';
@@ -19,7 +18,7 @@ const OTCForm = (props: OTCFormProps) => {
 		message: ''
 	};
 
-	const [state, formAction] = useFormState(
+	const [state, formAction, isPending] = useActionState(
 		otcUser,
 		initialState
 	);
@@ -82,6 +81,7 @@ const OTCForm = (props: OTCFormProps) => {
 			<Button
 				color="primary"
 				type="submit"
+				loading={isPending}
 			>
 				<span>
           				Login

@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from "react";
-import { useFormState } from 'react-dom';
+import { useActionState, useState } from "react";
 
 import { deleteUser, updateUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/UpdateForm.module.scss';
@@ -16,7 +15,7 @@ const EntryForm = () => {
 		message: ''
 	};
 
-	const [state, formAction] = useFormState(updateUser, initialState);
+	const [state, formAction, isPending] = useActionState(updateUser, initialState);
 
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
@@ -68,6 +67,7 @@ const EntryForm = () => {
 				<Button
 					color="primary"
 					type="submit"
+					loading={isPending}
 				>
 					<span>
           				Login

@@ -22,8 +22,6 @@ type ButtonProps = {
 };
 
 const Button = (props: ButtonProps) => {
-	const { pending } = useFormStatus();
-
 	const buttonRef = useRef<HTMLButtonElement>(null);
 
 	const [buttonDimdensions, setbuttonDimdensions] = useState<{ width: number, height: number } | null>(null);
@@ -55,7 +53,7 @@ const Button = (props: ButtonProps) => {
 			} as CSSProperties}
 			type={props.type}
 		>
-			{(pending || props.loading) ? (
+			{(props.loading) ? (
 				<Loader color="grayscale" size="sm" />
 			) : (
 				<>

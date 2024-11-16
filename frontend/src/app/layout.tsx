@@ -32,7 +32,7 @@ export default async function RootLayout({
 			lang="en"
 		>
 			<body className={`${inter.variable}`}>
-				<Navigation />
+				<Navigation initialLanguage={initialLanguage} initialTheme={initialTheme} />
 
 				<main>{children}</main>
 			</body>
