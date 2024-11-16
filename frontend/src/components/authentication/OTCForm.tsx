@@ -9,7 +9,11 @@ import Button from "@/components/common/buttons/Button";
 
 import TextInput from "../common/input/text/TextInput";
 
-const OTCForm = () => {
+type OTCFormProps = {
+	onClose: () => void;
+}
+
+const OTCForm = (props: OTCFormProps) => {
 	const initialState = {
 		success: true,
 		message: ''

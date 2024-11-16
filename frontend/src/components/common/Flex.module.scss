@@ -1,22 +1,72 @@
 .flex {
     display: flex;
-    justify-content: var(--flex-justify-content);
-    flex-direction: var(--flex-flex-direction);
-    flex-grow: var(--flex-flex-grow);
-    flex-basis: var(--flex-flex-basis);
-    flex-shrink: var(--flex-flex-shrink);
-    flex-wrap: var(--flex-flex-wrap);
-    flex: var(--flex-flex);
-    align-items: var(--flex-align-items);
-    gap: var(--flex-gap);
-    margin: var(--flex-margin);
-    padding: var(--flex-padding);
-    padding-inline: var(--flex-padding-inline);
-    padding-top: var(--flex-padding-block);
-    border-radius: var(--flex-border-radius);
-    width: var(--flex-width);
-    height: var(--flex-height);
-    max-width: var(--flex-max-width);
-    max-height: var(--flex-max-height);
+
+    &--justify-content {
+        justify-content: var(--justify-content, initial);
+    }
+
+    &--flex-direction {
+        flex-direction: var(--flex-direction, initial);
+    }
+
+    &--flex-grow {
+        flex-grow: var(--flex-grow, initial);
+    }
+
+    &--flex-basis {
+        flex-basis: var(--flex-basis, initial);
+    }
+
+    &--flex-shrink {
+        flex-shrink: var(--flex-shrink, initial);
+    }
+
+    &--flex-wrap {
+        flex-wrap: var(--flex-wrap, initial);
+    }
+
+    &--flex {
+        flex: var(--flex, initial);
+    }
+
+    &--align-items {
+        align-items: var(--align-items, initial);
+    }
+
+    &--gap {
+        gap: var(--gap, initial);
+    }
+
+    &--padding {
+        padding: var(--padding, initial);
+    }
+
+    &--padding-inline {
+        padding-inline: var(--padding-inline, initial);
+    }
+
+    &--padding-block {
+        padding-block: var(--padding-block, initial);
+    }
+
+    &--border-radius {
+        border-radius: var(--border-radius, initial);
+    }
+
+    &--width {
+        width: var(--width, initial);
+    }
+
+    &--height {
+        height: var(--height, initial);
+    }
+
+    &--max-width {
+        width: var(--max-width, initial);
+    }
+
+    &--max-height {
+        height: var(--max-height, initial);
+    }
 }
   

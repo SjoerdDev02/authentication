@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import React, { CSSProperties } from 'react';
 
 import styles from './Flex.module.scss';
@@ -69,7 +70,7 @@ type FlexProps = {
 	// eslint-disable-next-line no-unused-vars
 	onClick?: (item?: any) => void;
 	style?: CSSProperties;
-	as?: keyof JSX.IntrinsicElements;
+	tag?: keyof JSX.IntrinsicElements;
 	children?: React.ReactNode;
 	className?: string;
 
@@ -91,7 +92,6 @@ type FlexProps = {
 	paddingInline?: keyof typeof paddingMapping;
 	paddingBlock?: keyof typeof paddingMapping;
 	borderRadius?: keyof typeof borderRadiusMapping;
-	margin?: string;
 	width?: string;
 	height?: string;
 	maxWidth?: string;
@@ -99,32 +99,49 @@ type FlexProps = {
 };
 
 export const Flex = (props: FlexProps) => {
-	const Component = props.as || 'div';
+	const Component = props.tag || 'div';
 
 	const flexStyleVariables = {
-		...props.justifyContent && { '--flex-justify-content': props.justifyContent },
-		...props.flexDirection && { '--flex-flex-direction': props.flexDirection },
-		...props.flexGrow && { '--flex-flex-grow': props.flexGrow },
-		...props.flexBasis && { '--flex-flex-basis': props.flexBasis },
-		...props.flexShrink && { '--flex-flex-shrink': props.flexShrink },
-		...props.flexWrap && { '--flex-flex-wrap': props.flexWrap },
-		...props.flex && { '--flex-flex': props.flex },
-		...props.alignItems && { '--flex-align-items': props.alignItems },
+		...props.justifyContent && { '--justify-content': props.justifyContent },
+		...props.flexDirection && { '--flex-direction': props.flexDirection },
+		...props.flexGrow && { '--flex-grow': props.flexGrow },
+		...props.flexBasis && { '--flex-basis': props.flexBasis },
+		...props.flexShrink && { '--flex-shrink': props.flexShrink },
+		...props.flexWrap && { '--flex-wrap': props.flexWrap },
+		...props.flex && { '--flex': props.flex },
+		...props.alignItems && { '--align-items': props.alignItems },
 		...props.gap !== undefined && { '--flex-gap': gapMapping[props.gap] },
-		...props.margin && { '--flex-margin': props.margin },
-		...props.padding !== undefined && { '--flex-padding': paddingMapping[props.padding] },
-		...props.paddingInline !== undefined && { '--flex-padding-inline': paddingMapping[props.paddingInline] },
-		...props.paddingBlock !== undefined && { '--flex-padding-block': paddingMapping[props.paddingBlock] },
-		...props.borderRadius !== undefined && { '--flex-border-radius': borderRadiusMapping[props.borderRadius] },
-		...props.width !== undefined && { '--flex-width': props.width === 'fill' ? '100%' : props.width },
-		...props.height !== undefined && { '--flex-height': props.height === 'fill' ? '100%' : props.height },
-		...props.maxWidth && { '--flex-max-width': props.maxWidth },
-		...props.maxHeight && { '--flex-max-height': props.maxHeight }
+		...props.padding !== undefined && { '--padding': paddingMapping[props.padding] },
+		...props.paddingInline !== undefined && { '--padding-inline': paddingMapping[props.paddingInline] },
+		...props.paddingBlock !== undefined && { '--padding-block': paddingMapping[props.paddingBlock] },
+		...props.borderRadius !== undefined && { '--border-radius': borderRadiusMapping[props.borderRadius] },
+		...props.width !== undefined && { '--width': props.width === 'fill' ? '100%' : props.width },
+		...props.height !== undefined && { '--height': props.height === 'fill' ? '100%' : props.height },
+		...props.maxWidth && { '--max-width': props.maxWidth },
+		...props.maxHeight && { '--max-height': props.maxHeight }
 	};
 
 	return (
 		<Component
-			className={`${styles['flex']} ${props.className}`}
+			className={classNames(styles['flex'], props.className, {
+				[styles['flex--justify-content']]: !!props.justifyContent,
+				[styles['flex--flex-direction']]: !!props.flexDirection,
+				[styles['flex--flex-grow']]: !!props.flexGrow,
+				[styles['flex--flex-basis']]: !!props.flexBasis,
+				[styles['flex--flex-shrink']]: !!props.flexShrink,
+				[styles['flex-flex-wrap']]: !!props.flexWrap,
+				[styles['flex--flex']]: !!props.flex,
+				[styles['flex--align-items']]: !!props.alignItems,
+				[styles['flex--gap']]: !!props.gap,
+				[styles['flex--padding']]: !!props.padding,
+				[styles['flex--padding-inline']]: !!props.paddingInline,
+				[styles['flex--padding-block']]: !!props.paddingBlock,
+				[styles['flex--border-radius']]: !!props.borderRadius,
+				[styles['flex--width']]: !!props.width,
+				[styles['flex--height']]: !!props.height,
+				[styles['flex--max-width']]: !!props.maxWidth,
+				[styles['flex--max-height']]: !!props.maxHeight
+			})}
 			onClick={props.onClick}
 			style={{ ...flexStyleVariables } as CSSProperties}
 		>

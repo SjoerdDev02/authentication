@@ -27,7 +27,6 @@ const TabPill = (props: TabPillProps) => {
 	return (
 		<Flex
 			alignItems="center"
-			as="article"
 			borderRadius={5}
 			className={styles['tab-pill']}
 			justifyContent="space-between"
@@ -37,6 +36,7 @@ const TabPill = (props: TabPillProps) => {
 				'--items-count': props.items.length,
 				'--active-item-index': activeItemIndex
 			} as CSSProperties}
+			tag="article"
 		>
 			{props.items.map((item, index) => (
 				<article

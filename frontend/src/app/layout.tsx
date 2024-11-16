@@ -1,10 +1,10 @@
-import "./globals.css";
+import "./globals.scss";
 
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 
 import Navigation from "@/components/navigation/Navigation";
-import { getPreferredLanguage, getPrefferedTheme } from "@/utils/preferences/preferences";
+import { getPreferredLanguage, getPreferredTheme } from "@/utils/preferences/preferences";
 
 const inter = localFont({
 	src: "./fonts/InterVariable.woff2",
@@ -17,13 +17,13 @@ export const metadata: Metadata = {
 	description: "Manage your tasks like never before",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-	const initialTheme = getPrefferedTheme();
-	const initialLanguage = getPreferredLanguage();
+	const initialTheme = await getPreferredTheme();
+	const initialLanguage = await getPreferredLanguage();
 
 	return (
 		<html

@@ -1,8 +1,14 @@
 .user-entry {
-    width: 50vw !important;
-
     &__form {
+        display: grid;
         gap: var(--gap-3);
-        flex-direction: column;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include phone {
+        &__form {
+            display: flex;
+            flex-direction: column;
+        }
     }
 }
