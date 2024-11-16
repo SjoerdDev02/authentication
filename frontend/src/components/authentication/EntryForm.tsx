@@ -44,7 +44,7 @@ const EntryForm = () => {
 		<Flex
 			className={styles['user-entry']}
 			flexDirection="column"
-			gap={2}
+			gap={5}
 		>
 			<TabPill
 				activeValue={isRegistering}

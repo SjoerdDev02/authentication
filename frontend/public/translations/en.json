@@ -1,0 +1,43 @@
+{
+    "Customizer": {
+        "colorFormatLabel": "Color format",
+        "shadesAmountLabel": "Number of shades",
+        "colorValuesLabel": "Color values",
+        "colorValuesHue": "Hue",
+        "colorValuesSaturation": "Saturation",
+        "colorValuesLightness": "Lightness",
+        "colorValuesRed": "Red",
+        "colorValuesGreen": "Green",
+        "colorValuesBlue": "Blue",
+        "Tooltips": {
+            "colorFormatTooltip": "Select the color format to customize and view the palettes",
+            "shadesAmountTooltip": "Specify the number of shades you want in each palette"
+        }
+    },
+    "Palettes": {
+        "primary": "Primary",
+        "secondary": "Secondary",
+        "success": "Success",
+        "warning": "Warning",
+        "error": "Error",
+        "grayscale": "Grayscale",
+        "Tooltips": {
+            "colorCopiedTooltip": "Color copied!"
+        }
+    },
+    "Information": {
+        "createdPalettesLabel": "Created palettes",
+        "Tooltips": {
+            "createdPalettesTooltip": "The displayed color is the middle shade in each created palette",
+            "copyColorTooltip": "Color copied!",
+            "copyPaletteTooltip": "Palette copied!",
+            "copyAllTooltip": "All palettes copied!",
+            "downloadColorsTooltip": "Colors downloaded!"
+        },
+        "Buttons": {
+            "copyAll": "Copy All",
+            "share": "Share",
+            "download": "Download"
+        }
+    }
+}

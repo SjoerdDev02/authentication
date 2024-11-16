@@ -110,7 +110,7 @@ export const Flex = (props: FlexProps) => {
 		...props.flexWrap && { '--flex-wrap': props.flexWrap },
 		...props.flex && { '--flex': props.flex },
 		...props.alignItems && { '--align-items': props.alignItems },
-		...props.gap !== undefined && { '--flex-gap': gapMapping[props.gap] },
+		...props.gap !== undefined && { '--gap': gapMapping[props.gap] },
 		...props.padding !== undefined && { '--padding': paddingMapping[props.padding] },
 		...props.paddingInline !== undefined && { '--padding-inline': paddingMapping[props.paddingInline] },
 		...props.paddingBlock !== undefined && { '--padding-block': paddingMapping[props.paddingBlock] },

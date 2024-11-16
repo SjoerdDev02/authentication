@@ -1,0 +1,43 @@
+{
+    "Customizer": {
+        "colorFormatLabel": "Format de couleur",
+        "shadesAmountLabel": "Nombre de nuances",
+        "colorValuesLabel": "Valeurs de couleur",
+        "colorValuesHue": "Teinte",
+        "colorValuesSaturation": "Saturation",
+        "colorValuesLightness": "Clarté",
+        "colorValuesRed": "Rouge",
+        "colorValuesGreen": "Vert",
+        "colorValuesBlue": "Bleu",
+        "Tooltips": {
+            "colorFormatTooltip": "Sélectionnez le format de couleur pour personnaliser et afficher les palettes",
+            "shadesAmountTooltip": "Spécifiez le nombre de nuances que vous souhaitez dans chaque palette"
+        }
+    },
+    "Palettes": {
+        "primary": "Primaire",
+        "secondary": "Secondaire",
+        "success": "Succès",
+        "warning": "Avertissement",
+        "error": "Erreur",
+        "grayscale": "Niveaux de gris",
+        "Tooltips": {
+            "colorCopiedTooltip": "Couleur copiée!"
+        }
+    },
+    "Information": {
+        "createdPalettesLabel": "Palettes créées",
+        "Tooltips": {
+            "createdPalettesTooltip": "La couleur affichée est la nuance intermédiaire dans chaque palette créée",
+            "copyColorTooltip": "Couleur copiée!",
+            "copyPaletteTooltip": "Palette copiée!",
+            "copyAllTooltip": "Toutes les palettes copiées!",
+            "downloadColorsTooltip": "Couleur téléchargée!"
+        },
+        "Buttons": {
+            "copyAll": "Tout copier",
+            "share": "Partager",
+            "download": "Télécharger"
+        }
+    }
+}

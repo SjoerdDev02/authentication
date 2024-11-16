@@ -1,7 +1,7 @@
 .user-entry {
     &__form {
         display: grid;
-        gap: var(--gap-3);
+        gap: var(--gap-300);
         grid-template-columns: repeat(2, 1fr);
     }
 
