@@ -6,15 +6,15 @@ type TextInputProps = {
     disabled?: boolean;
     name?: string;
 	// eslint-disable-next-line no-unused-vars
-    onChange: (value: string) => void;
+    onChange?: (value: string) => void;
     placeholder?: string;
-    value: string;
+    value: string | number | null;
 	type?: HTMLInputTypeAttribute;
 }
 
 const TextInput = (props: TextInputProps) => {
 	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-		props.onChange(event.target.value);
+		props.onChange?.(event.target.value);
 	};
 
 	return (
@@ -26,7 +26,7 @@ const TextInput = (props: TextInputProps) => {
 			onChange={handleChange}
 			placeholder={props.placeholder}
 			type={props.type || "text"}
-			value={props.value}
+			value={props.value || undefined}
 		/>
 	);
 };

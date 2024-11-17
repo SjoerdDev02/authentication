@@ -5,9 +5,9 @@ export async function registerUser(prevState: any, formData: FormData) {
         const email = formData.get('email');
         const name = formData.get('name');
         const password = formData.get('password');
-        const passwordConfirmation = formData.get('passwordConfirmation');
+        const passwordConfirm = formData.get('passwordConfirmation');
 
-        if (!email || !name || !password || !passwordConfirmation) {
+        if (!email || !name || !password || !passwordConfirm) {
             return { success: false, message: 'Invalid credentials' };
         }
 
@@ -15,36 +15,56 @@ export async function registerUser(prevState: any, formData: FormData) {
             email,
             name,
             password,
-            passwordConfirmation
+            passwordConfirm
         });
 
-        return { success: true, message: response.data.message };
+        return { 
+            success: true,
+            message: response.data.message
+        };
     } catch (error: any) {
-        return { success: false, message: error.response?.data?.message || 'An error occurred' };
+        return { 
+            success: false,
+            message: error.response?.data?.message || 'An error occurred'
+        };
     }
 }
 
 export async function updateUser(prevState: any, formData: FormData) {
     try {
+        const id = formData.get('userId');
         const email = formData.get('email');
         const name = formData.get('name');
         const password = formData.get('password');
-        const passwordConfirmation = formData.get('passwordConfirmation');
+        const passwordConfirm = formData.get('passwordConfirmation');
 
-        if (!email || !name || !password || !passwordConfirmation) {
-            return { success: false, message: 'Invalid credentials' };
+        if (
+            (!email && !name)
+            && (!password && !passwordConfirm)
+        ) {
+            return { 
+                success: false, 
+                message: 'Invalid credentials' 
+            };
         }
 
         const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/update`, {
-            email,
-            name,
-            password,
-            passwordConfirmation
+            id,
+            ...(email && { email }),
+            ...(name && { name }),
+            ...(password && { password }),
+            ...(passwordConfirm && { passwordConfirm })
         });
 
-        return { success: true, message: response.data.message };
+        return { 
+            success: true,
+            message: response.data.message
+        };
     } catch (error: any) {
-        return { success: false, message: error.response?.data?.message || 'An error occurred' };
+        return { 
+            success: false,
+            message: error.response?.data?.message || 'An error occurred'
+        };
     }
 }
 
@@ -57,39 +77,73 @@ export async function loginUser(prevState: any, formData: FormData) {
             return { success: false, message: 'Invalid credentials' };
         }
 
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/login`, { name, password });
+        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/login`, { 
+            name, 
+            password 
+        });
 
-        return { success: true, message: response.data.message };
+        return { 
+            success: true, 
+            message: response.data.message
+         };
     } catch (error: any) {
-        return { success: false, message: error.response?.data?.message || 'An error occurred' };
+        return {
+             success: false, 
+             message: error.response?.data?.message || 'An error occurred' 
+        };
     }
 }
 
-export async function deleteUser() {
+export async function deleteUser(userId: number | null) {
     try {
-        const userId = 50;
+        const id = userId;
 
-        const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/delete/${userId}`);
+        const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/delete/${id}`);
 
-        return { success: true, message: response.data.message };
+        return { 
+            success: true,
+            message: response.data.message
+        };
     } catch (error: any) {
-        return { success: false, message: error.response?.data?.message || 'An error occurred' };
+        return {
+            success: false,
+            message: error.response?.data?.message || 'An error occurred'
+        };
     }
 }
 
 export async function otcUser(prevState: any, formData: FormData) {
     try {
-        const name = formData.get('name');
-        const password = formData.get('password');
+        const characterOne = formData.get('characterOne');
+        const characterTwo = formData.get('characterTwo');
+        const characterThree = formData.get('characterThree');
+        const characterFour = formData.get('characterFour');
+        const characterFive = formData.get('characterFive');
+        const characterSix = formData.get('characterSix');
 
-        if (!name || !password) {
+        if (!characterOne || !characterTwo || !characterThree || !characterFour || !characterFive || !characterSix) {
             return { success: false, message: 'Invalid credentials' };
         }
 
-        const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/otc`, { name, password });
+        const otc = [
+            characterOne,
+            characterTwo,
+            characterThree,
+            characterFour,
+            characterFive,
+            characterSix
+        ].join('');
 
-        return { success: true, message: response.data.message };
+        const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/otc/${otc}`);
+
+        return {
+            success: true,
+            message: response.data.message
+        };
     } catch (error: any) {
-        return { success: false, message: error.response?.data?.message || 'An error occurred' };
+        return {
+            success: false,
+            message: error.response?.data?.message || 'An error occurred'
+        };
     }
 }

@@ -8,6 +8,7 @@ import Button from "@/components/common/buttons/Button";
 
 import { Flex } from "../common/Flex";
 import TextInput from "../common/input/text/TextInput";
+import userStore from "@/states/userStore";
 
 const EntryForm = () => {
 	const initialState = {
@@ -17,10 +18,15 @@ const EntryForm = () => {
 
 	const [state, formAction, isPending] = useActionState(updateUser, initialState);
 
+	const userId = userStore.id;
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [passwordConfirmation, setPasswordConfirmation] = useState('');
+
+	const handleDeleteUser = () => {
+		deleteUser(userId);
+	}
 
 	return (
 		<Flex
@@ -32,6 +38,12 @@ const EntryForm = () => {
 				action={formAction}
 				className={styles['update-user__form']}
 			>
+				<TextInput
+					name="userId"
+					type='hidden'
+					value={userId}
+				/>
+
 				<TextInput
 					name="email"
 					onChange={(e) => setEmail(e)}
@@ -81,7 +93,7 @@ const EntryForm = () => {
 				)}
 			</form>
 
-			<Button color="warning" onClick={deleteUser}>
+			<Button color="warning" onClick={handleDeleteUser}>
 				<span>Delete account</span>
 			</Button>
 		</Flex>

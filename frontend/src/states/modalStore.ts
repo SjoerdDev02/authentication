@@ -1,10 +1,10 @@
 import { proxy } from 'valtio';
 
-type modalStoreType = {
+type ModalStoreType = {
     otc: boolean;
 };
 
-const modalStore: modalStoreType = proxy({
+const modalStore: ModalStoreType = proxy({
 	otc: false
 });
 

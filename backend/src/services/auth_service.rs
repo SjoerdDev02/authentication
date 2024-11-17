@@ -271,7 +271,8 @@ pub async fn update_user(
 pub async fn delete_user(
     State(state): State<AuthState>,
     Extension(claims): Extension<JwtClaims>,
-    Json(user_data): Json<DeleteUser>,
+    // Json(user_data): Json<DeleteUser>,
+    Query(params): Query<DeleteUser>,
 ) -> Result<StatusCode, StatusCode> {
     let user_email = &claims.email;
 
@@ -280,7 +281,7 @@ pub async fn delete_user(
 
     let otc_payload = OtcPayload {
         otc: otc.to_string(),
-        user_id: user_data.id,
+        user_id: params.id,
         action: OtcPayloadAction::DeleteAccount,
         name: None,
         email: None,
