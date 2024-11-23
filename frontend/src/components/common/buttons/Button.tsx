@@ -1,5 +1,6 @@
 'use client';
 
+import classNames from 'classnames';
 import { CSSProperties, ReactNode, useLayoutEffect, useRef, useState } from 'react';
 
 import Loader from '../loaders/Loader';
@@ -37,12 +38,10 @@ const Button = (props: ButtonProps) => {
 	return (
 		<button
 			aria-disabled={props.disabled}
-			className={`
-				${styles['button']} 
-				${styles[`button--${props.color}`]} 
-				${props.fill && styles['button--fill']}
-				${props.round && styles['button--round']}
-			`}
+			className={classNames(styles['button'], styles[`button--${props.color}`], {
+				[styles['button--fill']]: props.fill,
+				[styles['button--round']]: props.round
+			})}
 			disabled={props.disabled}
 			onClick={props.onClick}
 			ref={buttonRef}

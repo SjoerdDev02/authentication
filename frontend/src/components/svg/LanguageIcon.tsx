@@ -1,10 +1,12 @@
+import classNames from "classnames";
+
 type LanguageIconProps = {
 	className?: string;
 }
 
 const LanguageIcon = (props: LanguageIconProps) => {
 	return (
-		<svg  className={`${props.className} icon icon-tabler icons-tabler-outline icon-tabler-language`}
+		<svg  className={classNames(props.className, 'icon icon-tabler icons-tabler-outline icon-tabler-language')}
 			fill="none"
 			height="24"
 			stroke="currentColor"

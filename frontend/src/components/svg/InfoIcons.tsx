@@ -1,10 +1,12 @@
+import classNames from "classnames";
+
 type InfoIconProps = {
 	className?: string;
 }
 
 export const OpenInfoIcon = (props: InfoIconProps) => {
 	return (
-		<svg  className={`${props.className} icon icon-tabler icons-tabler-outline icon-tabler-info-circle`}
+		<svg  className={classNames(props.className, 'icon icon-tabler icons-tabler-outline icon-tabler-info-circle')}
 			fill="none"
 			height="24"
 			stroke="currentColor"
@@ -27,7 +29,7 @@ export const OpenInfoIcon = (props: InfoIconProps) => {
 
 export const FilledInfoIcon = (props: InfoIconProps) => {
 	return (
-		<svg  className={`${props.className} icon icon-tabler icons-tabler-filled icon-tabler-info-circle`}
+		<svg  className={classNames(props.className, 'icon icon-tabler icons-tabler-filled icon-tabler-info-circle')}
 			fill="currentColor"
 			height="24"
 			viewBox="0 0 24 24"

@@ -1,5 +1,6 @@
 'use client';
 
+import classNames from 'classnames';
 import { ReactNode, useState } from 'react';
 
 import useOutsideClick from '@/utils/hooks/useOutsideClick';
@@ -41,9 +42,9 @@ const WrapperDropdown = (props: WrapperDropdownProps) => {
 
 	return (
 		<article
-			className={`${styles['basic-dropdown']}
-			${isOpen && styles['basic-dropdown--active']}
-			`}
+			className={classNames(styles['basic-dropdown'], {
+				[styles['basic-dropdown--active']]: isOpen
+			})}
 			ref={ref}
 		>
 			<Button
@@ -57,14 +58,9 @@ const WrapperDropdown = (props: WrapperDropdownProps) => {
 				<article className={styles['basic-dropdown__body']}>
 					{props.items.map((item, index) => (
 						<article
-							className={`${
-								styles['basic-dropdown__list-item']
-							}
-							${
-						item.value === props.activeValue &&
-								styles['basic-dropdown__list-item--active']
-						}
-							`}
+							className={classNames(styles['basic-dropdown__list-item'], {
+								[styles['basic-dropdown__list-item--active']]: item.value === props.activeValue
+							})}
 							key={index}
 							onClick={() =>
 								handleChangeValue(item.value)

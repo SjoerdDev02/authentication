@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import { CSSProperties, useState } from 'react';
 
 import { Flex } from '../Flex';
@@ -40,16 +41,15 @@ const TabPill = (props: TabPillProps) => {
 		>
 			{props.items.map((item, index) => (
 				<article
-					className={`
-                        ${styles['tab-pill__item']}
-						${index === activeItemIndex && styles['tab-pill__item--active']}
-                    `}
+					className={classNames(styles['tab-pill__item'], {
+						[styles['tab-pill__item--active']]: index === activeItemIndex
+					})}
 					key={`tab-pill-${item.label}-${index}`}
 					onClick={() =>
 						handleChangeValue(item.value, index)
 					}
 				>
-					<label className={`${styles['tab-pill__item-label']} label`}>
+					<label className={classNames(styles['tab-pill__item-label'], 'label')}>
 						{item.label}
 					</label>
 				</article>

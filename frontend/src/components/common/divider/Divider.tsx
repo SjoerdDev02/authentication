@@ -9,8 +9,10 @@ const Divider = (props: DividerProps) => {
 		backgroundColor: `var(--color-${props.color}-500)`,
 	};
 
-	return <hr className={styles.divider}
-		style={dividerStyles} />;
+	return <hr
+		className={styles.divider}
+		style={dividerStyles}
+	/>;
 };
 
 export default Divider;

@@ -1,10 +1,12 @@
+import classNames from "classnames";
+
 type CloseIconProps = {
 	className?: string;
 }
 
 const CloseIcon = (props: CloseIconProps) => {
 	return (
-		<svg  className={`${props.className} icon icon-tabler icons-tabler-outline icon-tabler-square-x`}
+		<svg  className={classNames(props.className, 'icon icon-tabler icons-tabler-outline icon-tabler-square-x')}
 			fill="none"
 			height="24"
 			stroke="currentColor"

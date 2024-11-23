@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import { CSSProperties, ReactNode, useRef, useState } from 'react';
 
 import useTooltip from '@/utils/hooks/useTooltip';
@@ -24,10 +25,9 @@ const Tooltip = (props: TooltipPropsType) => {
 
 	return (
 		<div
-			className={`
-				${styles.tooltip}
-				${props.fill && styles['tooltip--fill']}
-			`}
+			className={classNames(styles['tooltip'], {
+				[styles['tooltip--fill']]: props.fill
+			})}
 			onClick={() => props.action === 'click' && setTooltipShown(true)}
 			onMouseEnter={() => props.action === 'hover' && setTooltipShown(true)}
 			onMouseLeave={() => setTooltipShown(false)}
@@ -36,11 +36,7 @@ const Tooltip = (props: TooltipPropsType) => {
 			{props.children}
 
 			<span
-				className={`
-					${styles['tooltip__text']}
-					${styles[`tooltip__text--${tooltipPosition}`]}
-					label label--small label--light-grayscale
-				`}
+				className={classNames(styles['tooltip__text'], styles[`tooltip__text--${tooltipPosition}`], 'label label--small label--light-grayscale')}
 				style={{
 					'--tooltip-visibility': tooltipShown ? 'visible' : 'hidden'
 				} as CSSProperties}

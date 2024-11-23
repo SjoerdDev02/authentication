@@ -31,7 +31,7 @@ export default async function RootLayout({
 			data-theme={initialTheme}
 			lang="en"
 		>
-			<body className={`${inter.variable}`}>
+			<body className={inter.variable}>
 				<Navigation initialLanguage={initialLanguage}
 					initialTheme={initialTheme} />
 

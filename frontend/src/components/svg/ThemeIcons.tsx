@@ -1,10 +1,12 @@
+import classNames from "classnames";
+
 type ThemeIconsProps = {
 	className?: string;
 }
 
 export const LightModeIcon = (props: ThemeIconsProps) => {
 	return (
-		<svg  className={`${props.className} icon icon-tabler icons-tabler-outline icon-tabler-moon`}
+		<svg  className={classNames(props.className, 'icon icon-tabler icons-tabler-outline icon-tabler-moon')}
 			fill="none"
 			height="24"
 			stroke="currentColor"
@@ -24,7 +26,7 @@ export const LightModeIcon = (props: ThemeIconsProps) => {
 
 export const DarkModeIcon = (props: ThemeIconsProps) => {
 	return (
-		<svg  className={`${props.className} icon icon-tabler icons-tabler-filled icon-tabler-moon`}
+		<svg  className={classNames(props.className, 'icon icon-tabler icons-tabler-filled icon-tabler-moon')}
 			fill="currentColor"
 			height="24"
 			viewBox="0 0 24 24"
