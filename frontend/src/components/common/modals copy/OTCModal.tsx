@@ -59,10 +59,12 @@ const OTCModal = () => {
 				className={styles.modal}
 				role="dialog"
 			>
-				<Flex gap={8} justifyContent="space-between">
+				<Flex gap={8}
+					justifyContent="space-between">
 					<h2 className="label label--big label--bold-weight">Send us a message</h2>
 
-					<Button color="blank" onClick={handleClose}>
+					<Button color="blank"
+						onClick={handleClose}>
 						<CloseIcon className={styles['modal__close-button']} />
 					</Button>
 				</Flex>

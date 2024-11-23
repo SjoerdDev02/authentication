@@ -4,7 +4,11 @@ import { Flex } from "@/components/common/Flex";
 
 export default function Home() {
 	return (
-		<Flex alignItems="center" className={styles.page} justifyContent="center">
+		<Flex
+			alignItems="center"
+			className={styles.page}
+			justifyContent="center"
+		>
 			<UpdateForm />
 		</Flex>
 	);

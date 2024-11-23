@@ -1,7 +1,6 @@
 'use client';
 
 import { CSSProperties, ReactNode, useLayoutEffect, useRef, useState } from 'react';
-import { useFormStatus } from 'react-dom';
 
 import Loader from '../loaders/Loader';
 import styles from './Button.module.scss';
@@ -54,7 +53,8 @@ const Button = (props: ButtonProps) => {
 			type={props.type}
 		>
 			{(props.loading) ? (
-				<Loader color="grayscale" size="sm" />
+				<Loader color="grayscale"
+					size="sm" />
 			) : (
 				<>
 					{props.children}

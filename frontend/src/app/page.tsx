@@ -5,7 +5,9 @@ import styles from "./page.module.css";
 
 export default function Home() {
 	return (
-		<Flex alignItems="center" className={styles.page} justifyContent="center">
+		<Flex alignItems="center"
+			className={styles.page}
+			justifyContent="center">
 			<EntryForm />
 		</Flex>
 	);

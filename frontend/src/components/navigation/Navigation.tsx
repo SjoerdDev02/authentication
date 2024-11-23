@@ -1,17 +1,18 @@
-'use client'
+'use client';
 
-import styles from '@/components/navigation/Navigation.module.scss';
-
-import { Flex } from "../common/Flex";
-import { LanguageType, ThemeType } from '@/utils/preferences/preferences';
-import useTheme from '@/utils/hooks/useTheme';
-import useLanguage from '@/utils/hooks/useLanguage';
-import { DarkModeIcon, LightModeIcon } from '../svg/ThemeIcons';
-import Button from '../common/buttons/Button';
-import LanguageIcon from '../svg/LanguageIcon';
-import Logo from '../../../public/logo.svg';
 import Image from 'next/image';
-import WrapperDropdown from '@/components/common/dropdowns/WrapperDropdown'
+
+import WrapperDropdown from '@/components/common/dropdowns/WrapperDropdown';
+import styles from '@/components/navigation/Navigation.module.scss';
+import useLanguage from '@/utils/hooks/useLanguage';
+import useTheme from '@/utils/hooks/useTheme';
+import { LanguageType, ThemeType } from '@/utils/preferences/preferences';
+
+import Logo from '../../../public/logo.svg';
+import Button from '../common/buttons/Button';
+import { Flex } from "../common/Flex";
+import LanguageIcon from '../svg/LanguageIcon';
+import { DarkModeIcon, LightModeIcon } from '../svg/ThemeIcons';
 
 type NavigationPropsType = {
 	initialTheme: ThemeType;
@@ -44,57 +45,57 @@ const Navigation = (props: NavigationPropsType) => {
 			value: 'ES'
 		}
 	];
-	
+
 	return (
-<Flex
+		<Flex
+			alignItems="center"
+			className={styles.navigation}
+			justifyContent="space-between"
+			paddingBlock={4}
+			paddingInline={6}
+			tag="nav"
+			width="fill"
+		>
+			<Flex
 				alignItems="center"
-				tag="nav"
-				className={styles.navigation}
-				justifyContent="space-between"
-				paddingInline={6}
-				paddingBlock={4}
-				width="fill"
-			>
-				<Flex
-					alignItems="center"
-					gap={2}
+				gap={2}
 				 	justifyContent="flex-start"
 				 >
-					<Image
-						alt="Logo"
+				<Image
+					alt="Logo"
 					 	src={Logo}
 					  />
-				</Flex>
+			</Flex>
 
-				<Flex
-					alignItems="center"
-					gap={3}
+			<Flex
+				alignItems="center"
+				gap={3}
+			>
+				<WrapperDropdown
+					activeValue={language}
+					items={languageItems}
+					onChangeValue={(language) => setLanguage(language)}
 				>
-					<WrapperDropdown
-						activeValue={language}
-						items={languageItems}
-						onChangeValue={(language) => setLanguage(language)}
-					>
-						<LanguageIcon className={styles['navigation__icon']} />
-					</WrapperDropdown>
+					<LanguageIcon className={styles['navigation__icon']} />
+				</WrapperDropdown>
 
-					{(props.initialTheme === 'dark' && !theme) || theme === 'dark' ? (
-						<Button
-							color="blank"
-							onClick={() => setTheme('light')}
-						>
-							<DarkModeIcon className={styles['navigation__icon']} />
-						</Button>
-					) : (
-						<Button
-							color="blank"
-							onClick={() => setTheme('dark')}
-						>
-							<LightModeIcon className={styles['navigation__icon']} />
-						</Button>
-					)}
-					</Flex>
-					</Flex>
+				{(props.initialTheme === 'dark' && !theme) || theme === 'dark' ? (
+					<Button
+						color="blank"
+						onClick={() => setTheme('light')}
+					>
+						<DarkModeIcon className={styles['navigation__icon']} />
+					</Button>
+				) : (
+					<Button
+						color="blank"
+						onClick={() => setTheme('dark')}
+					>
+						<LightModeIcon className={styles['navigation__icon']} />
+					</Button>
+				)}
+			</Flex>
+		</Flex>
 	);
 };
 

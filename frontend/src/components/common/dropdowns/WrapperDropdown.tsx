@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { ReactNode, useState } from 'react';
 
@@ -36,6 +36,7 @@ const WrapperDropdown = (props: WrapperDropdownProps) => {
 
 	function handleChangeValue(value: string) {
 		props.onChangeValue(value);
+		setIsOpen(false);
 	}
 
 	return (
@@ -52,37 +53,37 @@ const WrapperDropdown = (props: WrapperDropdownProps) => {
 				{props.children}
 			</Button>
 
-				{isOpen && (
-						<article>
-							{props.items.map((item, index) => (
-								<article
-									className={`${
-										styles['basic-dropdown__list-item']
-									}
+			{isOpen && (
+				<article className={styles['basic-dropdown__body']}>
+					{props.items.map((item, index) => (
+						<article
+							className={`${
+								styles['basic-dropdown__list-item']
+							}
 							${
-								item.value === props.activeValue &&
+						item.value === props.activeValue &&
 								styles['basic-dropdown__list-item--active']
-								}
+						}
 							`}
-									key={index}
-									onClick={() =>
-										handleChangeValue(item.value)
-									}
-								>
-									<label className="label label--clickable">
-										{item.label}
-									</label>
+							key={index}
+							onClick={() =>
+								handleChangeValue(item.value)
+							}
+						>
+							<label className="label label--clickable">
+								{item.label}
+							</label>
 
-									{item.subLabel && (
-										<label className="label label--small label--light-weight label--clickable">
-											{item.subLabel}
-										</label>
-									)}
-								</article>
-							))}
+							{item.subLabel && (
+								<label className="label label--small label--light-weight label--clickable">
+									{item.subLabel}
+								</label>
+							)}
 						</article>
-				)}
-                </article>
+					))}
+				</article>
+			)}
+		</article>
 	);
 };
 

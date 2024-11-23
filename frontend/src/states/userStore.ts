@@ -7,9 +7,9 @@ type UserStoreType = {
 };
 
 const userStore: UserStoreType = proxy({
-    id: null,
-    name: null,
-    email: null
+	id: null,
+	name: null,
+	email: null
 });
 
 export default userStore;

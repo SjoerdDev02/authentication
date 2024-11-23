@@ -26,7 +26,7 @@ const TextInput = (props: TextInputProps) => {
 			onChange={handleChange}
 			placeholder={props.placeholder}
 			type={props.type || "text"}
-			value={props.value || undefined}
+			value={props.value || ''}
 		/>
 	);
 };

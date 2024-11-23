@@ -1,13 +1,5 @@
 .page {
-  height: 100% !important;
-  background-color: var(--color-grayscale-100);
-}
-
-.flex {
-  background-color: orange;
-
-  @media (max-width: 768px) {
-      flex-direction: column;
-  }
+  height: 100%;
+  background-color: var(--color-grayscale-50);
 }
 

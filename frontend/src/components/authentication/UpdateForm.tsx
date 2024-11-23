@@ -5,12 +5,16 @@ import { useActionState, useState } from "react";
 import { deleteUser, updateUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/UpdateForm.module.scss';
 import Button from "@/components/common/buttons/Button";
+import userStore from "@/states/userStore";
+import useTranslations from "@/utils/hooks/useTranslations";
 
 import { Flex } from "../common/Flex";
 import TextInput from "../common/input/text/TextInput";
-import userStore from "@/states/userStore";
+import AuthFormWrapper from "./AuthFormWrapper";
 
 const EntryForm = () => {
+	const translations = useTranslations();
+
 	const initialState = {
 		success: true,
 		message: ''
@@ -26,7 +30,7 @@ const EntryForm = () => {
 
 	const handleDeleteUser = () => {
 		deleteUser(userId);
-	}
+	};
 
 	return (
 		<Flex
@@ -34,55 +38,54 @@ const EntryForm = () => {
 			flexDirection="column"
 			gap={2}
 		>
-			<form
-				action={formAction}
-				className={styles['update-user__form']}
-			>
-				<TextInput
-					name="userId"
-					type='hidden'
-					value={userId}
-				/>
+			<AuthFormWrapper action={formAction}>
+				<div className={styles['update-user__input-wrapper']}>
+					<TextInput
+						name="userId"
+						type="hidden"
+						value={userId}
+					/>
 
-				<TextInput
-					name="email"
-					onChange={(e) => setEmail(e)}
-					placeholder="Email address"
-					type="email"
-					value={email}
+					<TextInput
+						name="email"
+						onChange={(e) => setEmail(e)}
+						placeholder={translations('Authentication.emailPlaceholder')}
+						type="email"
+						value={email}
 				 />
 
-				<TextInput
-					name="name"
-					onChange={(e) => setName(e)}
-					placeholder="Name"
-					type="text"
-					value={name}
+					<TextInput
+						name="name"
+						onChange={(e) => setName(e)}
+						placeholder={translations('Authentication.namePlaceholder')}
+						type="text"
+						value={name}
 				 	/>
 
-				<TextInput
-					name="password"
-					onChange={(e) => setPassword(e)}
-					placeholder="Password"
-					type="password"
-					value={password}
+					<TextInput
+						name="password"
+						onChange={(e) => setPassword(e)}
+						placeholder={translations('Authentication.passwordPlaceholder')}
+						type="password"
+						value={password}
 				 />
 
-				<TextInput
-					name="passwordConfirmation"
-					onChange={(e) => setPasswordConfirmation(e)}
-					placeholder="Confirm password"
-					type="password"
-					value={passwordConfirmation}
+					<TextInput
+						name="passwordConfirmation"
+						onChange={(e) => setPasswordConfirmation(e)}
+						placeholder={translations('Authentication.passwordConfirmPlaceholder')}
+						type="password"
+						value={passwordConfirmation}
 				 	/>
+				</div>
 
 				<Button
 					color="primary"
-					type="submit"
 					loading={isPending}
+					type="submit"
 				>
 					<span>
-          				Login
+						{translations('Authentication.updateLabel')}
 					</span>
 				</Button>
 
@@ -91,10 +94,15 @@ const EntryForm = () => {
 						{state.message}
 					</div>
 				)}
-			</form>
+			</AuthFormWrapper>
 
-			<Button color="warning" onClick={handleDeleteUser}>
-				<span>Delete account</span>
+			<Button
+				color="warning"
+				onClick={handleDeleteUser}
+			>
+				<span>
+					{translations('Authentication.deleteLabel')}
+				</span>
 			</Button>
 		</Flex>
 	);

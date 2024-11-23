@@ -1,6 +1,19 @@
 .update-user {
-    &__form {
-        gap: var(--gap-3);
-        flex-direction: column;
+    background-color: var(--color-grayscale-100);
+    padding: var(--padding-700);
+    border-radius: var(--border-radius-200);
+    box-shadow: var(--box-shadow-sm);
+
+    &__input-wrapper {
+        display: grid;
+        gap: var(--gap-300);
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include phone {
+        &__input-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
     }
 }

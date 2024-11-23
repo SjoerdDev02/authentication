@@ -1,19 +1,18 @@
 .tab-pill {
     $self: &;
 
-    background-color: var(--color-grayscale-100);
+    background-color: var(--color-grayscale-400);
     box-shadow: var(--box-shadow-small);
     position: relative;
 
     &__indicator {
         position: absolute;
         width: calc(100% / var(--items-count));
-        background-color: red;
         height: calc(100% - var(--padding-200));
         top: var(--padding-100);
         left: calc(var(--padding-100));
         transform: translateX((calc((100% - var(--padding-100)) * var(--active-item-index))));
-        background-color: var(--color-grayscale-50);
+        background-color: var(--color-grayscale-800);
         border-radius: var(--border-radius-500);
         transition: all var(--transition-duration-short) ease-in;
     }
@@ -38,19 +37,18 @@
         justify-content: center;
 
         &--active {
-            #{$self}__item-label {
-                font-weight: var(--font-weight-400);
-            }
+            font-weight: var(--font-weight-500);
         }
 
         &:not(#{$item}--active) {
             &:hover {
-                background-color: var(--color-grayscale-200);
+                background-color: var(--color-grayscale-800);
             }
         }
     }
 
     &__item-label {
         transition: all var(--transition-duration-short) ease-in;
+        color: var(--color-grayscale-50)
     }
 }

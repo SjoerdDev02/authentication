@@ -1,6 +1,5 @@
 {
   "extends": [
-    "next/babel",
     "next/core-web-vitals"
   ],
   "plugins": [
@@ -28,6 +27,12 @@
       {
         "before": false,
         "after": true
+      }
+    ],
+    "react/jsx-max-props-per-line": [
+      "error",
+      {
+        "when": "always"
       }
     ]
   }

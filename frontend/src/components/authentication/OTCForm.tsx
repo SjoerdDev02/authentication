@@ -3,16 +3,23 @@
 import { useActionState, useState } from "react";
 
 import { otcUser } from "@/app/actions/authentication";
-import styles from '@/components/authentication/OTCForm.module.scss';
+// import styles from '@/components/authentication/OTCForm.module.scss';
 import Button from "@/components/common/buttons/Button";
+import useTranslations from "@/utils/hooks/useTranslations";
 
+import { Flex } from "../common/Flex";
 import TextInput from "../common/input/text/TextInput";
+import AuthFormWrapper from "./AuthFormWrapper";
 
 type OTCFormProps = {
 	onClose: () => void;
 }
 
+// TODO: Use these props
+// eslint-disable-next-line no-unused-vars
 const OTCForm = (props: OTCFormProps) => {
+	const translations = useTranslations();
+
 	const initialState = {
 		success: true,
 		message: ''
@@ -64,27 +71,26 @@ const OTCForm = (props: OTCFormProps) => {
 	];
 
 	return (
-		<form
-			action={formAction}
-			className={styles['user-entry__form']}
-		>
-			{inputItems.map((input, index) => (
-				<TextInput
-					key={`otc-input-${index}`}
-					name={input.inputName}
-					onChange={input.updateFunction}
-					type="text"
-					value={input.inputValue}
-				/>
-			))}
+		<AuthFormWrapper action={formAction}>
+			<Flex gap={2}>
+				{inputItems.map((input, index) => (
+					<TextInput
+						key={`otc-input-${index}`}
+						name={input.inputName}
+						onChange={input.updateFunction}
+						type="text"
+						value={input.inputValue}
+					/>
+				))}
+			</Flex>
 
 			<Button
 				color="primary"
-				type="submit"
 				loading={isPending}
+				type="submit"
 			>
 				<span>
-          				Login
+					{translations('Authentication.sendLabel')}
 				</span>
 			</Button>
 
@@ -93,7 +99,7 @@ const OTCForm = (props: OTCFormProps) => {
 					{state.message}
 				</div>
 			)}
-		</form>
+		</AuthFormWrapper>
 	);
 };
 

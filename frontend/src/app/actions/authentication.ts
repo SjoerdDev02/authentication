@@ -1,149 +1,149 @@
 import axios from 'axios';
 
 export async function registerUser(prevState: any, formData: FormData) {
-    try {
-        const email = formData.get('email');
-        const name = formData.get('name');
-        const password = formData.get('password');
-        const passwordConfirm = formData.get('passwordConfirmation');
+	try {
+		const email = formData.get('email');
+		const name = formData.get('name');
+		const password = formData.get('password');
+		const passwordConfirm = formData.get('passwordConfirmation');
 
-        if (!email || !name || !password || !passwordConfirm) {
-            return { success: false, message: 'Invalid credentials' };
-        }
+		if (!email || !name || !password || !passwordConfirm) {
+			return { success: false, message: 'Invalid credentials' };
+		}
 
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/register`, {
-            email,
-            name,
-            password,
-            passwordConfirm
-        });
+		const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/register`, {
+			email,
+			name,
+			password,
+			passwordConfirm
+		});
 
-        return { 
-            success: true,
-            message: response.data.message
-        };
-    } catch (error: any) {
-        return { 
-            success: false,
-            message: error.response?.data?.message || 'An error occurred'
-        };
-    }
+		return {
+			success: true,
+			message: response.data.message
+		};
+	} catch (error: any) {
+		return {
+			success: false,
+			message: error.response?.data?.message || 'An error occurred'
+		};
+	}
 }
 
 export async function updateUser(prevState: any, formData: FormData) {
-    try {
-        const id = formData.get('userId');
-        const email = formData.get('email');
-        const name = formData.get('name');
-        const password = formData.get('password');
-        const passwordConfirm = formData.get('passwordConfirmation');
+	try {
+		const id = formData.get('userId');
+		const email = formData.get('email');
+		const name = formData.get('name');
+		const password = formData.get('password');
+		const passwordConfirm = formData.get('passwordConfirmation');
 
-        if (
-            (!email && !name)
+		if (
+			(!email && !name)
             && (!password && !passwordConfirm)
-        ) {
-            return { 
-                success: false, 
-                message: 'Invalid credentials' 
-            };
-        }
+		) {
+			return {
+				success: false,
+				message: 'Invalid credentials'
+			};
+		}
 
-        const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/update`, {
-            id,
-            ...(email && { email }),
-            ...(name && { name }),
-            ...(password && { password }),
-            ...(passwordConfirm && { passwordConfirm })
-        });
+		const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/update`, {
+			id,
+			...(email && { email }),
+			...(name && { name }),
+			...(password && { password }),
+			...(passwordConfirm && { passwordConfirm })
+		});
 
-        return { 
-            success: true,
-            message: response.data.message
-        };
-    } catch (error: any) {
-        return { 
-            success: false,
-            message: error.response?.data?.message || 'An error occurred'
-        };
-    }
+		return {
+			success: true,
+			message: response.data.message
+		};
+	} catch (error: any) {
+		return {
+			success: false,
+			message: error.response?.data?.message || 'An error occurred'
+		};
+	}
 }
 
 export async function loginUser(prevState: any, formData: FormData) {
-    try {
-        const name = formData.get('name');
-        const password = formData.get('password');
+	try {
+		const email = formData.get('email');
+		const password = formData.get('password');
 
-        if (!name || !password) {
-            return { success: false, message: 'Invalid credentials' };
-        }
+		if (!email || !password) {
+			return { success: false, message: 'Invalid credentials' };
+		}
 
-        const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/login`, { 
-            name, 
-            password 
-        });
+		const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/login`, {
+			email,
+			password
+		});
 
-        return { 
-            success: true, 
-            message: response.data.message
-         };
-    } catch (error: any) {
-        return {
-             success: false, 
-             message: error.response?.data?.message || 'An error occurred' 
-        };
-    }
+		return {
+			success: true,
+			message: response.data.message
+		};
+	} catch (error: any) {
+		return {
+			success: false,
+			message: error.response?.data?.message || 'An error occurred'
+		};
+	}
 }
 
 export async function deleteUser(userId: number | null) {
-    try {
-        const id = userId;
+	try {
+		const id = userId;
 
-        const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/delete/${id}`);
+		const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/delete/${id}`);
 
-        return { 
-            success: true,
-            message: response.data.message
-        };
-    } catch (error: any) {
-        return {
-            success: false,
-            message: error.response?.data?.message || 'An error occurred'
-        };
-    }
+		return {
+			success: true,
+			message: response.data.message
+		};
+	} catch (error: any) {
+		return {
+			success: false,
+			message: error.response?.data?.message || 'An error occurred'
+		};
+	}
 }
 
 export async function otcUser(prevState: any, formData: FormData) {
-    try {
-        const characterOne = formData.get('characterOne');
-        const characterTwo = formData.get('characterTwo');
-        const characterThree = formData.get('characterThree');
-        const characterFour = formData.get('characterFour');
-        const characterFive = formData.get('characterFive');
-        const characterSix = formData.get('characterSix');
+	try {
+		const characterOne = formData.get('characterOne');
+		const characterTwo = formData.get('characterTwo');
+		const characterThree = formData.get('characterThree');
+		const characterFour = formData.get('characterFour');
+		const characterFive = formData.get('characterFive');
+		const characterSix = formData.get('characterSix');
 
-        if (!characterOne || !characterTwo || !characterThree || !characterFour || !characterFive || !characterSix) {
-            return { success: false, message: 'Invalid credentials' };
-        }
+		if (!characterOne || !characterTwo || !characterThree || !characterFour || !characterFive || !characterSix) {
+			return { success: false, message: 'Invalid credentials' };
+		}
 
-        const otc = [
-            characterOne,
-            characterTwo,
-            characterThree,
-            characterFour,
-            characterFive,
-            characterSix
-        ].join('');
+		const otc = [
+			characterOne,
+			characterTwo,
+			characterThree,
+			characterFour,
+			characterFive,
+			characterSix
+		].join('');
 
-        const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/otc/${otc}`);
+		const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/otc/${otc}`);
 
-        return {
-            success: true,
-            message: response.data.message
-        };
-    } catch (error: any) {
-        return {
-            success: false,
-            message: error.response?.data?.message || 'An error occurred'
-        };
-    }
+		return {
+			success: true,
+			message: response.data.message
+		};
+	} catch (error: any) {
+		return {
+			success: false,
+			message: error.response?.data?.message || 'An error occurred'
+		};
+	}
 }

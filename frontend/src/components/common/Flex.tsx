@@ -118,7 +118,8 @@ export const Flex = (props: FlexProps) => {
 		...props.width !== undefined && { '--width': props.width === 'fill' ? '100%' : props.width },
 		...props.height !== undefined && { '--height': props.height === 'fill' ? '100%' : props.height },
 		...props.maxWidth && { '--max-width': props.maxWidth },
-		...props.maxHeight && { '--max-height': props.maxHeight }
+		...props.maxHeight && { '--max-height': props.maxHeight },
+		...props.style
 	};
 
 	return (

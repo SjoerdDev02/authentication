@@ -5,12 +5,16 @@ import { useActionState, useState } from "react";
 import { loginUser, registerUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/EntryForm.module.scss';
 import Button from "@/components/common/buttons/Button";
+import useTranslations from "@/utils/hooks/useTranslations";
 
 import { Flex } from "../common/Flex";
 import TextInput from "../common/input/text/TextInput";
 import TabPill from "../common/tabs/TabPill";
+import AuthFormWrapper from "./AuthFormWrapper";
 
 const EntryForm = () => {
+	const translations = useTranslations();
+
 	const initialState = {
 		success: true,
 		message: ''
@@ -18,11 +22,11 @@ const EntryForm = () => {
 
 	const tabItems = [
 		{
-			label: 'Login',
+			label: translations('Authentication.loginLabel'),
 			value: false
 		},
 		{
-			label: 'Register',
+			label: translations('Authentication.registerLabel'),
 			value: true
 		}
 	];
@@ -51,62 +55,61 @@ const EntryForm = () => {
 				onChangeValue={setIsRegistering}
 			/>
 
-			<form
-				action={formAction}
-				className={styles['user-entry__form']}
-			>
-				<TextInput
-					name="email"
-					onChange={(e) => setEmail(e)}
-					placeholder="Email address"
-					type="email"
-					value={email}
-				 />
-
-				{isRegistering && (
+			<AuthFormWrapper action={formAction}>
+				<div className={styles['user-entry__input-wrapper']}>
 					<TextInput
-						name="name"
-						onChange={(e) => setName(e)}
-						placeholder="Name"
-						type="text"
-						value={name}
+						name="email"
+						onChange={(e) => setEmail(e)}
+						placeholder={translations('Authentication.emailPlaceholder')}
+						type="email"
+						value={email}
 				 	/>
-				)}
 
-				<TextInput
-					name="password"
-					onChange={(e) => setPassword(e)}
-					placeholder="Password"
-					type="password"
-					value={password}
-				 />
+					{isRegistering && (
+						<TextInput
+							name="name"
+							onChange={(e) => setName(e)}
+							placeholder={translations('Authentication.namePlaceholder')}
+							type="text"
+							value={name}
+				 	/>
+					)}
 
-				{isRegistering && (
 					<TextInput
-						name="passwordConfirmation"
-						onChange={(e) => setPasswordConfirmation(e)}
-						placeholder="Confirm password"
+						name="password"
+						onChange={(e) => setPassword(e)}
+						placeholder={translations('Authentication.passwordPlaceholder')}
 						type="password"
-						value={passwordConfirmation}
-				 	/>
-				)}
+						value={password}
+				 />
 
-				<Button
-					color="primary"
-					type="submit"
-					loading={isPending}
-				>
-					<span>
-          				Login
-					</span>
-				</Button>
+					{isRegistering && (
+						<TextInput
+							name="passwordConfirmation"
+							onChange={(e) => setPasswordConfirmation(e)}
+							placeholder={translations('Authentication.passwordConfirmPlaceholder')}
+							type="password"
+							value={passwordConfirmation}
+				 	/>
+					)}
+				</div>
 
 				{state.message && (
 					<div className={state.success ? 'text-green-600' : 'text-red-600'}>
 						{state.message}
 					</div>
 				)}
-			</form>
+
+				<Button
+					color="primary"
+					loading={isPending}
+					type="submit"
+				>
+					<span>
+						{translations('Authentication.loginLabel')}
+					</span>
+				</Button>
+			</AuthFormWrapper>
 		</Flex>
 	);
 };
