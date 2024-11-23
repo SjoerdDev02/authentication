@@ -1,14 +1,12 @@
 import EntryForm from "@/components/authentication/EntryForm";
-import { Flex } from "@/components/common/Flex";
+import Page from "@/components/common/page/Page";
 
-import styles from "./page.module.css";
+import styles from "./page.module.scss";
 
 export default function Home() {
 	return (
-		<Flex alignItems="center"
-			className={styles.page}
-			justifyContent="center">
+		<Page className={styles.page}>
 			<EntryForm />
-		</Flex>
+		</Page>
 	);
 }

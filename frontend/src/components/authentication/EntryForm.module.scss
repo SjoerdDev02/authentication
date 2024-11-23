@@ -11,6 +11,8 @@
     }
 
     @include phone {
+        width: calc(100vw - var(--padding-800));
+        
         &__input-wrapper {
             display: flex;
             flex-direction: column;

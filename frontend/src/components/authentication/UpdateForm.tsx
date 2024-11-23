@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
 
 import { deleteUser, updateUser } from "@/app/actions/authentication";
@@ -12,15 +13,9 @@ import { Flex } from "../common/Flex";
 import TextInput from "../common/input/text/TextInput";
 import AuthFormWrapper from "./AuthFormWrapper";
 
-const EntryForm = () => {
+const UpdateForm = () => {
 	const translations = useTranslations();
-
-	const initialState = {
-		success: true,
-		message: ''
-	};
-
-	const [state, formAction, isPending] = useActionState(updateUser, initialState);
+	const router = useRouter();
 
 	const userId = userStore.id;
 	const [name, setName] = useState('');
@@ -28,9 +23,32 @@ const EntryForm = () => {
 	const [password, setPassword] = useState('');
 	const [passwordConfirmation, setPasswordConfirmation] = useState('');
 
-	const handleDeleteUser = () => {
-		deleteUser(userId);
+	const initialState = {
+		success: true,
+		message: ''
 	};
+
+	const handleUpdateUser = async (prevState: any, formData: FormData) => {
+		const result = await updateUser(prevState, formData);
+
+		if (result.success) {
+			router.push('/otc');
+		}
+
+		return result;
+	};
+
+	const handleDeleteUser = async () => {
+		const result = await deleteUser(userId);
+
+		if (result.success) {
+			router.push('/otc');
+		}
+
+		return result;
+	};
+
+	const [state, formAction, isPending] = useActionState(handleUpdateUser, initialState);
 
 	return (
 		<Flex
@@ -52,7 +70,7 @@ const EntryForm = () => {
 						placeholder={translations('Authentication.emailPlaceholder')}
 						type="email"
 						value={email}
-				 />
+					/>
 
 					<TextInput
 						name="name"
@@ -60,7 +78,7 @@ const EntryForm = () => {
 						placeholder={translations('Authentication.namePlaceholder')}
 						type="text"
 						value={name}
-				 	/>
+					/>
 
 					<TextInput
 						name="password"
@@ -68,7 +86,7 @@ const EntryForm = () => {
 						placeholder={translations('Authentication.passwordPlaceholder')}
 						type="password"
 						value={password}
-				 />
+					/>
 
 					<TextInput
 						name="passwordConfirmation"
@@ -76,7 +94,7 @@ const EntryForm = () => {
 						placeholder={translations('Authentication.passwordConfirmPlaceholder')}
 						type="password"
 						value={passwordConfirmation}
-				 	/>
+					/>
 				</div>
 
 				<Button
@@ -108,4 +126,5 @@ const EntryForm = () => {
 	);
 };
 
-export default EntryForm;
+export default UpdateForm;
+

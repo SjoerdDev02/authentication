@@ -36,6 +36,8 @@ export default async function RootLayout({
 					initialTheme={initialTheme} />
 
 				<main>{children}</main>
+
+				<div id="modal" />
 			</body>
 		</html>
 	);

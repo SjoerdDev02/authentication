@@ -8,6 +8,7 @@ type AuthFormWrapperProps = {
     children: ReactNode;
     className?: string;
 }
+
 const AuthFormWrapper = (props: AuthFormWrapperProps) => {
 	return (
 		<form

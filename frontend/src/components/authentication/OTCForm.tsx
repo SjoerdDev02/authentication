@@ -1,9 +1,10 @@
 'use client';
 
+import { useParams } from "next/navigation";
 import { useActionState, useState } from "react";
 
 import { otcUser } from "@/app/actions/authentication";
-// import styles from '@/components/authentication/OTCForm.module.scss';
+import styles from '@/components/authentication/OTCForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import useTranslations from "@/utils/hooks/useTranslations";
 
@@ -11,13 +12,10 @@ import { Flex } from "../common/Flex";
 import TextInput from "../common/input/text/TextInput";
 import AuthFormWrapper from "./AuthFormWrapper";
 
-type OTCFormProps = {
-	onClose: () => void;
-}
-
 // TODO: Use these props
 // eslint-disable-next-line no-unused-vars
-const OTCForm = (props: OTCFormProps) => {
+const OTCForm = () => {
+	const params = useParams();
 	const translations = useTranslations();
 
 	const initialState = {
@@ -25,17 +23,19 @@ const OTCForm = (props: OTCFormProps) => {
 		message: ''
 	};
 
+	const initialCodeCharacters = params.code?.[0]?.split('');
+
 	const [state, formAction, isPending] = useActionState(
 		otcUser,
 		initialState
 	);
 
-	const [characterOne, setCharacterOne] = useState('');
-	const [characterTwo, setCharacterTwo] = useState('');
-	const [characterThree, setCharacterThree] = useState('');
-	const [characterFour, setCharacterFour] = useState('');
-	const [characterFive, setCharacterFive] = useState('');
-	const [characterSix, setCharacterSix] = useState('');
+	const [characterOne, setCharacterOne] = useState(initialCodeCharacters?.[0] || '');
+	const [characterTwo, setCharacterTwo] = useState(initialCodeCharacters?.[1] || '');
+	const [characterThree, setCharacterThree] = useState(initialCodeCharacters?.[2] || '');
+	const [characterFour, setCharacterFour] = useState(initialCodeCharacters?.[3] || '');
+	const [characterFive, setCharacterFive] = useState(initialCodeCharacters?.[4] || '');
+	const [characterSix, setCharacterSix] = useState(initialCodeCharacters?.[5] || '');
 
 	const inputItems = [
 		{
@@ -71,35 +71,51 @@ const OTCForm = (props: OTCFormProps) => {
 	];
 
 	return (
-		<AuthFormWrapper action={formAction}>
-			<Flex gap={2}>
-				{inputItems.map((input, index) => (
-					<TextInput
-						key={`otc-input-${index}`}
-						name={input.inputName}
-						onChange={input.updateFunction}
-						type="text"
-						value={input.inputValue}
-					/>
-				))}
-			</Flex>
+		<Flex
+			alignItems="center"
+			className={styles['otc-form']}
+			flexDirection="column"
+			gap={2}
+		>
+			<h1 className={styles['otc-form__header']}>{translations('Authentication.otcHeader')}</h1>
 
-			<Button
-				color="primary"
-				loading={isPending}
-				type="submit"
-			>
-				<span>
-					{translations('Authentication.sendLabel')}
-				</span>
-			</Button>
+			<h2 className={styles['otc-form__sub-header']}>{translations('Authentication.otcSubHeader')}</h2>
 
-			{state.message && (
-				<div className={state.success ? 'text-green-600' : 'text-red-600'}>
-					{state.message}
-				</div>
-			)}
-		</AuthFormWrapper>
+			<AuthFormWrapper action={formAction}>
+				<Flex
+					gap={2}
+					justifyContent="center"
+				>
+					{inputItems.map((input, index) => (
+						<TextInput
+							className={styles['otc-form__input']}
+							key={`otc-input-${index}`}
+							maxLength={1}
+							name={input.inputName}
+							onChange={input.updateFunction}
+							type="text"
+							value={input.inputValue}
+						/>
+					))}
+				</Flex>
+
+				<Button
+					color="primary"
+					loading={isPending}
+					type="submit"
+				>
+					<span>
+						{translations('Authentication.sendLabel')}
+					</span>
+				</Button>
+
+				{state.message && (
+					<div className={state.success ? 'text-green-600' : 'text-red-600'}>
+						{state.message}
+					</div>
+				)}
+			</AuthFormWrapper>
+		</Flex>
 	);
 };
 

@@ -8,6 +8,8 @@
         "emailPlaceholder": "Email address",
         "namePlaceholder": "Name",
         "passwordPlaceholder": "Password",
-        "passwordConfirmPlaceholder": "Confirm password"
+        "passwordConfirmPlaceholder": "Confirm password",
+        "otcHeader": "Verify Your Identity",
+        "otcSubHeader": "Check Your Inbox for the Code"
     }
 }

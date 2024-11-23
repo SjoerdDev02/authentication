@@ -1,15 +1,11 @@
 import styles from '@/app/update/update.module.scss';
 import UpdateForm from "@/components/authentication/UpdateForm";
-import { Flex } from "@/components/common/Flex";
+import Page from '@/components/common/page/Page';
 
 export default function Home() {
 	return (
-		<Flex
-			alignItems="center"
-			className={styles.page}
-			justifyContent="center"
-		>
+		<Page className={styles.page}>
 			<UpdateForm />
-		</Flex>
+		</Page>
 	);
 }

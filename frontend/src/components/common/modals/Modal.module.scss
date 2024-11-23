@@ -1,0 +1,36 @@
+.backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    backdrop-filter: brightness(.6);
+}
+
+.modal {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color-grayscale-100);
+    overflow: hidden;
+    border-radius: var(--border-radius-200);
+    box-shadow: var(--box-shadow-md);
+
+    &--sm {
+        width: 500px;
+        padding: var(--padding-400);
+    }
+
+    &--md {
+        width: 750px;
+        padding: var(--padding-600);
+    }
+
+    &--lg {
+        width: calc(100vw - var(--padding-500));
+        padding: var(--padding-800);
+    }
+
+    @include phone {
+        width: calc(100vw - var(--padding-400));
+    }
+}

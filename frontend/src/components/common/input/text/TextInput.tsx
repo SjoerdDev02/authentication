@@ -1,8 +1,10 @@
+import classNames from 'classnames';
 import { ChangeEvent, HTMLInputTypeAttribute } from 'react';
 
 import styles from './TextInput.module.scss';
 
 type TextInputProps = {
+	className?: string;
     disabled?: boolean;
     name?: string;
 	// eslint-disable-next-line no-unused-vars
@@ -10,6 +12,7 @@ type TextInputProps = {
     placeholder?: string;
     value: string | number | null;
 	type?: HTMLInputTypeAttribute;
+	maxLength?: number;
 }
 
 const TextInput = (props: TextInputProps) => {
@@ -20,8 +23,9 @@ const TextInput = (props: TextInputProps) => {
 	return (
 		<input
 			aria-disabled={props.disabled}
-			className={styles['text-input']}
+			className={classNames(styles['text-input'], props.className)}
 			disabled={props.disabled}
+			maxLength={props.maxLength}
 			name={props.name}
 			onChange={handleChange}
 			placeholder={props.placeholder}

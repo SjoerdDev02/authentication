@@ -21,6 +21,17 @@
   --padding-800: 1.6rem;
   --padding-900: 1.8rem;
 
+  /* Paddings */
+  --size-100: 0.8rem;
+  --size-200: 1rem;
+  --size-300: 1.2rem;
+  --size-400: 1.4rem;
+  --size-500: 1.6rem;
+  --size-600: 1.8rem;
+  --size-700: 2rem;
+  --size-800: 2.2rem;
+  --size-900: 2.4rem;
+
   /* Border Radii */
   --border-radius-0: 0;
   --border-radius-100: 4px;
@@ -99,15 +110,15 @@
     --box-shadow-md: 0px 4px 8px rgba(0, 0, 0, .1);
 
     /* Font Sizes */
-  --font-size-100: 0.8rem;
-  --font-size-200: 1rem;
-  --font-size-300: 1.2rem;
-  --font-size-400: 1.4rem;
-  --font-size-500: 1.6rem;
-  --font-size-600: 1.8rem;
-  --font-size-700: 2rem;
-  --font-size-800: 2.2rem;
-  --font-size-900: 2.4rem;
+    --font-size-100: 0.4rem;
+    --font-size-200: 0.8rem;
+    --font-size-300: 1.2rem;
+    --font-size-400: 1.6rem;
+    --font-size-500: 2rem;
+    --font-size-600: 2.4rem;
+    --font-size-700: 2.8rem;
+    --font-size-800: 3.2rem;
+    --font-size-900: 3.6rem;
 
     /* Font Weights */
     --font-weight-100: 100;
@@ -121,35 +132,39 @@
     --font-weight-900: 900;
 
     /* Fonts */
-    --font-100: var(--font-size-500) var(--font-weight-500) var(--font-inter);
-    --font-300: var(--font-size-600) var(--font-weight-600) var(--font-inter);
-    --font-500: var(--font-size-700) var(--font-weight-700) var(--font-inter);
-    --font-700: var(--font-size-800) var(--font-weight-800) var(--font-inter);
-    --font-900: var(--font-size-900) var(--font-weight-900) var(--font-inter);
+    --font-100: var(--font-weight-100) var(--font-size-100) / 1.2 "Inter";
+    --font-200: var(--font-weight-200) var(--font-size-200) / 1.2 "Inter";
+    --font-300: var(--font-weight-300) var(--font-size-300) / 1.2 "Inter";
+    --font-400: var(--font-weight-400) var(--font-size-400) / 1.2 "Inter";
+    --font-500: var(--font-weight-500) var(--font-size-500) / 1.2 "Inter";
+    --font-600: var(--font-weight-600) var(--font-size-600) / 1.2 "Inter";
+    --font-700: var(--font-weight-700) var(--font-size-700) / 1.2 "Inter";
+    --font-800: var(--font-weight-800) var(--font-size-800) / 1.2 "Inter";
+    --font-900: var(--font-weight-900) var(--font-size-900) / 1.2 "Inter";
 
-    @include laptop {
-      --font-100: var(--font-size-400) var(--font-weight-400) var(--font-inter);
-      --font-300: var(--font-size-500) var(--font-weight-500) var(--font-inter);
-      --font-500: var(--font-size-600) var(--font-weight-600) var(--font-inter);
-      --font-700: var(--font-size-700) var(--font-weight-700) var(--font-inter);
-      --font-900: var(--font-size-800) var(--font-weight-800) var(--font-inter);
-    }
+    // @include laptop {
+    //   --font-100: var(--font-weight-400) var(--font-size-100) / 1.2 "Inter";
+    //   --font-300: var(--font-weight-500) var(--font-size-300) / 1.2 "Inter";
+    //   --font-500: var(--font-weight-600) var(--font-size-500) / 1.2 "Inter";
+    //   --font-700: var(--font-weight-700) var(--font-size-700) / 1.2 "Inter";
+    //   --font-900: var(--font-weight-800) var(--font-size-900) / 1.2 "Inter";
+    // }
 
-    @include phone {
-      --font-100: var(--font-size-300) var(--font-weight-300) var(--font-inter);
-      --font-300: var(--font-size-400) var(--font-weight-400) var(--font-inter);
-      --font-500: var(--font-size-500) var(--font-weight-500) var(--font-inter);
-      --font-700: var(--font-size-600) var(--font-weight-600) var(--font-inter);
-      --font-900: var(--font-size-700) var(--font-weight-700) var(--font-inter);
-    }
+    // @include phone {
+    //   --font-100: var(--font-weight-300) var(--font-size-300) / 1.2 "Inter";
+    //   --font-300: var(--font-weight-400) var(--font-size-400) / 1.2 "Inter";
+    //   --font-500: var(--font-weight-500) var(--font-size-500) / 1.2 "Inter";
+    //   --font-700: var(--font-weight-600) var(--font-size-600) / 1.2 "Inter";
+    //   --font-900: var(--font-weight-700) var(--font-size-700) / 1.2 "Inter";
+    // }
 
-    @include phone {
-      --font-100: var(--font-size-200) var(--font-weight-200) var(--font-inter);
-      --font-300: var(--font-size-300) var(--font-weight-300) var(--font-inter);
-      --font-500: var(--font-size-400) var(--font-weight-400) var(--font-inter);
-      --font-700: var(--font-size-500) var(--font-weight-500) var(--font-inter);
-      --font-900: var(--font-size-600) var(--font-weight-600) var(--font-inter);
-    }
+    // @include small {
+    //   --font-100: var(--font-weight-200) var(--font-size-200) / 1.2 "Inter";
+    //   --font-300: var(--font-weight-300) var(--font-size-300) / 1.2 "Inter";
+    //   --font-500: var(--font-weight-400) var(--font-size-400) / 1.2 "Inter";
+    //   --font-700: var(--font-weight-500) var(--font-size-500) / 1.2 "Inter";
+    //   --font-900: var(--font-weight-600) var(--font-size-600) / 1.2 "Inter";
+    // }
 }
 
 [data-theme="dark"] {
@@ -204,10 +219,6 @@ html {
 /* TODO: Fix that the body does not overflow */
 body, main {
   height: 100%;
-}
-
-main {
-  background-color: var(--color-grayscale-100);
 }
 
 /* TODO: Check which one is neede */

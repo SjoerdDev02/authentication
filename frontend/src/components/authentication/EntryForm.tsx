@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
 
 import { loginUser, registerUser } from "@/app/actions/authentication";
@@ -14,6 +15,7 @@ import AuthFormWrapper from "./AuthFormWrapper";
 
 const EntryForm = () => {
 	const translations = useTranslations();
+	const router = useRouter();
 
 	const initialState = {
 		success: true,
@@ -33,8 +35,19 @@ const EntryForm = () => {
 
 	const [isRegistering, setIsRegistering] = useState(false);
 
+	const handleRegisterUser = async (prevState: any, formData: FormData) => {
+		const result = await registerUser(prevState, formData);
+
+
+		if (result.success) {
+			router.push('/otc');
+		}
+
+		return result;
+	};
+
 	const [state, formAction, isPending] = useActionState(
-		isRegistering ? registerUser : loginUser,
+		isRegistering ? handleRegisterUser : loginUser,
 		initialState
 	);
 

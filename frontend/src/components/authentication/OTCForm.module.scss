@@ -1,0 +1,30 @@
+.otc-form {
+    background-color: var(--color-grayscale-100);
+    padding: var(--padding-700);
+    border-radius: var(--border-radius-200);
+    box-shadow: var(--box-shadow-sm);
+
+    &__header {
+        font: var(--font-400);
+    }
+      
+    &__sub-header {
+        font: var(--font-200);
+    }
+
+    &__header,
+    &__sub-header {
+        color: var(--color-grayscale-800)
+    }
+
+    &__input {
+        width: var(--size-700);
+        height: var(--size-700);
+        text-align: center;
+        vertical-align: middle;
+    }    
+
+    @include phone {
+        width: calc(100vw - var(--padding-800));
+    }
+}

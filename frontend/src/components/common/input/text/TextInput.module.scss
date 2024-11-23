@@ -1,12 +1,10 @@
 .text-input {
-    padding: var(--padding-100);
     border-radius: var(--border-radius-100);
     border: none;
     background-color: var(--color-grayscale-50);
     outline: none;
     color: var(--color-grayscale-700);
-    font-size: var(--font-size-100);
-    font-weight: var(--font-weight-300);
+    font: var(--font-200);
     box-shadow: 0 0 0 1.5px rgba(87, 175, 219, 0.1);
     padding: var(--padding-300);
     transition: box-shadow var(--transition-duration-short) ease-in;
