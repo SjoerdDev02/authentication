@@ -1,20 +1,17 @@
-extern crate backend;
-use backend::models::auth_models::AuthState;
-use dotenv::dotenv;
-use sqlx::mysql::MySqlPoolOptions;
-
-use axum;
-use redis::Client;
+use tower_http::cors::{CorsLayer, Any};
 use std::{env, sync::Arc};
 use tokio::{net::TcpListener, sync::Mutex};
+use redis::Client;
+use dotenv::dotenv;
+use sqlx::mysql::MySqlPoolOptions;
+use backend::models::auth_models::AuthState;
+use http::{HeaderValue, Method};
 
 #[tokio::main]
 async fn main() {
     dotenv().ok();
 
-    // Use Docker service name "db" to reference MySQL
     let database_url = env::var("DATABASE_URL")
-        // .unwrap_or_else(|_| "mysql://name:password@localhost:3306/authentication".to_string());
         .unwrap_or_else(|_| "mysql://root:root@db:3306/authentication".to_string());
 
     let pool = MySqlPoolOptions::new()
@@ -22,8 +19,6 @@ async fn main() {
         .await
         .expect("Unable to connect to database");
 
-    // Use Docker service name "redis" to reference Redis
-    // let redis_client = Client::open("redis://127.0.0.1/").expect("Unable to connect to Redis");
     let redis_url = env::var("REDIS_URL").unwrap_or_else(|_| "redis://redis/".to_string());
     let redis_client = Client::open(redis_url).expect("Unable to connect to Redis");
 
@@ -41,8 +36,13 @@ async fn main() {
 
     let app = backend::routes::auth_routes::app(state);
 
-    // Bind to 0.0.0.0 to allow connections from other containers
-    // let listener = TcpListener::bind("127.0.0.1:8080")
+    let cors = CorsLayer::new()
+        .allow_origin("http://localhost:3000".parse::<HeaderValue>().unwrap())
+        .allow_methods(vec![Method::GET, Method::POST, Method::PUT, Method::PATCH, Method::DELETE])
+        .allow_headers(Any);
+
+    let app = app.layer(cors);
+
     let listener = TcpListener::bind("0.0.0.0:8080")
         .await
         .expect("Unable to bind to the server");

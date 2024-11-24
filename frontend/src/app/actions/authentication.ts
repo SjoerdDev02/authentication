@@ -20,23 +20,29 @@ export async function registerUser(prevState: any, formData: FormData) {
 
 		return {
 			success: true,
-			message: response.data.message
+			message: response.data.message,
+			data: response.data
 		};
 	} catch (error: any) {
 		return {
 			success: false,
-			message: error.response?.data?.message || 'An error occurred'
+			message: error.response?.data?.message || 'An error occurred',
+			data: null
 		};
 	}
 }
 
-export async function updateUser(prevState: any, formData: FormData) {
+export async function updateUser(prevState: any, formData: FormData, userId: number | null) {
 	try {
-		const id = formData.get('userId');
+		const id = userId;
 		const email = formData.get('email');
 		const name = formData.get('name');
 		const password = formData.get('password');
 		const passwordConfirm = formData.get('passwordConfirmation');
+
+		if (!userId) {
+			return { success: false, message: 'Invalid credentials' };
+		}
 
 		if (
 			(!email && !name)
@@ -84,12 +90,14 @@ export async function loginUser(prevState: any, formData: FormData) {
 
 		return {
 			success: true,
-			message: response.data.message
+			message: response.data.message,
+			data: response.data
 		};
 	} catch (error: any) {
 		return {
 			success: false,
-			message: error.response?.data?.message || 'An error occurred'
+			message: error.response?.data?.message || 'An error occurred',
+			data: null
 		};
 	}
 }
@@ -98,7 +106,11 @@ export async function deleteUser(userId: number | null) {
 	try {
 		const id = userId;
 
-		const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/delete/${id}`);
+		if (!userId) {
+			return { success: false, message: 'Invalid credentials' };
+		}
+
+		const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/delete?id=${id}`);
 
 		return {
 			success: true,
@@ -134,7 +146,7 @@ export async function otcUser(prevState: any, formData: FormData) {
 			characterSix
 		].join('');
 
-		const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/otc/${otc}`);
+		const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/otc?otc=${otc}`);
 
 		return {
 			success: true,

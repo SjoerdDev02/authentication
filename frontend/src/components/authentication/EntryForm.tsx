@@ -6,6 +6,8 @@ import { useActionState, useState } from "react";
 import { loginUser, registerUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/EntryForm.module.scss';
 import Button from "@/components/common/buttons/Button";
+import userStore from "@/states/userStore";
+import { AuthResponse, MinifiedAuthResponse } from "@/types/Authentication";
 import useTranslations from "@/utils/hooks/useTranslations";
 
 import { Flex } from "../common/Flex";
@@ -13,13 +15,20 @@ import TextInput from "../common/input/text/TextInput";
 import TabPill from "../common/tabs/TabPill";
 import AuthFormWrapper from "./AuthFormWrapper";
 
+type initialStateType = {
+	success: boolean;
+	message: string;
+	data: AuthResponse | MinifiedAuthResponse | null;
+}
+
 const EntryForm = () => {
 	const translations = useTranslations();
 	const router = useRouter();
 
-	const initialState = {
+	const initialState: initialStateType = {
 		success: true,
-		message: ''
+		message: '',
+		data: null
 	};
 
 	const tabItems = [
@@ -38,16 +47,36 @@ const EntryForm = () => {
 	const handleRegisterUser = async (prevState: any, formData: FormData) => {
 		const result = await registerUser(prevState, formData);
 
+		console.log(result);
 
 		if (result.success) {
 			router.push('/otc');
+
+			userStore.name = result.data?.name;
+			userStore.email = result.data?.email;
+		}
+
+		return result;
+	};
+
+	const handleLoginUser = async (prevState: any, formData: FormData) => {
+		const result = await loginUser(prevState, formData);
+
+		console.log(result);
+
+		if (result.success) {
+			router.push('/welcome');
+
+			userStore.id = result.data?.id;
+			userStore.name = result.data?.name;
+			userStore.email = result.data?.email;
 		}
 
 		return result;
 	};
 
 	const [state, formAction, isPending] = useActionState(
-		isRegistering ? handleRegisterUser : loginUser,
+		isRegistering ? handleRegisterUser : handleLoginUser,
 		initialState
 	);
 

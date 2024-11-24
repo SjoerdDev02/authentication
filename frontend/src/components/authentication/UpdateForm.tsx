@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
+import { useSnapshot } from "valtio";
 
 import { deleteUser, updateUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/UpdateForm.module.scss';
@@ -16,8 +17,9 @@ import AuthFormWrapper from "./AuthFormWrapper";
 const UpdateForm = () => {
 	const translations = useTranslations();
 	const router = useRouter();
+	const userStoreSnap = useSnapshot(userStore);
 
-	const userId = userStore.id;
+	const userId = userStoreSnap.id;
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
@@ -29,7 +31,7 @@ const UpdateForm = () => {
 	};
 
 	const handleUpdateUser = async (prevState: any, formData: FormData) => {
-		const result = await updateUser(prevState, formData);
+		const result = await updateUser(prevState, formData, userId);
 
 		if (result.success) {
 			router.push('/otc');

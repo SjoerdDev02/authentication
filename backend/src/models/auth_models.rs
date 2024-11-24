@@ -21,6 +21,7 @@ pub struct RegisterUser {
     pub name: String,
     pub email: String,
     pub password: String,
+    #[serde(rename = "passwordConfirm")]
     pub password_confirm: String,
 }
 
@@ -36,6 +37,7 @@ pub struct UpdateUser {
     pub name: Option<String>,
     pub email: Option<String>,
     pub password: Option<String>,
+    #[serde(rename = "passwordConfirm")]
     pub password_confirm: Option<String>,
 }
 

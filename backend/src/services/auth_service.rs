@@ -33,6 +33,8 @@ pub async fn register_user(
     State(state): State<AuthState>,
     Json(user_data): Json<RegisterUser>,
 ) -> Result<Json<MinifiedAuthResponse>, StatusCode> {
+    println!("{} {} {} {}", user_data.name, user_data.email, user_data.password, user_data.password_confirm);
+
     if user_data.password != user_data.password_confirm {
         return Err(StatusCode::BAD_REQUEST);
     }
