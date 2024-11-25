@@ -25,6 +25,8 @@ const EntryForm = () => {
 	const translations = useTranslations();
 	const router = useRouter();
 
+	const [isRegistering, setIsRegistering] = useState(false);
+
 	const initialState: initialStateType = {
 		success: true,
 		message: '',
@@ -42,12 +44,8 @@ const EntryForm = () => {
 		}
 	];
 
-	const [isRegistering, setIsRegistering] = useState(false);
-
 	const handleRegisterUser = async (prevState: any, formData: FormData) => {
 		const result = await registerUser(prevState, formData);
-
-		console.log(result);
 
 		if (result.success) {
 			router.push('/otc');
@@ -61,8 +59,6 @@ const EntryForm = () => {
 
 	const handleLoginUser = async (prevState: any, formData: FormData) => {
 		const result = await loginUser(prevState, formData);
-
-		console.log(result);
 
 		if (result.success) {
 			router.push('/welcome');

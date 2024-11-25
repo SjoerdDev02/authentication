@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import { ChangeEvent, HTMLInputTypeAttribute } from 'react';
+import { ChangeEvent, HTMLInputTypeAttribute, Ref } from 'react';
 
 import styles from './TextInput.module.scss';
 
@@ -13,11 +13,19 @@ type TextInputProps = {
     value: string | number | null;
 	type?: HTMLInputTypeAttribute;
 	maxLength?: number;
+    upperCase?: boolean;
+	ref?: Ref<HTMLInputElement> | null;
 }
 
 const TextInput = (props: TextInputProps) => {
 	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-		props.onChange?.(event.target.value);
+		let value = event.target.value;
+
+		if (props.upperCase) {
+			value = value.toUpperCase();
+		}
+
+		props.onChange?.(value);
 	};
 
 	return (
@@ -29,6 +37,7 @@ const TextInput = (props: TextInputProps) => {
 			name={props.name}
 			onChange={handleChange}
 			placeholder={props.placeholder}
+			ref={props.ref || undefined}
 			type={props.type || "text"}
 			value={props.value || ''}
 		/>

@@ -12,12 +12,15 @@ import useTranslations from "@/utils/hooks/useTranslations";
 
 import { Flex } from "../common/Flex";
 import TextInput from "../common/input/text/TextInput";
+import TabPill from "../common/tabs/TabPill";
 import AuthFormWrapper from "./AuthFormWrapper";
 
 const UpdateForm = () => {
 	const translations = useTranslations();
 	const router = useRouter();
 	const userStoreSnap = useSnapshot(userStore);
+
+	const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
 	const userId = userStoreSnap.id;
 	const [name, setName] = useState('');
@@ -29,6 +32,17 @@ const UpdateForm = () => {
 		success: true,
 		message: ''
 	};
+
+	const tabItems = [
+		{
+			label: translations('Authentication.changeOtherLabel'),
+			value: false
+		},
+		{
+			label: translations('Authentication.changePasswordLabel'),
+			value: true
+		}
+	];
 
 	const handleUpdateUser = async (prevState: any, formData: FormData) => {
 		const result = await updateUser(prevState, formData, userId);
@@ -56,74 +70,89 @@ const UpdateForm = () => {
 		<Flex
 			className={styles['update-user']}
 			flexDirection="column"
-			gap={2}
+			gap={5}
 		>
-			<AuthFormWrapper action={formAction}>
-				<div className={styles['update-user__input-wrapper']}>
-					<TextInput
-						name="userId"
-						type="hidden"
-						value={userId}
-					/>
+			<TabPill
+				activeValue={isUpdatingPassword}
+				items={tabItems}
+				onChangeValue={setIsUpdatingPassword}
+			/>
 
-					<TextInput
-						name="email"
-						onChange={(e) => setEmail(e)}
-						placeholder={translations('Authentication.emailPlaceholder')}
-						type="email"
-						value={email}
-					/>
+			<Flex flexDirection="column"
+				gap={2}>
+				<AuthFormWrapper action={formAction}>
+					<div className={styles['update-user__input-wrapper']}>
+						<TextInput
+							name="userId"
+							type="hidden"
+							value={userId}
+						/>
 
-					<TextInput
-						name="name"
-						onChange={(e) => setName(e)}
-						placeholder={translations('Authentication.namePlaceholder')}
-						type="text"
-						value={name}
-					/>
+						{isUpdatingPassword ? (
+							<>
+								<TextInput
+									name="password"
+									onChange={(e) => setPassword(e)}
+									placeholder={translations('Authentication.passwordPlaceholder')}
+									type="password"
+									value={password}
+								/>
 
-					<TextInput
-						name="password"
-						onChange={(e) => setPassword(e)}
-						placeholder={translations('Authentication.passwordPlaceholder')}
-						type="password"
-						value={password}
-					/>
+								<TextInput
+									name="passwordConfirmation"
+									onChange={(e) => setPasswordConfirmation(e)}
+									placeholder={translations('Authentication.passwordConfirmPlaceholder')}
+									type="password"
+									value={passwordConfirmation}
+								/>
+							</>
+						): (
+							<>
+								<TextInput
+									name="email"
+									onChange={(e) => setEmail(e)}
+									placeholder={translations('Authentication.emailPlaceholder')}
+									type="email"
+									value={email}
+								/>
 
-					<TextInput
-						name="passwordConfirmation"
-						onChange={(e) => setPasswordConfirmation(e)}
-						placeholder={translations('Authentication.passwordConfirmPlaceholder')}
-						type="password"
-						value={passwordConfirmation}
-					/>
-				</div>
+								<TextInput
+									name="name"
+									onChange={(e) => setName(e)}
+									placeholder={translations('Authentication.namePlaceholder')}
+									type="text"
+									value={name}
+								/>
+							</>
+						)}
+					</div>
+
+					<Button
+						color="primary"
+						loading={isPending}
+						type="submit"
+					>
+						<span>
+							{translations('Authentication.updateLabel')}
+						</span>
+					</Button>
+
+					{state.message && (
+						<div className={state.success ? 'text-green-600' : 'text-red-600'}>
+							{state.message}
+						</div>
+					)}
+				</AuthFormWrapper>
 
 				<Button
-					color="primary"
-					loading={isPending}
-					type="submit"
+					color="warning"
+					onClick={handleDeleteUser}
 				>
 					<span>
-						{translations('Authentication.updateLabel')}
+						{translations('Authentication.deleteLabel')}
 					</span>
 				</Button>
-
-				{state.message && (
-					<div className={state.success ? 'text-green-600' : 'text-red-600'}>
-						{state.message}
-					</div>
-				)}
-			</AuthFormWrapper>
-
-			<Button
-				color="warning"
-				onClick={handleDeleteUser}
-			>
-				<span>
-					{translations('Authentication.deleteLabel')}
-				</span>
-			</Button>
+			</Flex>
 		</Flex>
 	);
 };

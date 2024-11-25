@@ -1,7 +1,8 @@
 'use client';
 
 import { useParams } from "next/navigation";
-import { useActionState, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useRef, useState } from "react";
 
 import { otcUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/OTCForm.module.scss';
@@ -12,10 +13,9 @@ import { Flex } from "../common/Flex";
 import TextInput from "../common/input/text/TextInput";
 import AuthFormWrapper from "./AuthFormWrapper";
 
-// TODO: Use these props
-// eslint-disable-next-line no-unused-vars
 const OTCForm = () => {
 	const params = useParams();
+	const router = useRouter();
 	const translations = useTranslations();
 
 	const initialState = {
@@ -25,8 +25,22 @@ const OTCForm = () => {
 
 	const initialCodeCharacters = params.code?.[0]?.split('');
 
+	const handleOtcUser = async (prevState: any, formData: FormData) => {
+		const result = await otcUser(prevState, formData);
+
+		if (result.success) {
+			router.push('/welcome');
+
+			// TODO: Update new name and email here if they changed
+			// userStore.name = result.data?.name;
+			// userStore.email = result.data?.email;
+		}
+
+		return result;
+	};
+
 	const [state, formAction, isPending] = useActionState(
-		otcUser,
+		handleOtcUser,
 		initialState
 	);
 
@@ -37,38 +51,55 @@ const OTCForm = () => {
 	const [characterFive, setCharacterFive] = useState(initialCodeCharacters?.[4] || '');
 	const [characterSix, setCharacterSix] = useState(initialCodeCharacters?.[5] || '');
 
+	const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
+
 	const inputItems = [
 		{
 			inputName: 'characterOne',
 			inputValue: characterOne,
-			updateFunction: setCharacterOne
+			updateFunction: setCharacterOne,
+			refIndex: 0,
 		},
 		{
 			inputName: 'characterTwo',
 			inputValue: characterTwo,
-			updateFunction: setCharacterTwo
+			updateFunction: setCharacterTwo,
+			refIndex: 1,
 		},
 		{
 			inputName: 'characterThree',
 			inputValue: characterThree,
-			updateFunction: setCharacterThree
+			updateFunction: setCharacterThree,
+			refIndex: 2,
 		},
 		{
 			inputName: 'characterFour',
 			inputValue: characterFour,
-			updateFunction: setCharacterFour
+			updateFunction: setCharacterFour,
+			refIndex: 3,
 		},
 		{
 			inputName: 'characterFive',
 			inputValue: characterFive,
-			updateFunction: setCharacterFive
+			updateFunction: setCharacterFive,
+			refIndex: 4,
 		},
 		{
 			inputName: 'characterSix',
 			inputValue: characterSix,
-			updateFunction: setCharacterSix
-		}
+			updateFunction: setCharacterSix,
+			refIndex: 5,
+		},
 	];
+
+	// eslint-disable-next-line no-unused-vars
+	const handleInputChange = (value: string, updateFunction: (v: string) => void, refIndex: number) => {
+		updateFunction(value);
+
+		if (value.length === 1 && refIndex < inputRefs.current.length - 1) {
+			inputRefs.current[refIndex + 1]?.focus();
+		}
+	};
 
 	return (
 		<Flex
@@ -92,8 +123,12 @@ const OTCForm = () => {
 							key={`otc-input-${index}`}
 							maxLength={1}
 							name={input.inputName}
-							onChange={input.updateFunction}
+							onChange={(value) => handleInputChange(value, input.updateFunction, index)}
+							ref={(el) => {
+								inputRefs.current[index] = el;
+							}}
 							type="text"
+							upperCase
 							value={input.inputValue}
 						/>
 					))}

@@ -5,6 +5,8 @@
         "updateLabel": "Update",
         "deleteLabel": "Delete account",
         "sendLabel": "Send",
+        "changeOtherLabel": "Change other",
+        "changePasswordLabel": "Change password",
         "emailPlaceholder": "Email address",
         "namePlaceholder": "Name",
         "passwordPlaceholder": "Password",
