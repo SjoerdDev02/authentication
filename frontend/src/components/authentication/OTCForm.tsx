@@ -1,5 +1,6 @@
 'use client';
 
+import classNames from "classnames";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useActionState, useRef, useState } from "react";
@@ -29,7 +30,7 @@ const OTCForm = () => {
 		const result = await otcUser(prevState, formData);
 
 		if (result.success) {
-			router.push('/welcome');
+			router.push('/');
 
 			// TODO: Update new name and email here if they changed
 			// userStore.name = result.data?.name;
@@ -145,7 +146,7 @@ const OTCForm = () => {
 				</Button>
 
 				{state.message && (
-					<div className={state.success ? 'text-green-600' : 'text-red-600'}>
+					<div className={classNames('label', `label--${state.success ? 'medium-success' : 'medium-error'}`)}>
 						{state.message}
 					</div>
 				)}

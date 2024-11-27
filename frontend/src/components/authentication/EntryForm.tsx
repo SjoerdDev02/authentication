@@ -1,5 +1,6 @@
 'use client';
 
+import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
 
@@ -25,22 +26,22 @@ const EntryForm = () => {
 	const translations = useTranslations();
 	const router = useRouter();
 
-	const [isRegistering, setIsRegistering] = useState(false);
+	const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
 
 	const initialState: initialStateType = {
 		success: true,
-		message: '',
+		message: 'testje',
 		data: null
 	};
 
 	const tabItems = [
 		{
 			label: translations('Authentication.loginLabel'),
-			value: false
+			value: 'login'
 		},
 		{
 			label: translations('Authentication.registerLabel'),
-			value: true
+			value: 'register'
 		}
 	];
 
@@ -72,7 +73,7 @@ const EntryForm = () => {
 	};
 
 	const [state, formAction, isPending] = useActionState(
-		isRegistering ? handleRegisterUser : handleLoginUser,
+		activeTab === 'register' ? handleRegisterUser : handleLoginUser,
 		initialState
 	);
 
@@ -81,6 +82,15 @@ const EntryForm = () => {
 	const [password, setPassword] = useState('');
 	const [passwordConfirmation, setPasswordConfirmation] = useState('');
 
+	const onChangeTab = (value: 'login' | 'register') => {
+		setName('');
+		setEmail('');
+		setPassword('');
+		setPasswordConfirmation('');
+		setActiveTab(value);
+		state.message = '';
+	};
+
 	return (
 		<Flex
 			className={styles['user-entry']}
@@ -88,9 +98,9 @@ const EntryForm = () => {
 			gap={5}
 		>
 			<TabPill
-				activeValue={isRegistering}
+				activeValue={activeTab}
 				items={tabItems}
-				onChangeValue={setIsRegistering}
+				onChangeValue={onChangeTab}
 			/>
 
 			<AuthFormWrapper action={formAction}>
@@ -103,14 +113,14 @@ const EntryForm = () => {
 						value={email}
 				 	/>
 
-					{isRegistering && (
+					{activeTab === 'register' && (
 						<TextInput
 							name="name"
 							onChange={(e) => setName(e)}
 							placeholder={translations('Authentication.namePlaceholder')}
 							type="text"
 							value={name}
-				 	/>
+				 		/>
 					)}
 
 					<TextInput
@@ -119,9 +129,9 @@ const EntryForm = () => {
 						placeholder={translations('Authentication.passwordPlaceholder')}
 						type="password"
 						value={password}
-				 />
+				 	/>
 
-					{isRegistering && (
+					{activeTab === 'register' && (
 						<TextInput
 							name="passwordConfirmation"
 							onChange={(e) => setPasswordConfirmation(e)}
@@ -133,7 +143,7 @@ const EntryForm = () => {
 				</div>
 
 				{state.message && (
-					<div className={state.success ? 'text-green-600' : 'text-red-600'}>
+					<div className={classNames('label', `label--${state.success ? 'medium-success' : 'medium-error'}`)}>
 						{state.message}
 					</div>
 				)}

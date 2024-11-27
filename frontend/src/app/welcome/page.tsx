@@ -10,6 +10,8 @@ export default function Welcome() {
 			<h1>Welcome!</h1>
 
 			<Link href="/update">Update</Link>
+
+			<Link href="/otc">OTC</Link>
 		</Page>
 	);
 }

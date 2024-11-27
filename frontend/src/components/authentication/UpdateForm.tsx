@@ -1,5 +1,6 @@
 'use client';
 
+import classNames from "classnames";
 import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
 import { useSnapshot } from "valtio";
@@ -20,7 +21,7 @@ const UpdateForm = () => {
 	const router = useRouter();
 	const userStoreSnap = useSnapshot(userStore);
 
-	const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+	const [activeTab, setActiveTab] = useState<'other' | 'password'>('other');
 
 	const userId = userStoreSnap.id;
 	const [name, setName] = useState('');
@@ -36,11 +37,11 @@ const UpdateForm = () => {
 	const tabItems = [
 		{
 			label: translations('Authentication.changeOtherLabel'),
-			value: false
+			value: 'other'
 		},
 		{
 			label: translations('Authentication.changePasswordLabel'),
-			value: true
+			value: 'password'
 		}
 	];
 
@@ -66,6 +67,15 @@ const UpdateForm = () => {
 
 	const [state, formAction, isPending] = useActionState(handleUpdateUser, initialState);
 
+	const onChangeTab = (value: 'other' | 'password') => {
+		setName('');
+		setEmail('');
+		setPassword('');
+		setPasswordConfirmation('');
+		setActiveTab(value);
+		state.message = '';
+	};
+
 	return (
 		<Flex
 			className={styles['update-user']}
@@ -73,9 +83,9 @@ const UpdateForm = () => {
 			gap={5}
 		>
 			<TabPill
-				activeValue={isUpdatingPassword}
+				activeValue={activeTab}
 				items={tabItems}
-				onChangeValue={setIsUpdatingPassword}
+				onChangeValue={onChangeTab}
 			/>
 
 			<Flex flexDirection="column"
@@ -88,7 +98,7 @@ const UpdateForm = () => {
 							value={userId}
 						/>
 
-						{isUpdatingPassword ? (
+						{activeTab === 'password' ? (
 							<>
 								<TextInput
 									name="password"
@@ -138,7 +148,7 @@ const UpdateForm = () => {
 					</Button>
 
 					{state.message && (
-						<div className={state.success ? 'text-green-600' : 'text-red-600'}>
+						<div className={classNames('label', `label--${state.success ? 'medium-success' : 'medium-error'}`)}>
 							{state.message}
 						</div>
 					)}
