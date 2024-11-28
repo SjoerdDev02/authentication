@@ -30,7 +30,7 @@ const EntryForm = () => {
 
 	const initialState: initialStateType = {
 		success: true,
-		message: 'testje',
+		message: '',
 		data: null
 	};
 
