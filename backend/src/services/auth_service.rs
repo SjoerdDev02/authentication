@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::env;
 use std::fs::File;
 use std::io::Read;
 
@@ -86,6 +87,8 @@ pub async fn register_user(
 
     set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
 
+    let client_base_url = env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
+
     let mut template_variables: HashMap<&str, String> = HashMap::new();
     // let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
     let mut image_file =
@@ -113,7 +116,7 @@ pub async fn register_user(
         "link_title",
         "You can also enter this link to confirm your account".to_string(),
     );
-    template_variables.insert("otc_link", format!("http://example.com/otc?otc={}", otc));
+    template_variables.insert("otc_link", format!("{}/otc?otc={}", client_base_url, otc));
     template_variables.insert(
         "footer_note",
         "If you did not create this account, please ignore this email.".to_string(),
@@ -227,6 +230,8 @@ pub async fn update_user(
 
     let (_, _, email) = old_user;
 
+    let client_base_url = env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
+
     let mut template_variables: HashMap<&str, String> = HashMap::new();
     // let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
     let mut image_file =
@@ -248,7 +253,7 @@ pub async fn update_user(
         "link_title",
         "You can also enter this link to confirm your account update".to_string(),
     );
-    template_variables.insert("otc_link", format!("http://example.com/otc?otc={}", otc));
+    template_variables.insert("otc_link", format!("{}/otc?otc={}", client_base_url, otc));
     template_variables.insert(
         "footer_note",
         "If you did not intend to update your account, please ignore this email.".to_string(),
@@ -295,6 +300,8 @@ pub async fn delete_user(
 
     set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
 
+    let client_base_url = env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
+
     let mut template_variables: HashMap<&str, String> = HashMap::new();
     let mut image_file =
         File::open("/app/src/static/images/code_image.png").expect("Image file not found");
@@ -315,7 +322,7 @@ pub async fn delete_user(
         "link_title",
         "You can also enter this link to delete your account".to_string(),
     );
-    template_variables.insert("otc_link", format!("http://example.com/otc?otc={}", otc));
+    template_variables.insert("otc_link", format!("{}/otc?otc={}", client_base_url, otc));
     template_variables.insert(
         "footer_note",
         "If you did not intend to delete your account, please ignore this email.".to_string(),
