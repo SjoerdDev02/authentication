@@ -8,19 +8,21 @@ export function setCookie(name: string, value: string, days: number) {
 	document.cookie = `${name}=${encodeURIComponent(value)}${expires}; path=/`;
 }
 
-export function getCookie(name: string) {
-	const nameEQ = `${name}=`;
-	const ca = document.cookie.split(';');
-	for (let i = 0; i < ca.length; i++) {
-		let c = ca[i];
-		while (c.charAt(0) === ' ') {
-			c = c.substring(1);
-		}
-		if (c.indexOf(nameEQ) === 0) {
-			return decodeURIComponent(c.substring(nameEQ.length, c.length));
-		}
+export function getClientCookie(cookieName: string): string | undefined {
+	if (typeof window === 'undefined') return undefined;
+
+	const cookieNameWithEquals = `${cookieName}=`;
+	const allCookies = document.cookie.split(';');
+
+	for (let i = 0; i < allCookies.length; i++) {
+	  let currentCookie = allCookies[i].trim();
+
+	  if (currentCookie.indexOf(cookieNameWithEquals) === 0) {
+			return decodeURIComponent(currentCookie.substring(cookieNameWithEquals.length));
+	  }
 	}
-	return null;
+
+	return undefined;
 }
 
 

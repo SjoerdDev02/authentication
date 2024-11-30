@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { getCookie, setCookie } from "@/utils/preferences/cookies";
+import { getClientCookie, setCookie } from "@/utils/preferences/cookies";
 
 import { ThemeType } from "../preferences/preferences";
 
@@ -13,7 +13,7 @@ function useTheme() {
 		if (!theme) {
 			const initialTheme = document.documentElement.getAttribute('data-theme') as ThemeType;
 
-			if (!getCookie('theme')) {
+			if (!getClientCookie('theme')) {
 				setCookie('theme', initialTheme, 100);
 			}
 

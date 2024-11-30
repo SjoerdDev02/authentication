@@ -4,10 +4,10 @@ import { subscribeKey } from "valtio/utils";
 import preferencesStoreStore from "@/states/preferencesStore";
 import { getDynamicNestedProperties } from "@/utils/objects";
 
-import { getCookie } from "../preferences/cookies";
+import { getClientCookie } from "../preferences/cookies";
 
 function useTranslations() {
-	const initialLanguage = getCookie('language');
+	const initialLanguage = getClientCookie('language');
 
 	const [language, setLanguage] = useState(initialLanguage);
 	const [translations, setTranslations] = useState({});
