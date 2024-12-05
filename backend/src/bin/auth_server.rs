@@ -1,11 +1,11 @@
 use backend::models::auth_models::AuthState;
 use dotenv::dotenv;
-use http::{HeaderValue, Method};
+use http::{header, HeaderValue, Method};
 use redis::Client;
 use sqlx::mysql::MySqlPoolOptions;
 use std::{env, sync::Arc};
 use tokio::{net::TcpListener, sync::Mutex};
-use tower_http::cors::{Any, CorsLayer};
+use tower_http::cors::CorsLayer;
 
 #[tokio::main]
 async fn main() {
@@ -45,7 +45,11 @@ async fn main() {
             Method::PATCH,
             Method::DELETE,
         ])
-        .allow_headers(Any)
+        .allow_headers(vec![
+            header::CONTENT_TYPE,
+            header::AUTHORIZATION,
+            header::COOKIE
+        ])
         .allow_credentials(true);
     
 let app = app.layer(cors);

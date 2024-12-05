@@ -12,7 +12,7 @@ RUN cargo install sqlx-cli --no-default-features --features mysql
 COPY src ./src
 COPY migrations ./migrations
 
-# Build the project in release mode
+# Build the project
 RUN cargo build --release
 
 # Use a small base image to run the binary
