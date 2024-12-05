@@ -2,7 +2,6 @@ use crate::{
     constants::auth_constants::JWT_EXPIRATION_SECONDS,
     models::auth_models::AuthState,
     utils::{
-        auth_utils::get_user_by_id,
         jwt_utils::{decode_jwt, encode_jwt, format_refresh_token_key, generate_refresh_token},
         redis_utils::{get_token, remove_token, set_token},
     },
@@ -14,34 +13,43 @@ use axum::{
     middleware::Next,
 };
 use chrono::Utc;
+use http::Method;
 
 pub async fn jwt_middleware(
     State(state): State<AuthState>,
-    mut req: Request<Body>,
+    req: Request<Body>,
     next: Next,
 ) -> Result<Response<Body>, StatusCode> {
-    let jwt = req
-        .headers()
-        .get(header::AUTHORIZATION)
-        .and_then(|h| h.to_str().ok())
-        .map(|t| t.trim_start_matches("Bearer ").to_string());
+    if req.method() == Method::OPTIONS {
+        return Ok(next.run(req).await);
+    }
 
-    let mut claims = match jwt {
+    let jwt = req
+        .headers().get(header::COOKIE)
+        .and_then(|h| h.to_str().ok())
+        .map(|t| t.trim_start_matches("Bearer").to_string());
+
+    // TODO: Remove this when debugging is finished
+    match &jwt {
+        Some(token) => println!("JWT: {}", token),
+        None => println!("JWT is None"),
+    }
+
+    let claims = match jwt {
         Some(token) => decode_jwt(&token).map_err(|_| StatusCode::UNAUTHORIZED)?,
         None => return Err(StatusCode::UNAUTHORIZED),
     }
     .claims;
 
-    let mut new_jwt = None;
-    let mut new_refresh_token = None;
+    let mut response = Response::new(Body::empty());
 
     if claims.exp < Utc::now().timestamp() as usize {
         let refresh_token = req
             .headers()
             .get(header::COOKIE)
             .and_then(|h| h.to_str().ok())
-            .and_then(|c| c.split("; ").find(|s| s.starts_with("refresh_token=")))
-            .map(|t| t.trim_start_matches("refresh_token=").to_string());
+            .and_then(|c| c.split("; ").find(|s| s.starts_with("RefreshToken")))
+            .map(|t| t.trim_start_matches("RefreshToken").to_string());
 
         let refresh_token = match refresh_token {
             Some(token) => token,
@@ -60,54 +68,50 @@ pub async fn jwt_middleware(
             Err(_) => return Err(StatusCode::BAD_REQUEST),
         };
 
-        let user = match get_user_by_id(&state, &token_payload_user_id).await {
-            Ok(user) => user,
-            Err(_) => return Err(StatusCode::NOT_FOUND),
-        };
+        remove_token(&state, &formatted_refresh_token_key)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-        let (id, name, email) = user;
-
-        new_jwt =
-            Some(encode_jwt(&id, &name, &email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?);
-        claims = decode_jwt(new_jwt.as_ref().unwrap())
-            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
-            .claims;
-
-        new_refresh_token = Some(generate_refresh_token());
-        let new_refresh_token_key = format_refresh_token_key(new_refresh_token.as_ref().unwrap());
+        let new_jwt = encode_jwt(&claims.id, &claims.name, &claims.email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        let refresh_token = generate_refresh_token();
+        let refresh_token_key = format_refresh_token_key(&refresh_token);
 
         set_token(
             &state,
-            &new_refresh_token_key,
+            &refresh_token_key,
             &token_payload_user_id.to_string(),
             JWT_EXPIRATION_SECONDS,
         )
         .await;
 
-        remove_token(&state, &formatted_refresh_token_key)
-            .await
-            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    }
-
-    req.extensions_mut().insert(claims);
-
-    let mut response = next.run(req).await;
-
-    if let Some(jwt) = new_jwt {
-        response.headers_mut().append(
-            header::SET_COOKIE,
-            format!("JWT={}; HttpOnly; Secure; Path=/", jwt)
-                .parse()
-                .unwrap(),
-        );
-    }
-    if let Some(refresh_token) = new_refresh_token {
-        response.headers_mut().append(
-            header::SET_COOKIE,
-            format!("refresh_token={}; HttpOnly; Secure; Path=/", refresh_token)
-                .parse()
-                .unwrap(),
-        );
+        let jwt_cookie = if cfg!(debug_assertions) {
+            // Development: Allow cross-origin with SameSite=None
+            format!("Bearer={}; HttpOnly; SameSite=None; Path=/", new_jwt)
+        } else {
+            // Production: Omit SameSite=None for stricter security
+            format!("Bearer={}; HttpOnly; Secure; Path=/", new_jwt)
+        };
+    
+        let jwt_cookie = jwt_cookie.parse().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    
+        let refresh_cookie = if cfg!(debug_assertions) {
+            // Development: Allow cross-origin with SameSite=None
+            format!(
+                "RefreshToken={}; HttpOnly; SameSite=None; Path=/; Max-Age={}",
+                refresh_token, JWT_EXPIRATION_SECONDS
+            )
+        } else {
+            // Production: Omit SameSite=None for stricter security
+            format!(
+                "RefreshToken={}; HttpOnly; Secure; Path=/; Max-Age={}",
+                refresh_token, JWT_EXPIRATION_SECONDS
+            )
+        };
+    
+        let refresh_cookie = refresh_cookie.parse().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    
+        response.headers_mut().append(header::SET_COOKIE, jwt_cookie);
+        response.headers_mut().append(header::SET_COOKIE, refresh_cookie);
     }
 
     Ok(response)

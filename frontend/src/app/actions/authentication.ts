@@ -8,7 +8,7 @@ export async function registerUser(prevState: any, formData: FormData) {
 		const passwordConfirm = formData.get('passwordConfirmation');
 
 		if (!email || !name || !password || !passwordConfirm) {
-			return { success: false, message: 'Invalid credentials' };
+			return { success: false, message: 'Invalid credentials', data: null };
 		}
 
 		const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/register`, {
@@ -80,7 +80,7 @@ export async function loginUser(prevState: any, formData: FormData) {
 		const password = formData.get('password');
 
 		if (!email || !password) {
-			return { success: false, message: 'Invalid credentials' };
+			return { success: false, message: 'Invalid credentials', data: null };
 		}
 
 		const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/login`, {
@@ -110,7 +110,9 @@ export async function deleteUser(userId: number | null) {
 			return { success: false, message: 'Invalid credentials' };
 		}
 
-		const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/delete?id=${id}`);
+		const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/delete?id=${id}`, {
+			withCredentials: true
+		});
 
 		return {
 			success: true,
@@ -134,7 +136,7 @@ export async function otcUser(prevState: any, formData: FormData) {
 		const characterSix = formData.get('characterSix');
 
 		if (!characterOne || !characterTwo || !characterThree || !characterFour || !characterFive || !characterSix) {
-			return { success: false, message: 'Invalid credentials' };
+			return { success: false, message: 'Invalid credentials', data: null };
 		}
 
 		const otc = [
@@ -150,12 +152,14 @@ export async function otcUser(prevState: any, formData: FormData) {
 
 		return {
 			success: true,
-			message: response.data.message
+			message: response.data.message,
+			data: response.data
 		};
 	} catch (error: any) {
 		return {
 			success: false,
-			message: error.response?.data?.message || 'An error occurred'
+			message: error.response?.data?.message || 'An error occurred',
+			data: null
 		};
 	}
 }

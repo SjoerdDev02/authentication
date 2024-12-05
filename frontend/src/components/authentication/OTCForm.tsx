@@ -8,20 +8,29 @@ import { useActionState, useRef, useState } from "react";
 import { otcUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/OTCForm.module.scss';
 import Button from "@/components/common/buttons/Button";
+import userStore from "@/states/userStore";
+import { MinifiedAuthResponse } from "@/types/Authentication";
 import useTranslations from "@/utils/hooks/useTranslations";
 
 import { Flex } from "../common/Flex";
 import TextInput from "../common/input/text/TextInput";
 import AuthFormWrapper from "./AuthFormWrapper";
 
+type initialStateType = {
+	success: boolean;
+	message: string;
+	data: MinifiedAuthResponse | null;
+}
+
 const OTCForm = () => {
 	const params = useParams();
 	const router = useRouter();
 	const translations = useTranslations();
 
-	const initialState = {
+	const initialState: initialStateType = {
 		success: true,
-		message: ''
+		message: '',
+		data: null
 	};
 
 	const initialCodeCharacters = params.code?.[0]?.split('');
@@ -30,11 +39,13 @@ const OTCForm = () => {
 		const result = await otcUser(prevState, formData);
 
 		if (result.success) {
-			router.push('/');
+			router.push(userStore.name && userStore.email ? '/welcome' : '/');
 
-			// TODO: Update new name and email here if they changed
-			// userStore.name = result.data?.name;
-			// userStore.email = result.data?.email;
+			// Update new name and email here if they changed
+			if (result.data?.name && result.data?.email) {
+				userStore.name = result.data?.name;
+				userStore.email = result.data?.email;
+			}
 		}
 
 		return result;

@@ -1,10 +1,10 @@
-use std::time::Duration;
 use axum::{
     middleware,
     routing::{delete, patch, post},
     Router,
 };
-use tower::{buffer::BufferLayer, ServiceBuilder, limit::RateLimitLayer};
+use std::time::Duration;
+use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
 
 use crate::{
     middleware::jwt_middleware::jwt_middleware,

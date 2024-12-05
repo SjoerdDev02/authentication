@@ -20,6 +20,8 @@ use crate::utils::emails::send_email_with_template;
 use crate::utils::jwt_utils::{encode_jwt, format_refresh_token_key, generate_refresh_token};
 use crate::utils::redis_utils::{get_token, remove_token, set_token};
 use crate::utils::templates::generate_template;
+use axum::body::Body;
+use axum::http::{header, Response};
 use axum::Extension;
 use axum::{
     extract::{Json, Query, State},
@@ -27,15 +29,11 @@ use axum::{
 };
 use base64::prelude::BASE64_STANDARD;
 use base64::Engine;
-use axum::http::{header, Response};
-use axum::body::Body;
 
 pub async fn register_user(
     State(state): State<AuthState>,
     Json(user_data): Json<RegisterUser>,
 ) -> Result<Json<MinifiedAuthResponse>, StatusCode> {
-    println!("{} {} {} {}", user_data.name, user_data.email, user_data.password, user_data.password_confirm);
-
     if user_data.password != user_data.password_confirm {
         return Err(StatusCode::BAD_REQUEST);
     }
@@ -87,7 +85,8 @@ pub async fn register_user(
 
     set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
 
-    let client_base_url = env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
+    let client_base_url =
+        env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
     // let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
@@ -141,7 +140,7 @@ pub async fn register_user(
 pub async fn login_user(
     State(state): State<AuthState>,
     Json(user_data): Json<LoginUser>,
-) -> Result<Json<AuthResponse>, StatusCode> {
+) -> Result<Response<Body>, StatusCode> {
     let user = match get_user_by_email(&state, &user_data.email).await {
         Ok(user) => user,
         Err(_) => return Err(StatusCode::UNAUTHORIZED),
@@ -159,6 +158,7 @@ pub async fn login_user(
         return Err(StatusCode::UNAUTHORIZED);
     }
 
+    let new_jwt = encode_jwt(&id, &name, &email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     let refresh_token = generate_refresh_token();
     let refresh_token_key = format_refresh_token_key(&refresh_token);
 
@@ -170,9 +170,45 @@ pub async fn login_user(
     )
     .await;
 
-    let response = AuthResponse { id, name, email };
+    let response_body = serde_json::to_string(&AuthResponse { id, name, email })
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    Ok(Json(response))
+    let mut response = Response::new(Body::from(response_body));
+
+    let jwt_cookie = if cfg!(debug_assertions) {
+        // Development: Allow cross-origin with SameSite=None
+        format!("Bearer={}; HttpOnly; SameSite=None; Path=/", new_jwt)
+    } else {
+        // Production: Omit SameSite=None for stricter security
+        format!("Bearer={}; HttpOnly; Secure; Path=/", new_jwt)
+    };
+
+    let jwt_cookie = jwt_cookie.parse().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    let refresh_cookie = if cfg!(debug_assertions) {
+        // Development: Allow cross-origin with SameSite=None
+        format!(
+            "RefreshToken={}; HttpOnly; SameSite=None; Path=/; Max-Age={}",
+            refresh_token, JWT_EXPIRATION_SECONDS
+        )
+    } else {
+        // Production: Omit SameSite=None for stricter security
+        format!(
+            "RefreshToken={}; HttpOnly; Secure; Path=/; Max-Age={}",
+            refresh_token, JWT_EXPIRATION_SECONDS
+        )
+    };
+
+    let refresh_cookie = refresh_cookie.parse().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    response.headers_mut().append(header::SET_COOKIE, jwt_cookie);
+    response.headers_mut().append(header::SET_COOKIE, refresh_cookie);
+
+    response
+        .headers_mut()
+        .insert(header::CONTENT_TYPE, "application/json".parse().unwrap());
+
+    Ok(response)
 }
 
 pub async fn update_user(
@@ -230,7 +266,8 @@ pub async fn update_user(
 
     let (_, _, email) = old_user;
 
-    let client_base_url = env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
+    let client_base_url =
+        env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
     // let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
@@ -278,7 +315,6 @@ pub async fn update_user(
 pub async fn delete_user(
     State(state): State<AuthState>,
     Extension(claims): Extension<JwtClaims>,
-    // Json(user_data): Json<DeleteUser>,
     Query(params): Query<DeleteUser>,
 ) -> Result<StatusCode, StatusCode> {
     let user_email = &claims.email;
@@ -300,7 +336,8 @@ pub async fn delete_user(
 
     set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
 
-    let client_base_url = env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
+    let client_base_url =
+        env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
     let mut image_file =
@@ -340,7 +377,7 @@ pub async fn delete_user(
     {
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     }
-
+    
     Ok(StatusCode::NO_CONTENT)
 }
 
@@ -365,7 +402,9 @@ pub async fn otc_user(
     let user_id = token_payload.user_id;
     let email = token_payload.email.unwrap_or_else(|| "".to_string());
     let name = token_payload.name.unwrap_or_else(|| "".to_string());
-    let password_hash = token_payload.password_hash.unwrap_or_else(|| "".to_string());
+    let password_hash = token_payload
+        .password_hash
+        .unwrap_or_else(|| "".to_string());
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
 
@@ -399,9 +438,6 @@ pub async fn otc_user(
                 .await
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-            let new_jwt = encode_jwt(&user_id, &name, &email)
-                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
             template_name = "Successfully updated account".to_string();
             template_variables.insert(
                 "header_title",
@@ -415,12 +451,30 @@ pub async fn otc_user(
                 "If you did not create this account, please ignore this email.".to_string(),
             );
 
-            response.headers_mut().append(
-                header::SET_COOKIE,
-                format!("JWT={}; HttpOnly; Secure; Path=/", new_jwt)
-                    .parse()
-                    .unwrap(),
-            );
+            let new_jwt = encode_jwt(&user_id, &name, &email)
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+            let cookie = if cfg!(debug_assertions) {
+                format!("Bearer={}; HttpOnly; SameSite=None; Path=/", new_jwt)
+            } else {
+                format!("Bearer={}; HttpOnly; Secure; Path=/", new_jwt)
+            };
+
+            let cookie = match cookie.parse() {
+                Ok(cookie) => cookie,
+                Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
+            };
+
+            response.headers_mut().append(header::SET_COOKIE, cookie);
+
+            let response_body = serde_json::to_string(&AuthResponse {
+                id: user_id.clone(),
+                name: name.clone(),
+                email: email.clone(),
+            })
+            .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+            *response.body_mut() = Body::from(response_body);
         }
         OtcPayloadAction::UpdatePassword => {
             update_user_password(&state, &user_id, &password_hash)

@@ -1,11 +1,11 @@
-use tower_http::cors::{CorsLayer, Any};
+use backend::models::auth_models::AuthState;
+use dotenv::dotenv;
+use http::{HeaderValue, Method};
+use redis::Client;
+use sqlx::mysql::MySqlPoolOptions;
 use std::{env, sync::Arc};
 use tokio::{net::TcpListener, sync::Mutex};
-use redis::Client;
-use dotenv::dotenv;
-use sqlx::mysql::MySqlPoolOptions;
-use backend::models::auth_models::AuthState;
-use http::{HeaderValue, Method};
+use tower_http::cors::{Any, CorsLayer};
 
 #[tokio::main]
 async fn main() {
@@ -38,10 +38,17 @@ async fn main() {
 
     let cors = CorsLayer::new()
         .allow_origin("http://localhost:3000".parse::<HeaderValue>().unwrap())
-        .allow_methods(vec![Method::GET, Method::POST, Method::PUT, Method::PATCH, Method::DELETE])
-        .allow_headers(Any);
-
-    let app = app.layer(cors);
+        .allow_methods(vec![
+            Method::GET,
+            Method::POST,
+            Method::PUT,
+            Method::PATCH,
+            Method::DELETE,
+        ])
+        .allow_headers(Any)
+        .allow_credentials(true);
+    
+let app = app.layer(cors);
 
     let listener = TcpListener::bind("0.0.0.0:8080")
         .await
