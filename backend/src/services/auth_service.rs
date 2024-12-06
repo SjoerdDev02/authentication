@@ -16,6 +16,7 @@ use crate::utils::auth_utils::{
     get_user_by_id, hash_password, update_user_email_and_name, update_user_password,
     verify_password,
 };
+use crate::utils::cookie_utils::set_cookie;
 use crate::utils::emails::send_email_with_template;
 use crate::utils::jwt_utils::{encode_jwt, format_refresh_token_key, generate_refresh_token};
 use crate::utils::redis_utils::{get_token, remove_token, set_token};
@@ -160,11 +161,11 @@ pub async fn login_user(
 
     let new_jwt = encode_jwt(&id, &name, &email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     let refresh_token = generate_refresh_token();
-    let refresh_token_key = format_refresh_token_key(&refresh_token);
+    let redis_refresh_token_key = format_refresh_token_key(&refresh_token);
 
     set_token(
         &state,
-        &refresh_token_key,
+        &redis_refresh_token_key,
         &id.to_string(),
         JWT_EXPIRATION_SECONDS,
     )
@@ -175,34 +176,8 @@ pub async fn login_user(
 
     let mut response = Response::new(Body::from(response_body));
 
-    let jwt_cookie = if cfg!(debug_assertions) {
-        // Development: Allow cross-origin with SameSite=None
-        format!("Bearer={}; HttpOnly; SameSite=None; Path=/", new_jwt)
-    } else {
-        // Production: Omit SameSite=None for stricter security
-        format!("Bearer={}; HttpOnly; Secure; Path=/", new_jwt)
-    };
-
-    let jwt_cookie = jwt_cookie.parse().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-    let refresh_cookie = if cfg!(debug_assertions) {
-        // Development: Allow cross-origin with SameSite=None
-        format!(
-            "RefreshToken={}; HttpOnly; SameSite=None; Path=/; Max-Age={}",
-            refresh_token, JWT_EXPIRATION_SECONDS
-        )
-    } else {
-        // Production: Omit SameSite=None for stricter security
-        format!(
-            "RefreshToken={}; HttpOnly; Secure; Path=/; Max-Age={}",
-            refresh_token, JWT_EXPIRATION_SECONDS
-        )
-    };
-
-    let refresh_cookie = refresh_cookie.parse().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-    response.headers_mut().append(header::SET_COOKIE, jwt_cookie);
-    response.headers_mut().append(header::SET_COOKIE, refresh_cookie);
+    response = set_cookie(response, "Bearer", &new_jwt, None)?;
+    response = set_cookie(response, "RefreshToken", &refresh_token, None)?;
 
     response
         .headers_mut()
