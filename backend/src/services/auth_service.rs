@@ -3,9 +3,9 @@ use std::env;
 use std::fs::File;
 use std::io::Read;
 
-use crate::constants::auth_constants::{JWT_EXPIRATION_SECONDS, OTC_EXPIRATION_SECONDS};
+use crate::constants::auth_constants::{BEARER_EXPIRATION_SECONDS, OTC_EXPIRATION_SECONDS, REFRESH_EXPIRATION_SECONDS};
 use crate::models::auth_models::{
-    AuthResponse, AuthState, DeleteUser, JwtClaims, LoginUser, MinifiedAuthResponse, Otc,
+    AuthResponse, AuthState, JwtClaims, LoginUser, MinifiedAuthResponse, Otc,
     OtcPayload, OtcPayloadAction, RegisterUser, UpdateUser,
 };
 use crate::templates::auth_templates::{
@@ -167,7 +167,7 @@ pub async fn login_user(
         &state,
         &redis_refresh_token_key,
         &id.to_string(),
-        JWT_EXPIRATION_SECONDS,
+        REFRESH_EXPIRATION_SECONDS,
     )
     .await;
 
@@ -176,8 +176,8 @@ pub async fn login_user(
 
     let mut response = Response::new(Body::from(response_body));
 
-    response = set_cookie(response, "Bearer", &new_jwt, None)?;
-    response = set_cookie(response, "RefreshToken", &refresh_token, None)?;
+    response = set_cookie(response, "Bearer", &new_jwt, Some(BEARER_EXPIRATION_SECONDS))?;
+    response = set_cookie(response, "RefreshToken", &refresh_token, Some(REFRESH_EXPIRATION_SECONDS))?;
 
     response
         .headers_mut()
@@ -289,8 +289,7 @@ pub async fn update_user(
 
 pub async fn delete_user(
     State(state): State<AuthState>,
-    Extension(claims): Extension<JwtClaims>,
-    Query(params): Query<DeleteUser>,
+    Extension(claims): Extension<JwtClaims>
 ) -> Result<StatusCode, StatusCode> {
     let user_email = &claims.email;
 
@@ -299,7 +298,7 @@ pub async fn delete_user(
 
     let otc_payload = OtcPayload {
         otc: otc.to_string(),
-        user_id: params.id,
+        user_id: claims.id,
         action: OtcPayloadAction::DeleteAccount,
         name: None,
         email: None,
@@ -429,18 +428,7 @@ pub async fn otc_user(
             let new_jwt = encode_jwt(&user_id, &name, &email)
                 .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-            let cookie = if cfg!(debug_assertions) {
-                format!("Bearer={}; HttpOnly; SameSite=None; Path=/", new_jwt)
-            } else {
-                format!("Bearer={}; HttpOnly; Secure; Path=/", new_jwt)
-            };
-
-            let cookie = match cookie.parse() {
-                Ok(cookie) => cookie,
-                Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
-            };
-
-            response.headers_mut().append(header::SET_COOKIE, cookie);
+            response = set_cookie(response, "Bearer", &new_jwt, Some(BEARER_EXPIRATION_SECONDS))?;
 
             let response_body = serde_json::to_string(&AuthResponse {
                 id: user_id.clone(),

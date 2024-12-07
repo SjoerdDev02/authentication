@@ -56,7 +56,7 @@ const UpdateForm = () => {
 	};
 
 	const handleDeleteUser = async () => {
-		const result = await deleteUser(userId);
+		const result = await deleteUser();
 
 		if (result.success) {
 			router.push('/otc');

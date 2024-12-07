@@ -102,15 +102,9 @@ export async function loginUser(prevState: any, formData: FormData) {
 	}
 }
 
-export async function deleteUser(userId: number | null) {
+export async function deleteUser() {
 	try {
-		const id = userId;
-
-		if (!userId) {
-			return { success: false, message: 'Invalid credentials' };
-		}
-
-		const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/delete?id=${id}`, {
+		const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/delete`, {
 			withCredentials: true
 		});
 

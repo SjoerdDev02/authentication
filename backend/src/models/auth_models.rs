@@ -41,11 +41,6 @@ pub struct UpdateUser {
     pub password_confirm: Option<String>,
 }
 
-#[derive(Deserialize)]
-pub struct DeleteUser {
-    pub id: i32,
-}
-
 // Structure for holding JwtClaims data used in JWT tokens
 #[derive(Clone, Serialize, Deserialize)]
 pub struct JwtClaims {
