@@ -28,8 +28,6 @@ use axum::{
     extract::{Json, Query, State},
     http::StatusCode,
 };
-use base64::prelude::BASE64_STANDARD;
-use base64::Engine;
 
 pub async fn register_user(
     State(state): State<AuthState>,
@@ -90,16 +88,12 @@ pub async fn register_user(
         env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
-    // let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
-    let mut image_file =
-        File::open("/app/src/static/images/code_image.png").expect("Image file not found");
+    let mut image_file = File::open("/app/src/static/images/code_image.png")
+    .expect("Image file not found");
     let mut image_data = Vec::new();
     image_file
-        .read_to_end(&mut image_data)
-        .expect("Failed to read image");
-    let base64_image = BASE64_STANDARD.encode(&image_data);
-    let image_data_url = format!("data:image/png;base64,{}", base64_image);
-    template_variables.insert("image_url", image_data_url);
+    .read_to_end(&mut image_data)
+    .expect("Failed to read image");
     template_variables.insert(
         "header_title",
         format!(
@@ -129,7 +123,7 @@ pub async fn register_user(
     )
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    if let Err(_) = send_email_with_template(&email, "Confirm your account", &email_body).await {
+    if let Err(_) = send_email_with_template(&email, "Confirm your account", &email_body, image_data).await {
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     }
 
@@ -245,16 +239,13 @@ pub async fn update_user(
         env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
-    // let mut image_file = File::open("src/static/images/code_image.png").expect("Image file not found");
-    let mut image_file =
-        File::open("/app/src/static/images/code_image.png").expect("Image file not found");
+    let mut image_file = File::open("/app/src/static/images/code_image.png")
+        .expect("Image file not found");
     let mut image_data = Vec::new();
     image_file
         .read_to_end(&mut image_data)
         .expect("Failed to read image");
-    let base64_image = BASE64_STANDARD.encode(&image_data);
-    let image_data_url = format!("data:image/png;base64,{}", base64_image);
-    template_variables.insert("image_url", image_data_url);
+    
     template_variables.insert("header_title", "Account Update Code".to_string());
     template_variables.insert(
         "code_description",
@@ -270,19 +261,17 @@ pub async fn update_user(
         "footer_note",
         "If you did not intend to update your account, please ignore this email.".to_string(),
     );
-
+    
     let email_body = generate_template(
         VERIFICATION_CODE_TEMPLATE,
         "Confirm account update",
         template_variables,
     )
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-    if let Err(_) =
-        send_email_with_template(&email, "Confirm your account update", &email_body).await
-    {
-        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-    }
+    
+    send_email_with_template(&email, "Confirm your account update", &email_body, image_data)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     Ok(StatusCode::OK)
 }
@@ -314,15 +303,12 @@ pub async fn delete_user(
         env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
-    let mut image_file =
-        File::open("/app/src/static/images/code_image.png").expect("Image file not found");
+    let mut image_file = File::open("/app/src/static/images/code_image.png")
+        .expect("Image file not found");
     let mut image_data = Vec::new();
     image_file
         .read_to_end(&mut image_data)
         .expect("Failed to read image");
-    let base64_image = BASE64_STANDARD.encode(&image_data);
-    let image_data_url = format!("data:image/png;base64,{}", base64_image);
-    template_variables.insert("image_url", image_data_url);
     template_variables.insert("header_title", "Account Update Code".to_string());
     template_variables.insert(
         "code_description",
@@ -347,7 +333,7 @@ pub async fn delete_user(
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     if let Err(_) =
-        send_email_with_template(user_email, "Confirm account deletion", &email_body).await
+        send_email_with_template(user_email, "Confirm account deletion", &email_body, image_data).await
     {
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     }
@@ -382,15 +368,12 @@ pub async fn otc_user(
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
 
-    let mut image_file =
-        File::open("/app/src/static/images/code_image.png").expect("Image file not found");
+    let mut image_file = File::open("/app/src/static/images/success_image.png")
+    .expect("Image file not found");
     let mut image_data = Vec::new();
     image_file
-        .read_to_end(&mut image_data)
-        .expect("Failed to read image");
-    let base64_image = BASE64_STANDARD.encode(&image_data);
-    let image_data_url = format!("data:image/png;base64,{}", base64_image);
-    template_variables.insert("image_url", image_data_url);
+    .read_to_end(&mut image_data)
+    .expect("Failed to read image");
 
     let template_name;
 
@@ -503,7 +486,7 @@ pub async fn otc_user(
     )
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    if let Err(_) = send_email_with_template(&confirm_mail_email, &template_name, &email_body).await
+    if let Err(_) = send_email_with_template(&confirm_mail_email, &template_name, &email_body, image_data).await
     {
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     }
