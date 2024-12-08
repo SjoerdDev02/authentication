@@ -11,6 +11,7 @@ pub struct CurrentUser {
     pub name: String,
     pub email: String,
     pub password_hash: String,
+    pub language: String,
     pub is_confirmed: bool,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,

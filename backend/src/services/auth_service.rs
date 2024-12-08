@@ -21,6 +21,7 @@ use crate::utils::emails::send_email_with_template;
 use crate::utils::jwt_utils::{encode_jwt, format_refresh_token_key, generate_refresh_token};
 use crate::utils::redis_utils::{get_token, remove_token, set_token};
 use crate::utils::templates::generate_template;
+use crate::utils::translations_utils::load_translations;
 use axum::body::Body;
 use axum::http::{header, Response};
 use axum::Extension;
@@ -86,6 +87,11 @@ pub async fn register_user(
 
     let client_base_url =
         env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
+
+    let translations = load_translations("en");
+    let test = translations.emails.get("confirm_account").unwrap();
+
+    println!("{}", test.body);
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
     let mut image_file = File::open("/app/src/static/images/code_image.png")
@@ -309,7 +315,7 @@ pub async fn delete_user(
     image_file
         .read_to_end(&mut image_data)
         .expect("Failed to read image");
-    template_variables.insert("header_title", "Account Update Code".to_string());
+    template_variables.insert("header_title", "Account Deletion Code".to_string());
     template_variables.insert(
         "code_description",
         "Enter this code to confirm you want to delete your account".to_string(),
@@ -405,7 +411,7 @@ pub async fn otc_user(
             );
             template_variables.insert(
                 "footer_note",
-                "If you did not create this account, please ignore this email.".to_string(),
+                "If you did not update this account, please contact us.".to_string(),
             );
 
             let new_jwt = encode_jwt(&user_id, &name, &email)
@@ -455,7 +461,7 @@ pub async fn otc_user(
             );
             template_variables.insert(
                 "footer_note",
-                "If you did not delete your account, please contact us.".to_string(),
+                "If you did not delete this account, please contact us.".to_string(),
             );
         }
         OtcPayloadAction::ConfirmAccount => {
@@ -470,7 +476,7 @@ pub async fn otc_user(
             );
             template_variables.insert(
                 "footer_note",
-                "If you did not confirm your account, please contact us.".to_string(),
+                "If you did not confirm this account, please contact us.".to_string(),
             );
         }
     }
