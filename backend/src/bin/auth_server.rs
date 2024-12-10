@@ -44,6 +44,7 @@ async fn main() {
             Method::PUT,
             Method::PATCH,
             Method::DELETE,
+            // Method::OPTIONS
         ])
         .allow_headers(vec![
             header::CONTENT_TYPE,
@@ -52,7 +53,7 @@ async fn main() {
         ])
         .allow_credentials(true);
     
-let app = app.layer(cors);
+    let app = app.layer(cors);
 
     let listener = TcpListener::bind("0.0.0.0:8080")
         .await

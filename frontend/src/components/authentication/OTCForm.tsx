@@ -1,8 +1,7 @@
 'use client';
 
 import classNames from "classnames";
-import { useParams } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useActionState, useRef, useState } from "react";
 
 import { otcUser } from "@/app/actions/authentication";
@@ -23,8 +22,8 @@ type initialStateType = {
 }
 
 const OTCForm = () => {
-	const params = useParams();
 	const router = useRouter();
+	const searchParams = useSearchParams();
 	const translations = useTranslations();
 
 	const initialState: initialStateType = {
@@ -33,7 +32,10 @@ const OTCForm = () => {
 		data: null
 	};
 
-	const initialCodeCharacters = params.code?.[0]?.split('');
+	const otcCode = searchParams.get('otc');
+	const initialCodeCharacters = otcCode ? otcCode.split('') : null;
+
+	console.log(initialCodeCharacters, otcCode);
 
 	const handleOtcUser = async (prevState: any, formData: FormData) => {
 		const result = await otcUser(prevState, formData);

@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::env;
 use std::fs::File;
 use std::io::Read;
+use std::sync::Arc;
 
 use crate::constants::auth_constants::{BEARER_EXPIRATION_SECONDS, OTC_EXPIRATION_SECONDS, REFRESH_EXPIRATION_SECONDS};
 use crate::models::auth_models::{
@@ -32,8 +33,10 @@ use axum::{
 
 pub async fn register_user(
     State(state): State<AuthState>,
+    Extension(lang): Extension<Arc<String>>,
     Json(user_data): Json<RegisterUser>,
 ) -> Result<Json<MinifiedAuthResponse>, StatusCode> {
+    println!("{}", lang);
     if user_data.password != user_data.password_confirm {
         return Err(StatusCode::BAD_REQUEST);
     }
@@ -140,6 +143,7 @@ pub async fn register_user(
 
 pub async fn login_user(
     State(state): State<AuthState>,
+    Extension(_lang): Extension<Arc<String>>,
     Json(user_data): Json<LoginUser>,
 ) -> Result<Response<Body>, StatusCode> {
     let user = match get_user_by_email(&state, &user_data.email).await {
@@ -188,6 +192,7 @@ pub async fn login_user(
 
 pub async fn update_user(
     State(state): State<AuthState>,
+    Extension(_lang): Extension<Arc<String>>,
     Json(user_data): Json<UpdateUser>,
 ) -> Result<StatusCode, StatusCode> {
     let otc = create_otc();
@@ -284,6 +289,7 @@ pub async fn update_user(
 
 pub async fn delete_user(
     State(state): State<AuthState>,
+    Extension(_lang): Extension<Arc<String>>,
     Extension(claims): Extension<JwtClaims>
 ) -> Result<StatusCode, StatusCode> {
     let user_email = &claims.email;
@@ -349,6 +355,7 @@ pub async fn delete_user(
 
 pub async fn otc_user(
     State(state): State<AuthState>,
+    Extension(_lang): Extension<Arc<String>>,
     Query(params): Query<Otc>,
 ) -> Result<Response<Body>, StatusCode> {
     let otc_key = format_otc_key(&params.otc);

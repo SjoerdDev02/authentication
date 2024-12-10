@@ -14,7 +14,7 @@ pub struct EmailTemplate {
 }
 
 pub fn load_translations(lang: &str) -> Translations {
-    let path = format!("src/translations/{}.json", lang);
+    let path = format!("/app/src/translations/{}.json", lang.to_lowercase());
     let content = fs::read_to_string(path).expect("Could not read translation file");
     serde_json::from_str(&content).expect("Could not parse translation file")
 }

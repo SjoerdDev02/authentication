@@ -7,7 +7,7 @@ use std::time::Duration;
 use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
 
 use crate::{
-    middleware::jwt_middleware::jwt_middleware,
+    middleware::{jwt_middleware::jwt_middleware, language_middleware::language_middleware},
     models::auth_models::AuthState,
     services::auth_service::{delete_user, login_user, otc_user, register_user, update_user},
 };
@@ -27,6 +27,7 @@ pub fn app(state: AuthState) -> Router {
         )
         .route("/otc", patch(otc_user))
         .with_state(state)
+        .layer(middleware::from_fn(language_middleware))
         .layer(
             ServiceBuilder::new()
                 .layer(HandleErrorLayer::new(|err: BoxError| async move {

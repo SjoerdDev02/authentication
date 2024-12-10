@@ -16,6 +16,8 @@ export async function registerUser(prevState: any, formData: FormData) {
 			name,
 			password,
 			passwordConfirm
+		}, {
+			withCredentials: true
 		});
 
 		return {
@@ -60,6 +62,8 @@ export async function updateUser(prevState: any, formData: FormData, userId: num
 			...(name && { name }),
 			...(password && { password }),
 			...(passwordConfirm && { passwordConfirm })
+		}, {
+			withCredentials: true
 		});
 
 		return {
@@ -86,6 +90,8 @@ export async function loginUser(prevState: any, formData: FormData) {
 		const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/login`, {
 			email,
 			password
+		}, {
+			withCredentials: true
 		});
 
 		return {
@@ -142,7 +148,9 @@ export async function otcUser(prevState: any, formData: FormData) {
 			characterSix
 		].join('');
 
-		const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/otc?otc=${otc}`);
+		const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/otc?otc=${otc}`, undefined, {
+			withCredentials: true
+		});
 
 		return {
 			success: true,
