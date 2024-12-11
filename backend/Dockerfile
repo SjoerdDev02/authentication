@@ -30,6 +30,7 @@ COPY --from=builder /backend/target/release/auth_server /app/auth_server
 COPY --from=builder /backend/migrations /app/migrations
 COPY --from=builder /usr/local/cargo/bin/sqlx /usr/local/bin/sqlx
 COPY src/static/images /app/src/static/images
+COPY src/translations /app/src/translations
 
 # Expose the backend server port
 EXPOSE 8080

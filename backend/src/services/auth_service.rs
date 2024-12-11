@@ -36,7 +36,6 @@ pub async fn register_user(
     Extension(lang): Extension<Arc<String>>,
     Json(user_data): Json<RegisterUser>,
 ) -> Result<Json<MinifiedAuthResponse>, StatusCode> {
-    println!("{}", lang);
     if user_data.password != user_data.password_confirm {
         return Err(StatusCode::BAD_REQUEST);
     }
@@ -91,10 +90,15 @@ pub async fn register_user(
     let client_base_url =
         env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
 
-    let translations = load_translations("en");
-    let test = translations.emails.get("confirm_account").unwrap();
+    let translations = load_translations(&lang);
 
-    println!("{}", test.body);
+    if let Some(emails) = translations.emails {
+        if let Some(confirm_account) = emails.get("confirm_account") {
+            if let Some(subject) = confirm_account.get("subject") {
+                println!("Confirm Account Subject: {}", subject);
+            }
+        }
+    }
 
     let mut template_variables: HashMap<&str, String> = HashMap::new();
     let mut image_file = File::open("/app/src/static/images/code_image.png")

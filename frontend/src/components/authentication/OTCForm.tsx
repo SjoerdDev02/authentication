@@ -35,8 +35,6 @@ const OTCForm = () => {
 	const otcCode = searchParams.get('otc');
 	const initialCodeCharacters = otcCode ? otcCode.split('') : null;
 
-	console.log(initialCodeCharacters, otcCode);
-
 	const handleOtcUser = async (prevState: any, formData: FormData) => {
 		const result = await otcUser(prevState, formData);
 
