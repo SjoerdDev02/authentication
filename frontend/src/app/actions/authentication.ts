@@ -1,15 +1,22 @@
 import axios from 'axios';
 
+import { sanitize } from '@/utils/strings';
+
 export async function registerUser(prevState: any, formData: FormData) {
 	try {
-		const email = formData.get('email');
-		const name = formData.get('name');
-		const password = formData.get('password');
-		const passwordConfirm = formData.get('passwordConfirmation');
+		let email = formData.get('email');
+		let name = formData.get('name');
+		let password = formData.get('password');
+		let passwordConfirm = formData.get('passwordConfirmation');
 
 		if (!email || !name || !password || !passwordConfirm) {
 			return { success: false, message: 'Invalid credentials', data: null };
 		}
+
+		email = sanitize(email);
+		name = sanitize(name);
+		password = sanitize(password);
+		passwordConfirm = sanitize(passwordConfirm);
 
 		const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/register`, {
 			email,
@@ -37,19 +44,22 @@ export async function registerUser(prevState: any, formData: FormData) {
 export async function updateUser(prevState: any, formData: FormData, userId: number | null) {
 	try {
 		const id = userId;
-		const email = formData.get('email');
-		const name = formData.get('name');
-		const password = formData.get('password');
-		const passwordConfirm = formData.get('passwordConfirmation');
+		let email = formData.get('email');
+		let name = formData.get('name');
+		let password = formData.get('password');
+		let passwordConfirm = formData.get('passwordConfirmation');
 
 		if (!userId) {
 			return { success: false, message: 'Invalid credentials' };
 		}
 
-		if (
-			(!email && !name)
-            && (!password && !passwordConfirm)
-		) {
+		if (!!email && !!name) {
+			email = sanitize(email);
+			name = sanitize(name);
+		} else if (!!password && !!passwordConfirm) {
+			password = sanitize(password);
+			passwordConfirm = sanitize(passwordConfirm);
+		} else {
 			return {
 				success: false,
 				message: 'Invalid credentials'
@@ -80,12 +90,15 @@ export async function updateUser(prevState: any, formData: FormData, userId: num
 
 export async function loginUser(prevState: any, formData: FormData) {
 	try {
-		const email = formData.get('email');
-		const password = formData.get('password');
+		let email = formData.get('email');
+		let password = formData.get('password');
 
 		if (!email || !password) {
 			return { success: false, message: 'Invalid credentials', data: null };
 		}
+
+		email = sanitize(email);
+		password = sanitize(password);
 
 		const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/login`, {
 			email,
@@ -128,16 +141,23 @@ export async function deleteUser() {
 
 export async function otcUser(prevState: any, formData: FormData) {
 	try {
-		const characterOne = formData.get('characterOne');
-		const characterTwo = formData.get('characterTwo');
-		const characterThree = formData.get('characterThree');
-		const characterFour = formData.get('characterFour');
-		const characterFive = formData.get('characterFive');
-		const characterSix = formData.get('characterSix');
+		let characterOne = formData.get('characterOne');
+		let characterTwo = formData.get('characterTwo');
+		let characterThree = formData.get('characterThree');
+		let characterFour = formData.get('characterFour');
+		let characterFive = formData.get('characterFive');
+		let characterSix = formData.get('characterSix');
 
 		if (!characterOne || !characterTwo || !characterThree || !characterFour || !characterFive || !characterSix) {
 			return { success: false, message: 'Invalid credentials', data: null };
 		}
+
+		characterOne = sanitize(characterOne);
+		characterTwo = sanitize(characterTwo);
+		characterThree = sanitize(characterThree);
+		characterFour = sanitize(characterFour);
+		characterFive = sanitize(characterFive);
+		characterSix = sanitize(characterSix);
 
 		const otc = [
 			characterOne,

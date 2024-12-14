@@ -16,6 +16,7 @@ use crate::utils::cookie_utils::set_cookie;
 use crate::utils::emails::{send_otc_email, send_otc_success_email};
 use crate::utils::jwt_utils::{encode_jwt, format_refresh_token_key, generate_refresh_token};
 use crate::utils::redis_utils::{get_token, remove_token, set_token};
+use crate::utils::string_utils::sanitize;
 use crate::utils::translations_utils::Translations;
 use axum::body::Body;
 use axum::http::{header, Response};
@@ -30,11 +31,16 @@ pub async fn register_user(
     Extension(translations): Extension<Arc<Translations>>,
     Json(user_data): Json<RegisterUser>,
 ) -> Result<Json<MinifiedAuthResponse>, StatusCode> {
-    if user_data.password != user_data.password_confirm {
+    let name = sanitize(&user_data.name);
+    let email = sanitize(&user_data.name);
+    let password = sanitize(&user_data.name);
+    let password_confirm = sanitize(&user_data.name);
+
+    if password != password_confirm {
         return Err(StatusCode::BAD_REQUEST);
     }
 
-    let existing_user = get_user_by_email(&state, &user_data.email).await;
+    let existing_user = get_user_by_email(&state, &email).await;
 
     if existing_user.is_ok() {
         return Err(StatusCode::CONFLICT);
@@ -42,9 +48,9 @@ pub async fn register_user(
 
     let create_user_result = match create_user(
         &state,
-        &user_data.name,
-        &user_data.email,
-        &user_data.password,
+        &name,
+        &email,
+        &password,
     )
     .await
     {
@@ -95,7 +101,10 @@ pub async fn login_user(
     Extension(_translations): Extension<Arc<Translations>>,
     Json(user_data): Json<LoginUser>,
 ) -> Result<Response<Body>, StatusCode> {
-    let user = match get_user_by_email(&state, &user_data.email).await {
+    let sanitized_email = sanitize(&user_data.email);
+    let sanitized_password = sanitize(&user_data.password);
+
+    let user = match get_user_by_email(&state, &sanitized_email).await {
         Ok(user) => user,
         Err(_) => return Err(StatusCode::UNAUTHORIZED),
     };
@@ -106,7 +115,7 @@ pub async fn login_user(
         return Err(StatusCode::UNAUTHORIZED);
     }
 
-    if !verify_password(&user_data.password, &password_hash)
+    if !verify_password(&sanitized_password, &password_hash)
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
     {
         return Err(StatusCode::UNAUTHORIZED);
@@ -152,8 +161,8 @@ pub async fn update_user(
             otc: otc.to_string(),
             user_id: user_data.id,
             action: OtcPayloadAction::UpdateNameAndEmail,
-            name: Some(name.to_string()),
-            email: Some(email.to_string()),
+            name: Some(sanitize(name)),
+            email: Some(sanitize(email)),
             password_hash: None,
         };
 
@@ -166,6 +175,9 @@ pub async fn update_user(
     if let (Some(password), Some(password_confirm)) =
         (&user_data.password, &user_data.password_confirm)
     {
+        let password = &sanitize(&password);
+        let password_confirm = &sanitize(&password_confirm);
+
         if password != password_confirm {
             return Err(StatusCode::BAD_REQUEST);
         }
@@ -259,16 +271,12 @@ pub async fn otc_user(
         .password_hash
         .unwrap_or_else(|| "".to_string());
 
-    // let mut template_variables: HashMap<&str, String> = HashMap::new();
-
     let mut image_file = File::open("/app/src/static/images/success_image.png")
     .expect("Image file not found");
     let mut image_data = Vec::new();
     image_file
     .read_to_end(&mut image_data)
     .expect("Failed to read image");
-
-    // let template_name;
 
     let confirm_mail_email = if action == OtcPayloadAction::UpdateNameAndEmail {
         email.clone()

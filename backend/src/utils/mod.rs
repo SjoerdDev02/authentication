@@ -6,3 +6,4 @@ pub mod redis_utils;
 pub mod templates;
 pub mod cookie_utils;
 pub mod translations_utils;
+pub mod string_utils;
