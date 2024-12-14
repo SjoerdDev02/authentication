@@ -33,7 +33,7 @@ pub fn app(state: AuthState) -> Router {
                 .layer(HandleErrorLayer::new(|err: BoxError| async move {
                     (
                         StatusCode::INTERNAL_SERVER_ERROR,
-                        format!("Unhandled error: {}", err),
+                        eprintln!("Error creating ServiceBuilder: {}", err),
                     )
                 }))
                 .layer(BufferLayer::new(1024))

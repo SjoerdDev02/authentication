@@ -5,7 +5,7 @@ use tera::{Context, Tera};
 pub fn generate_template(
     template: &str,
     template_name: &str,
-    variables: HashMap<&str, String>,
+    variables: HashMap<&str, &str>,
 ) -> Result<String, tera::Error> {
     let mut tera = Tera::new("templates/**/*")?;
 
