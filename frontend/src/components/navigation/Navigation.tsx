@@ -37,8 +37,8 @@ const Navigation = (props: NavigationPropsType) => {
 			value: 'FR'
 		},
 		{
-			label: 'GE',
-			value: 'GE'
+			label: 'DE',
+			value: 'DE'
 		},
 		{
 			label: 'ES',

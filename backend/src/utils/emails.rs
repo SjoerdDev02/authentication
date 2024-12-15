@@ -42,8 +42,12 @@ pub async fn send_email_with_template(
                         .header(header::ContentId::from("cid_image".to_string()))
                         .body(image_data),
                 ),
-        )
-        .unwrap();
+        );
+
+        let email = match email {
+            Ok(email) => email,
+            Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR)
+        };
 
     let env_email = env::var("EMAIL_USER").map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     let env_password = env::var("EMAIL_PASSWORD").map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;

@@ -32,9 +32,9 @@ pub async fn register_user(
     Json(user_data): Json<RegisterUser>,
 ) -> Result<Json<MinifiedAuthResponse>, StatusCode> {
     let name = sanitize(&user_data.name);
-    let email = sanitize(&user_data.name);
-    let password = sanitize(&user_data.name);
-    let password_confirm = sanitize(&user_data.name);
+    let email = sanitize(&user_data.email);
+    let password = sanitize(&user_data.password);
+    let password_confirm = sanitize(&user_data.password_confirm);
 
     if password != password_confirm {
         return Err(StatusCode::BAD_REQUEST);
