@@ -7,8 +7,11 @@ use crate::{
 };
 use axum::http::StatusCode;
 use bcrypt::{hash, verify, DEFAULT_COST};
-use rand::distributions::Alphanumeric;
-use rand::{thread_rng, Rng};
+use rand::{
+    distributions::Alphanumeric,
+    thread_rng,
+    Rng
+};
 use sqlx::mysql::MySqlQueryResult;
 
 pub fn verify_password(password: &str, hash: &str) -> Result<bool, bcrypt::BcryptError> {
@@ -17,6 +20,7 @@ pub fn verify_password(password: &str, hash: &str) -> Result<bool, bcrypt::Bcryp
 
 pub fn hash_password(password: &str) -> Result<String, bcrypt::BcryptError> {
     let hash = hash(password, DEFAULT_COST)?;
+
     Ok(hash)
 }
 
@@ -31,7 +35,7 @@ pub fn create_otc() -> String {
         .sample_iter(&Alphanumeric)
         .take(6)
         .map(char::from)
-        .map(|c| c.to_ascii_uppercase())
+        .map(|character| character.to_ascii_uppercase())
         .collect();
 
     otc

@@ -154,7 +154,7 @@ const EntryForm = () => {
 					type="submit"
 				>
 					<span>
-						{translations('Authentication.loginLabel')}
+						{translations(`Authentication.${activeTab === 'register' ? 'registerLabel' : 'loginLabel'}`)}
 					</span>
 				</Button>
 			</AuthFormWrapper>

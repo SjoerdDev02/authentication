@@ -1,9 +1,11 @@
 use axum::http::StatusCode;
 use chrono::{Duration, Utc};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, TokenData, Validation};
-use rand::distributions::Alphanumeric;
-use rand::{thread_rng, Rng};
-
+use rand::{
+    distributions::Alphanumeric,
+    thread_rng,
+    Rng
+};
 use crate::models::auth_models::JwtClaims;
 
 pub fn encode_jwt(id: &i32, name: &str, email: &str) -> Result<String, StatusCode> {
@@ -44,7 +46,7 @@ pub fn decode_jwt(jwt: &str) -> Result<TokenData<JwtClaims>, StatusCode> {
 }
 
 pub fn verify_jwt(jwt: &str, expected_id: &i32) -> Result<JwtClaims, StatusCode> {
-    let secret = "your_secret_key";
+    let secret = "randomstring";
 
     let token_data = decode::<JwtClaims>(
         jwt,

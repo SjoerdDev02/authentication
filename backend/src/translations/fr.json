@@ -1,0 +1,50 @@
+{
+    "emails": {
+        "otc": {
+            "confirm_account": {
+                "template_name": "Confirmez la création du compte",
+                "subject": "Confirmez votre compte",
+                "header": "Votre compte a été créé avec succès",
+                "code_description": "Entrez ce code pour confirmer votre compte",
+                "link_description": "Vous pouvez également entrer ce lien pour confirmer votre compte",
+                "footer_note": "Si vous n'avez pas créé ce compte, veuillez ignorer cet e-mail."
+            },
+            "update_account": {
+                "template_name": "Confirmez la mise à jour du compte",
+                "subject": "Confirmez la mise à jour de votre compte",
+                "header": "Code de mise à jour du compte",
+                "code_description": "Entrez ce code pour confirmer que vous souhaitez mettre à jour votre compte",
+                "link_description": "Vous pouvez également entrer ce lien pour confirmer la mise à jour de votre compte",
+                "footer_note": "Si vous ne vouliez pas mettre à jour votre compte, veuillez ignorer cet e-mail."
+            },
+            "delete_account": {
+                "template_name": "Confirmez la suppression du compte",
+                "subject": "Confirmez la suppression de votre compte",
+                "header": "Code de suppression du compte",
+                "code_description": "Entrez ce code pour confirmer que vous souhaitez supprimer votre compte",
+                "link_description": "Vous pouvez également entrer ce lien pour supprimer votre compte",
+                "footer_note": "Si vous ne vouliez pas supprimer votre compte, veuillez ignorer cet e-mail."
+            }
+        },
+        "otc_success": {
+            "confirm_account": {
+                "template_name": "Compte confirmé avec succès",
+                "subject": "Votre compte a été confirmé avec succès",
+                "header": "Félicitations ! Vous avez confirmé votre compte avec succès",
+                "footer_note": "Si vous n'avez pas confirmé ce compte, veuillez nous contacter."
+            },
+            "update_account": {
+                "template_name": "Compte mis à jour avec succès",
+                "subject": "Votre compte a été mis à jour avec succès",
+                "header": "Votre compte a été mis à jour avec succès",
+                "footer_note": "Si vous n'avez pas mis à jour ce compte, veuillez nous contacter."
+            },
+            "delete_account": {
+                "template_name": "Compte supprimé avec succès",
+                "subject": "Votre compte a été supprimé avec succès",
+                "header": "Nous sommes désolés de vous voir partir. Votre compte a été supprimé avec succès",
+                "footer_note": "Si vous n'avez pas supprimé ce compte, veuillez nous contacter."
+            }
+        }
+    }
+}

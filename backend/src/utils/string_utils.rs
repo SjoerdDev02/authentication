@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use regex::Regex;
+use std::collections::HashMap;
 
 pub fn sanitize(input: &str) -> String {
     let mut entity_map: HashMap<char, &str> = HashMap::new();
@@ -12,14 +12,27 @@ pub fn sanitize(input: &str) -> String {
     entity_map.insert('`', "&amp;#x60;");
     entity_map.insert('=', "&amp;#x3D;");
 
-    let regex = Regex::new(r"[&<>'`=/]").expect("Invalid regex pattern");
+    let regex = match Regex::new(r"[&<>'`=/]") {
+        Ok(r) => r,
+        Err(_) => return input.to_string()
+    };
 
     let result = regex.replace_all(input, |caps: &regex::Captures| {
-        if let Some(matched) = caps.get(0) {
-            let matched_char = matched.as_str().chars().next().unwrap_or_default();
-            String::from(*entity_map.get(&matched_char).unwrap_or(&matched.as_str()))
-        } else {
-            String::new()
+        match caps.get(0) {
+            Some(matched) => {
+                let matched_char = matched.as_str().chars().next();
+
+                match matched_char {
+                    Some(chararcter) => {
+                        match entity_map.get(&chararcter) {
+                            Some(&entity) => entity.to_string(),
+                            None => matched.as_str().to_string(),
+                        }
+                    }
+                    None => matched.as_str().to_string(),
+                }
+            },
+            None => String::new(),
         }
     });
 

@@ -1,0 +1,50 @@
+{
+    "emails": {
+        "otc": {
+            "confirm_account": {
+                "template_name": "Bevestig account aanmaken",
+                "subject": "Bevestig uw account",
+                "header": "Uw account is succesvol aangemaakt",
+                "code_description": "Voer deze code in om uw account te bevestigen",
+                "link_description": "U kunt ook deze link invoeren om uw account te bevestigen",
+                "footer_note": "Als u dit account niet heeft aangemaakt, negeer dan deze e-mail."
+            },
+            "update_account": {
+                "template_name": "Bevestig account update",
+                "subject": "Bevestig uw accountupdate",
+                "header": "Code voor accountupdate",
+                "code_description": "Voer deze code in om te bevestigen dat u uw account wilt updaten",
+                "link_description": "U kunt ook deze link invoeren om uw accountupdate te bevestigen",
+                "footer_note": "Als u niet van plan was uw account te updaten, negeer dan deze e-mail."
+            },
+            "delete_account": {
+                "template_name": "Bevestig account verwijderen",
+                "subject": "Bevestig het verwijderen van uw account",
+                "header": "Code voor accountverwijdering",
+                "code_description": "Voer deze code in om te bevestigen dat u uw account wilt verwijderen",
+                "link_description": "U kunt ook deze link invoeren om uw account te verwijderen",
+                "footer_note": "Als u niet van plan was uw account te verwijderen, negeer dan deze e-mail."
+            }
+        },
+        "otc_success": {
+            "confirm_account": {
+                "template_name": "Account succesvol bevestigd",
+                "subject": "Uw account is succesvol bevestigd",
+                "header": "Gefeliciteerd! U heeft uw account succesvol bevestigd",
+                "footer_note": "Als u dit account niet heeft bevestigd, neem dan contact met ons op."
+            },
+            "update_account": {
+                "template_name": "Account succesvol geüpdatet",
+                "subject": "Uw account is succesvol geüpdatet",
+                "header": "Uw account is succesvol geüpdatet",
+                "footer_note": "Als u dit account niet heeft geüpdatet, neem dan contact met ons op."
+            },
+            "delete_account": {
+                "template_name": "Account succesvol verwijderd",
+                "subject": "Uw account is succesvol verwijderd",
+                "header": "Het spijt ons u te zien gaan. Uw account is succesvol verwijderd",
+                "footer_note": "Als u dit account niet heeft verwijderd, neem dan contact met ons op."
+            }
+        }
+    }
+}

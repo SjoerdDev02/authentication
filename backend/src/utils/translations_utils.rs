@@ -1,16 +1,19 @@
-use serde::Deserialize;
 use std::fs;
-use serde_json::Value;
+use http::StatusCode;
+use serde_json;
 
-#[derive(Debug, Deserialize)]
-pub struct Translations {
-    pub emails: Option<Value>,
-    pub errors: Option<Value>,
-}
+use crate::models::translations_models::Translations;
 
-
-pub fn load_translations(lang: &str) -> Translations {
+pub fn load_translations(lang: &str) -> Result<Translations, StatusCode> {
     let path = format!("/app/src/translations/{}.json", lang.to_lowercase());
-    let content = fs::read_to_string(path).expect("Could not read translation file");
-    serde_json::from_str(&content).expect("Could not parse translation file")
+
+    let content = match fs::read_to_string(&path) {
+        Ok(content) => content,
+        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
+    };
+
+    match serde_json::from_str::<Translations>(&content) {
+        Ok(translations) => Ok(translations),
+        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
+    }
 }

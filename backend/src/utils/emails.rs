@@ -1,4 +1,7 @@
-use std::io::Read;
+use crate::models::translations_models::Translations;
+use crate::templates::auth_templates::{
+    VERIFICATION_CODE_SUCCESS_TEMPLATE, VERIFICATION_CODE_TEMPLATE,
+};
 use crate::utils::templates::generate_template;
 use axum::http::StatusCode;
 use dotenv::dotenv;
@@ -8,8 +11,7 @@ use lettre::{Message, SmtpTransport, Transport};
 use std::collections::HashMap;
 use std::env;
 use std::fs::File;
-use crate::utils::translations_utils::Translations;
-use crate::templates::auth_templates::{VERIFICATION_CODE_SUCCESS_TEMPLATE, VERIFICATION_CODE_TEMPLATE};
+use std::io::Read;
 
 pub async fn send_email_with_template(
     recipient: &str,
@@ -28,14 +30,18 @@ pub async fn send_email_with_template(
         .subject(subject)
         .multipart(
             MultiPart::mixed()
-                .singlepart(SinglePart::builder()
-                    .header(header::ContentType::TEXT_HTML)
-                    .body(body.to_string()))
-                .singlepart(SinglePart::builder()
-                    .header(header::ContentType::parse("image/png").unwrap())
-                    .header(header::ContentDisposition::inline())
-                    .header(header::ContentId::from("cid_image".to_string()))
-                    .body(image_data)),
+                .singlepart(
+                    SinglePart::builder()
+                        .header(header::ContentType::TEXT_HTML)
+                        .body(body.to_string()),
+                )
+                .singlepart(
+                    SinglePart::builder()
+                        .header(header::ContentType::parse("image/png").unwrap())
+                        .header(header::ContentDisposition::inline())
+                        .header(header::ContentId::from("cid_image".to_string()))
+                        .body(image_data),
+                ),
         )
         .unwrap();
 
@@ -51,7 +57,7 @@ pub async fn send_email_with_template(
 
     match mailer.send(&email) {
         Ok(_) => Ok(()),
-        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR)
+        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
 }
 
@@ -62,7 +68,8 @@ pub async fn send_otc_email(
     otc_code: &str,
     email: &str,
 ) -> Result<(), StatusCode> {
-    let client_base_url = env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
+    let client_base_url =
+        env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
 
     if let Some(emails) = &translations.emails {
         if let Some(otc_translations) = emails.get("otc") {
@@ -73,21 +80,28 @@ pub async fn send_otc_email(
                     template_variables.insert("header_title", header);
                 }
 
-                if let Some(code_description) = otc_data.get("code_description").and_then(|str| str.as_str()) {
+                if let Some(code_description) = otc_data
+                    .get("code_description")
+                    .and_then(|str| str.as_str())
+                {
                     template_variables.insert("code_description", code_description);
                 }
 
-                if let Some(link_description) = otc_data.get("link_description").and_then(|str| str.as_str()) {
+                if let Some(link_description) = otc_data
+                    .get("link_description")
+                    .and_then(|str| str.as_str())
+                {
                     template_variables.insert("link_title", link_description);
                 }
-                if let Some(footer_note) = otc_data.get("footer_note").and_then(|str| str.as_str()) {
+                if let Some(footer_note) = otc_data.get("footer_note").and_then(|str| str.as_str())
+                {
                     template_variables.insert("footer_note", footer_note);
                 }
 
                 template_variables.insert("otc", otc_code);
                 let otc_link = format!("{}/otc?otc={}", client_base_url, otc_code);
                 template_variables.insert("otc_link", otc_link.as_str());
-                
+
                 let mut image_file = File::open("/app/src/static/images/code_image.png")
                     .expect("Image file not found");
                 let mut image_data = Vec::new();
@@ -106,13 +120,8 @@ pub async fn send_otc_email(
                     )
                     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-                    if let Err(_) = send_email_with_template(
-                        &email,
-                        &subject,
-                        &email_body,
-                        image_data,
-                    )
-                    .await
+                    if let Err(_) =
+                        send_email_with_template(&email, &subject, &email_body, image_data).await
                     {
                         return Err(StatusCode::INTERNAL_SERVER_ERROR);
                     }
@@ -147,10 +156,11 @@ pub async fn send_otc_success_email(
                     template_variables.insert("header_title", header);
                 }
 
-                if let Some(footer_note) = otc_data.get("footer_note").and_then(|str| str.as_str()) {
+                if let Some(footer_note) = otc_data.get("footer_note").and_then(|str| str.as_str())
+                {
                     template_variables.insert("footer_note", footer_note);
                 }
-                
+
                 let mut image_file = File::open("/app/src/static/images/success_image.png")
                     .expect("Image file not found");
                 let mut image_data = Vec::new();
@@ -169,13 +179,8 @@ pub async fn send_otc_success_email(
                     )
                     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-                    if let Err(_) = send_email_with_template(
-                        &email,
-                        &subject,
-                        &email_body,
-                        image_data,
-                    )
-                    .await
+                    if let Err(_) =
+                        send_email_with_template(&email, &subject, &email_body, image_data).await
                     {
                         return Err(StatusCode::INTERNAL_SERVER_ERROR);
                     }

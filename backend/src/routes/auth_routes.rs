@@ -1,7 +1,9 @@
 use axum::{
+    error_handling::HandleErrorLayer,
+    http::StatusCode,
     middleware,
     routing::{delete, patch, post},
-    Router,
+    BoxError, Router,
 };
 use std::time::Duration;
 use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
@@ -11,7 +13,6 @@ use crate::{
     models::auth_models::AuthState,
     services::auth_service::{delete_user, login_user, otc_user, register_user, update_user},
 };
-use axum::{error_handling::HandleErrorLayer, http::StatusCode, BoxError};
 
 pub fn app(state: AuthState) -> Router {
     let routes = Router::new()

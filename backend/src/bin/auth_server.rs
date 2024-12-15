@@ -53,15 +53,15 @@ async fn main() {
             Method::POST,
             Method::PUT,
             Method::PATCH,
-            Method::DELETE
+            Method::DELETE,
         ])
         .allow_headers(vec![
             header::CONTENT_TYPE,
             header::AUTHORIZATION,
-            header::COOKIE
+            header::COOKIE,
         ])
         .allow_credentials(true);
-    
+
     let app = app.layer(cors);
 
     let listener = match TcpListener::bind("0.0.0.0:8080").await {

@@ -1,43 +1,17 @@
 {
-    "Customizer": {
-        "colorFormatLabel": "Kleurformaat",
-        "shadesAmountLabel": "Aantal tinten",
-        "colorValuesLabel": "Kleurwaarden",
-        "colorValuesHue": "Kleurtoon",
-        "colorValuesSaturation": "Verzadiging",
-        "colorValuesLightness": "Helderheid",
-        "colorValuesRed": "Rood",
-        "colorValuesGreen": "Groen",
-        "colorValuesBlue": "Blauw",
-        "Tooltips": {
-            "colorFormatTooltip": "Selecteer het kleurformaat om de paletten aan te passen en weer te geven",
-            "shadesAmountTooltip": "Geef het aantal tinten op dat je in elk palet wilt hebben"
-        }
-    },
-    "Palettes": {
-        "primary": "Primair",
-        "secondary": "Secundair",
-        "success": "Succes",
-        "warning": "Waarschuwing",
-        "error": "Fout",
-        "grayscale": "Grijswaarden",
-        "Tooltips": {
-            "colorCopiedTooltip": "Kleur gekopieerd!"
-        }
-    },
-    "Information": {
-        "createdPalettesLabel": "Gemaakte paletten",
-        "Tooltips": {
-            "createdPalettesTooltip": "De weergegeven kleur is de middelste tint in elk gemaakt palet",
-            "copyColorTooltip": "Kleur gekopieerd!",
-            "copyPaletteTooltip": "Palette gekopieerd!",
-            "copyAllTooltip": "Alle paletten gekopieerd!",
-            "downloadColorsTooltip": "Kleuren gedownload!"
-        },
-        "Buttons": {
-            "copyAll": "Alles kopiëren",
-            "share": "Delen",
-            "download": "Downloaden"
-        }
+    "Authentication": {
+        "loginLabel": "Inloggen",
+        "registerLabel": "Registreren",
+        "updateLabel": "Bijwerken",
+        "deleteLabel": "Account verwijderen",
+        "sendLabel": "Verzenden",
+        "changeOtherLabel": "Wijzig andere",
+        "changePasswordLabel": "Wachtwoord wijzigen",
+        "emailPlaceholder": "E-mailadres",
+        "namePlaceholder": "Naam",
+        "passwordPlaceholder": "Wachtwoord",
+        "passwordConfirmPlaceholder": "Bevestig wachtwoord",
+        "otcHeader": "Verifieer uw identiteit",
+        "otcSubHeader": "Controleer uw inbox voor de code"
     }
 }
