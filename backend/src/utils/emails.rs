@@ -4,14 +4,13 @@ use crate::templates::auth_templates::{
 };
 use crate::utils::templates::generate_template;
 use axum::http::StatusCode;
-use dotenv::dotenv;
 use lettre::message::{header, MultiPart, SinglePart};
 use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
 use std::collections::HashMap;
-use std::env;
 use std::fs::File;
 use std::io::Read;
+use crate::utils::env::get_environment_variable;
 
 pub async fn send_email_with_template(
     recipient: &str,
@@ -19,8 +18,6 @@ pub async fn send_email_with_template(
     body: &str,
     image_data: Vec<u8>,
 ) -> Result<(), StatusCode> {
-    dotenv().ok();
-
     let email = Message::builder()
         .from("NoBody <nobody@domain.tld>".parse().unwrap())
         .reply_to("Yuin <yuin@domain.tld>".parse().unwrap())
@@ -49,8 +46,15 @@ pub async fn send_email_with_template(
             Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR)
         };
 
-    let env_email = env::var("EMAIL_USER").map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    let env_password = env::var("EMAIL_PASSWORD").map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        let env_email = match get_environment_variable("EMAIL_USER") {
+            Ok(env_email) => env_email,
+            Err(_) => return Err(StatusCode::BAD_REQUEST)
+        };
+
+        let env_password = match get_environment_variable("EMAIL_PASSWORD") {
+            Ok(env_password) => env_password,
+            Err(_) => return Err(StatusCode::BAD_REQUEST)
+        };
 
     let creds = Credentials::new(env_email, env_password);
 
@@ -72,8 +76,10 @@ pub async fn send_otc_email(
     otc_code: &str,
     email: &str,
 ) -> Result<(), StatusCode> {
-    let client_base_url =
-        env::var("CLIENT_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
+        let client_base_url = match get_environment_variable("CLIENT_BASE_URL") {
+            Ok(client_base_url) => client_base_url,
+            Err(_) => return Err(StatusCode::BAD_REQUEST)
+        };
 
     if let Some(emails) = &translations.emails {
         if let Some(otc_translations) = emails.get("otc") {

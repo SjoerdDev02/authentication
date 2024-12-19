@@ -7,9 +7,13 @@ use rand::{
     Rng
 };
 use crate::models::auth_models::JwtClaims;
+use crate::utils::env::get_environment_variable;
 
 pub fn encode_jwt(id: &i32, name: &str, email: &str) -> Result<String, StatusCode> {
-    let jwt_secret = "randomstring".to_string();
+    let jwt_secret = match get_environment_variable("JWT_SECRET_KEY") {
+        Ok(jwt_secret) => jwt_secret,
+        Err(_) => return Err(StatusCode::BAD_REQUEST)
+    };
 
     let now = Utc::now();
     let expire = Duration::hours(24);
@@ -33,11 +37,14 @@ pub fn encode_jwt(id: &i32, name: &str, email: &str) -> Result<String, StatusCod
 }
 
 pub fn decode_jwt(jwt: &str) -> Result<TokenData<JwtClaims>, StatusCode> {
-    let secret = "randomstring".to_string();
+    let jwt_secret = match get_environment_variable("JWT_SECRET_KEY") {
+        Ok(jwt_secret) => jwt_secret,
+        Err(_) => return Err(StatusCode::BAD_REQUEST)
+    };
 
     let result: Result<TokenData<JwtClaims>, StatusCode> = decode(
         &jwt,
-        &DecodingKey::from_secret(secret.as_ref()),
+        &DecodingKey::from_secret(jwt_secret.as_ref()),
         &Validation::default(),
     )
     .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR);
@@ -46,11 +53,14 @@ pub fn decode_jwt(jwt: &str) -> Result<TokenData<JwtClaims>, StatusCode> {
 }
 
 pub fn verify_jwt(jwt: &str, expected_id: &i32) -> Result<JwtClaims, StatusCode> {
-    let secret = "randomstring";
+    let jwt_secret = match get_environment_variable("JWT_SECRET_KEY") {
+        Ok(jwt_secret) => jwt_secret,
+        Err(_) => return Err(StatusCode::BAD_REQUEST)
+    };
 
     let token_data = decode::<JwtClaims>(
         jwt,
-        &DecodingKey::from_secret(secret.as_ref()),
+        &DecodingKey::from_secret(jwt_secret.as_ref()),
         &Validation::default(),
     )
     .map_err(|_| StatusCode::UNAUTHORIZED)?;

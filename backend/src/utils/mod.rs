@@ -7,3 +7,4 @@ pub mod redis_utils;
 pub mod string_utils;
 pub mod templates;
 pub mod translations_utils;
+pub mod env;

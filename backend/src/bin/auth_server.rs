@@ -1,9 +1,9 @@
-use backend::models::auth_models::AuthState;
+use backend::{models::auth_models::AuthState, utils::env::get_environment_variable};
 use dotenv::dotenv;
 use http::{header, HeaderValue, Method};
 use redis::Client;
 use sqlx::mysql::MySqlPoolOptions;
-use std::{env, sync::Arc};
+use std::sync::Arc;
 use tokio::{net::TcpListener, sync::Mutex};
 use tower_http::cors::CorsLayer;
 
@@ -11,15 +11,26 @@ use tower_http::cors::CorsLayer;
 async fn main() {
     dotenv().ok();
 
-    let database_url = env::var("DATABASE_URL")
-        .unwrap_or_else(|_| "mysql://root:root@db:3306/authentication".to_string());
+    let database_url = match get_environment_variable("DATABASE_URL") {
+        Ok(database_url) => database_url,
+        Err(err) => {
+            eprintln!("Error getting DATABASE_URL: {}", err);
+            std::process::exit(1);
+        }
+    };
 
     let pool = MySqlPoolOptions::new()
         .connect(&database_url)
         .await
         .expect("Unable to connect to database");
 
-    let redis_url = env::var("REDIS_URL").unwrap_or_else(|_| "redis://redis/".to_string());
+    let redis_url = match get_environment_variable("REDIS_URL") {
+        Ok(redis_url) => redis_url,
+        Err(err) => {
+            eprintln!("Error getting REDIS_URL: {}", err);
+            std::process::exit(1);
+        }
+    };
 
     let redis_client = match Client::open(redis_url) {
         Ok(client) => client,
@@ -46,8 +57,16 @@ async fn main() {
 
     let app = backend::routes::auth_routes::app(state);
 
+    let allow_origin_url = match get_environment_variable("CORS_ALLOW_ORIGIN") {
+        Ok(allow_origin_url) => allow_origin_url,
+        Err(err) => {
+            eprintln!("Error getting CORS_ALLOW_ORIGIN: {}", err);
+            std::process::exit(1);
+        }
+    };
+
     let cors = CorsLayer::new()
-        .allow_origin("http://localhost:3000".parse::<HeaderValue>().unwrap())
+        .allow_origin(allow_origin_url.parse::<HeaderValue>().unwrap())
         .allow_methods(vec![
             Method::GET,
             Method::POST,
