@@ -57,10 +57,10 @@ async fn main() {
 
     let app = backend::routes::auth_routes::app(state);
 
-    let allow_origin_url = match get_environment_variable("CORS_ALLOW_ORIGIN") {
+    let allow_origin_url = match get_environment_variable("CLIENT_BASE_URL") {
         Ok(allow_origin_url) => allow_origin_url,
         Err(err) => {
-            eprintln!("Error getting CORS_ALLOW_ORIGIN: {}", err);
+            eprintln!("Error getting CLIENT_BASE_URL: {}", err);
             std::process::exit(1);
         }
     };
