@@ -17,7 +17,6 @@ use crate::utils::cookie_utils::set_cookie;
 use crate::utils::emails::{send_otc_email, send_otc_success_email};
 use crate::utils::jwt_utils::{encode_jwt, format_refresh_token_key, generate_refresh_token};
 use crate::utils::redis_utils::{get_token, remove_token, set_token};
-use crate::utils::string_utils::sanitize;
 use axum::{
     body::Body,
     extract::{Json, Query, State},
@@ -31,22 +30,24 @@ pub async fn register_user(
     Extension(translations): Extension<Arc<Translations>>,
     Json(user_data): Json<RegisterUser>,
 ) -> Result<Json<MinifiedAuthResponse>, StatusCode> {
-    let name = sanitize(&user_data.name);
-    let email = sanitize(&user_data.email);
-    let password = sanitize(&user_data.password);
-    let password_confirm = sanitize(&user_data.password_confirm);
-
-    if password != password_confirm {
+    if user_data.password != user_data.password_confirm {
         return Err(StatusCode::BAD_REQUEST);
     }
 
-    let existing_user = get_user_by_email(&state, &email).await;
+    let existing_user = get_user_by_email(&state, &user_data.email).await;
 
     if existing_user.is_ok() {
         return Err(StatusCode::CONFLICT);
     }
 
-    let create_user_result = match create_user(&state, &name, &email, &password).await {
+    let create_user_result = match create_user(
+        &state,
+        &user_data.name,
+        &user_data.email,
+        &user_data.password,
+    )
+    .await
+    {
         Ok(user) => user,
         Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
     };
@@ -73,11 +74,14 @@ pub async fn register_user(
 
     let _ = set_token(&state, &otc_key, &otc_payload, OTC_EXPIRATION_SECONDS).await;
 
-    send_otc_email(&translations, "confirm_account", &otc, &email)
+    send_otc_email(&translations, "confirm_account", &otc, &user_data.email)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    let response = MinifiedAuthResponse { name, email };
+    let response = MinifiedAuthResponse {
+        name: user_data.name,
+        email: user_data.email,
+    };
 
     Ok(Json(response))
 }
@@ -87,10 +91,7 @@ pub async fn login_user(
     Extension(_translations): Extension<Arc<Translations>>,
     Json(user_data): Json<LoginUser>,
 ) -> Result<Response<Body>, StatusCode> {
-    let sanitized_email = sanitize(&user_data.email);
-    let sanitized_password = sanitize(&user_data.password);
-
-    let user = match get_user_by_email(&state, &sanitized_email).await {
+    let user = match get_user_by_email(&state, &user_data.email).await {
         Ok(user) => user,
         Err(_) => return Err(StatusCode::UNAUTHORIZED),
     };
@@ -101,14 +102,13 @@ pub async fn login_user(
         return Err(StatusCode::UNAUTHORIZED);
     }
 
-    if !verify_password(&sanitized_password, &password_hash)
+    if !verify_password(&user_data.password, &password_hash)
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
     {
         return Err(StatusCode::UNAUTHORIZED);
     }
 
-    let new_jwt = encode_jwt(&id, &name, &email)
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let new_jwt = encode_jwt(&id, &name, &email).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
     let new_refresh_token = generate_refresh_token();
     let new_redis_refresh_token_key = format_refresh_token_key(&new_refresh_token);
 
@@ -140,7 +140,7 @@ pub async fn login_user(
 
     let content_type_header_value = match "application/json".parse() {
         Ok(header) => header,
-        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR)
+        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
     };
 
     response
@@ -158,36 +158,28 @@ pub async fn update_user(
     let otc = create_otc();
     let otc_key = format_otc_key(&otc);
 
-    let user_id = match sanitize(&user_data.id.to_string()).parse() {
-        Ok(id) => id,
-        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR)
-    };
-
     let otc_payload = if let (Some(email), Some(name)) = (&user_data.email, &user_data.name) {
         OtcPayload {
             otc: otc.to_string(),
-            user_id,
+            user_id: user_data.id,
             action: OtcPayloadAction::UpdateNameAndEmail,
-            name: Some(sanitize(name)),
-            email: Some(sanitize(email)),
+            name: Some(name.to_string()),
+            email: Some(email.to_string()),
             password_hash: None,
         }
     } else if let (Some(password), Some(password_confirm)) =
         (&user_data.password, &user_data.password_confirm)
     {
-        let password = &sanitize(password);
-        let password_confirm = &sanitize(password_confirm);
-    
         if password != password_confirm {
             return Err(StatusCode::BAD_REQUEST);
         }
-    
+
         let password_hash =
             hash_password(password).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    
+
         OtcPayload {
             otc: otc.to_string(),
-            user_id,
+            user_id: user_data.id,
             action: OtcPayloadAction::UpdatePassword,
             name: None,
             email: None,
@@ -195,14 +187,14 @@ pub async fn update_user(
         }
     } else {
         return Err(StatusCode::BAD_REQUEST);
-    };    
+    };
 
-    let otc_payload = serde_json::to_string(&otc_payload)
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let otc_payload =
+        serde_json::to_string(&otc_payload).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     let _ = set_token(&state, &otc_key, &otc_payload, OTC_EXPIRATION_SECONDS).await;
 
-    let old_user = match get_user_by_id(&state, &user_id).await {
+    let old_user = match get_user_by_id(&state, &user_data.id).await {
         Ok(user) => user,
         Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
     };
@@ -221,18 +213,12 @@ pub async fn delete_user(
     Extension(translations): Extension<Arc<Translations>>,
     Extension(claims): Extension<JwtClaims>,
 ) -> Result<StatusCode, StatusCode> {
-    let user_id: i32 = match sanitize(&claims.id.to_string()).parse() {
-        Ok(id) => id,
-        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR)
-    };
-    let user_email = sanitize(&claims.email);
-
     let otc = create_otc();
     let otc_key = format_otc_key(&otc);
 
     let otc_payload = OtcPayload {
         otc: otc.to_string(),
-        user_id,
+        user_id: claims.id,
         action: OtcPayloadAction::DeleteAccount,
         name: None,
         email: None,
@@ -244,7 +230,7 @@ pub async fn delete_user(
 
     let _ = set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
 
-    send_otc_email(&translations, "update_account", &otc, &user_email)
+    send_otc_email(&translations, "delete_account", &otc, &claims.email)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
@@ -273,15 +259,15 @@ pub async fn otc_user(
     let user_id = token_payload.user_id;
     let email = match token_payload.email {
         Some(email) => email,
-        None => "".to_string()
+        None => "".to_string(),
     };
     let name = match token_payload.name {
         Some(email) => email,
-        None => "".to_string()
+        None => "".to_string(),
     };
     let password_hash = match token_payload.password_hash {
         Some(email) => email,
-        None => "".to_string()
+        None => "".to_string(),
     };
 
     let confirm_mail_email = if action == OtcPayloadAction::UpdateNameAndEmail {
@@ -316,6 +302,15 @@ pub async fn otc_user(
                 &new_jwt,
                 Some(BEARER_EXPIRATION_SECONDS),
             )?;
+
+            let content_type_header_value = match "application/json".parse() {
+                Ok(header) => header,
+                Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
+            };
+
+            response
+                .headers_mut()
+                .insert(header::CONTENT_TYPE, content_type_header_value);
 
             let response_body = serde_json::to_string(&AuthResponse {
                 id: user_id,

@@ -8,7 +8,7 @@ import { loginUser, registerUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/EntryForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import userStore from "@/states/userStore";
-import { AuthResponse, MinifiedAuthResponse } from "@/types/Authentication";
+import { AuthResponse, MinifiedAuthResponse } from "@/types/authentication";
 import useTranslations from "@/utils/hooks/useTranslations";
 
 import { Flex } from "../common/Flex";

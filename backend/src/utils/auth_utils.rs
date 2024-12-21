@@ -7,11 +7,7 @@ use crate::{
 };
 use axum::http::StatusCode;
 use bcrypt::{hash, verify, DEFAULT_COST};
-use rand::{
-    distributions::Alphanumeric,
-    thread_rng,
-    Rng
-};
+use rand::{distributions::Alphanumeric, thread_rng, Rng};
 use sqlx::mysql::MySqlQueryResult;
 
 pub fn verify_password(password: &str, hash: &str) -> Result<bool, bcrypt::BcryptError> {

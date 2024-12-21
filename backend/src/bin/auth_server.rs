@@ -57,7 +57,7 @@ async fn main() {
 
     let app = backend::routes::auth_routes::app(state);
 
-    let allow_origin_url = match get_environment_variable("CLIENT_BASE_URL") {
+    let allow_origin = match get_environment_variable("CLIENT_BASE_URL") {
         Ok(allow_origin_url) => allow_origin_url,
         Err(err) => {
             eprintln!("Error getting CLIENT_BASE_URL: {}", err);
@@ -65,8 +65,19 @@ async fn main() {
         }
     };
 
+    let allow_origin = match allow_origin.parse::<HeaderValue>() {
+        Ok(header) => header,
+        Err(err) => {
+            eprintln!(
+                "Error parsing CLIENT_BASE_URL to allow origin header: {}",
+                err
+            );
+            std::process::exit(1);
+        }
+    };
+
     let cors = CorsLayer::new()
-        .allow_origin(allow_origin_url.parse::<HeaderValue>().unwrap())
+        .allow_origin(allow_origin)
         .allow_methods(vec![
             Method::GET,
             Method::POST,

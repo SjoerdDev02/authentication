@@ -49,7 +49,11 @@ Ensure that your MySQL service is running. You can use MySQL Workbench to connec
    sqlx migrate run
    ```
 
-### 3. Docker Setup
+3. Set Up Environment Variables
+
+Create .env files in the root directories of both the frontend and backend projects. You can use the .env.example files as templates—simply copy their contents into new .env files and customize the values to suit your configuration. These environment variables are essential for configuring Docker images and are utilized throughout the application's execution.
+
+### 4. Docker Setup
 
 This project uses Docker for containerization. We have a `docker-compose.yml` to set up the services.
 
@@ -65,7 +69,7 @@ This project uses Docker for containerization. We have a `docker-compose.yml` to
    - MySQL is available on port 3306.
    - Redis is available on port 6379.
 
-### 4. Backend Setup (Rust)
+### 5. Backend Setup (Rust)
 
 The backend is built using Rust. To set up the backend:
 
@@ -83,7 +87,7 @@ The backend is built using Rust. To set up the backend:
 
    This will start the Rust server, which listens for requests from the frontend.
 
-### 5. Frontend Setup (Next.js)
+### 6. Frontend Setup (Next.js)
 
 1. Navigate to the frontend directory:
 
@@ -105,13 +109,12 @@ The backend is built using Rust. To set up the backend:
 
    The frontend will be available at [http://localhost:3000](http://localhost:3000).
 
-### 6. Authentication & Cookies
+### 7. Authentication & Cookies
 
 - **Session Cookies**: Authentication is handled using cookies, which only work with HTTPS and SameSite domains for security reasons.
 - If you're running locally, consider using a tool like [ngrok](https://ngrok.com/) to expose your local environment to HTTPS.
-- Ensure that your cookie settings (e.g., `Secure`, `SameSite`) are configured correctly in the backend.
 
-### 7. Redis CLI
+### 8. Redis CLI
 
 If you want to interact with Redis, you can use the `redis-cli`:
 
@@ -119,7 +122,7 @@ If you want to interact with Redis, you can use the `redis-cli`:
 redis-cli
 ```
 
-### 8. Database Management with MySQL Workbench
+### 9. Database Management with MySQL Workbench
 
 - Connect to MySQL using the connection details from your `docker-compose.yml`.
 - Use MySQL Workbench to query and manage the database.

@@ -1,6 +1,6 @@
 use axum::{
     body::Body,
-    http::{header, HeaderValue, Response}
+    http::{header, HeaderValue, Response},
 };
 use http::{Request, StatusCode};
 

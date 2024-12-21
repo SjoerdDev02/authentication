@@ -23,7 +23,7 @@ pub async fn language_middleware(
 
     let translations = match load_translations(&language_cookie) {
         Ok(translations) => translations,
-        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR)
+        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
     };
 
     req.extensions_mut().insert(Arc::new(translations));

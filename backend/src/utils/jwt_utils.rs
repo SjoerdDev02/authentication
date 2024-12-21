@@ -1,18 +1,14 @@
+use crate::models::auth_models::JwtClaims;
+use crate::utils::env::get_environment_variable;
 use axum::http::StatusCode;
 use chrono::{Duration, Utc};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, TokenData, Validation};
-use rand::{
-    distributions::Alphanumeric,
-    thread_rng,
-    Rng
-};
-use crate::models::auth_models::JwtClaims;
-use crate::utils::env::get_environment_variable;
+use rand::{distributions::Alphanumeric, thread_rng, Rng};
 
 pub fn encode_jwt(id: &i32, name: &str, email: &str) -> Result<String, StatusCode> {
     let jwt_secret = match get_environment_variable("JWT_SECRET_KEY") {
         Ok(jwt_secret) => jwt_secret,
-        Err(_) => return Err(StatusCode::BAD_REQUEST)
+        Err(_) => return Err(StatusCode::BAD_REQUEST),
     };
 
     let now = Utc::now();
@@ -23,7 +19,7 @@ pub fn encode_jwt(id: &i32, name: &str, email: &str) -> Result<String, StatusCod
     let claims = JwtClaims {
         exp,
         iat,
-        id: id.clone(),
+        id: *id,
         name: name.to_string(),
         email: email.to_string(),
     };
@@ -39,7 +35,7 @@ pub fn encode_jwt(id: &i32, name: &str, email: &str) -> Result<String, StatusCod
 pub fn decode_jwt(jwt: &str) -> Result<TokenData<JwtClaims>, StatusCode> {
     let jwt_secret = match get_environment_variable("JWT_SECRET_KEY") {
         Ok(jwt_secret) => jwt_secret,
-        Err(_) => return Err(StatusCode::BAD_REQUEST)
+        Err(_) => return Err(StatusCode::BAD_REQUEST),
     };
 
     let result: Result<TokenData<JwtClaims>, StatusCode> = decode(
@@ -55,7 +51,7 @@ pub fn decode_jwt(jwt: &str) -> Result<TokenData<JwtClaims>, StatusCode> {
 pub fn verify_jwt(jwt: &str, expected_id: &i32) -> Result<JwtClaims, StatusCode> {
     let jwt_secret = match get_environment_variable("JWT_SECRET_KEY") {
         Ok(jwt_secret) => jwt_secret,
-        Err(_) => return Err(StatusCode::BAD_REQUEST)
+        Err(_) => return Err(StatusCode::BAD_REQUEST),
     };
 
     let token_data = decode::<JwtClaims>(

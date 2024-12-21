@@ -2,6 +2,7 @@ use crate::models::translations_models::Translations;
 use crate::templates::auth_templates::{
     VERIFICATION_CODE_SUCCESS_TEMPLATE, VERIFICATION_CODE_TEMPLATE,
 };
+use crate::utils::env::get_environment_variable;
 use crate::utils::templates::generate_template;
 use axum::http::StatusCode;
 use lettre::message::{header, MultiPart, SinglePart};
@@ -10,7 +11,6 @@ use lettre::{Message, SmtpTransport, Transport};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
-use crate::utils::env::get_environment_variable;
 
 pub async fn send_email_with_template(
     recipient: &str,
@@ -18,9 +18,33 @@ pub async fn send_email_with_template(
     body: &str,
     image_data: Vec<u8>,
 ) -> Result<(), StatusCode> {
+    let env_email = match get_environment_variable("EMAIL_USER") {
+        Ok(env_email) => env_email,
+        Err(_) => return Err(StatusCode::BAD_REQUEST),
+    };
+
+    let env_password = match get_environment_variable("EMAIL_PASSWORD") {
+        Ok(env_password) => env_password,
+        Err(_) => return Err(StatusCode::BAD_REQUEST),
+    };
+
+    let from_header = match env_email.parse() {
+        Ok(header) => header,
+        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
+    };
+
+    let image_contenttype_header = match header::ContentType::parse("image/png") {
+        Ok(header) => header,
+        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
+    };
+
     let email = Message::builder()
-        .from("NoBody <nobody@domain.tld>".parse().unwrap())
-        .reply_to("Yuin <yuin@domain.tld>".parse().unwrap())
+        .from(from_header)
+        .reply_to(
+            recipient
+                .parse()
+                .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?,
+        )
         .to(recipient
             .parse()
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?)
@@ -34,32 +58,22 @@ pub async fn send_email_with_template(
                 )
                 .singlepart(
                     SinglePart::builder()
-                        .header(header::ContentType::parse("image/png").unwrap())
+                        .header(image_contenttype_header)
                         .header(header::ContentDisposition::inline())
                         .header(header::ContentId::from("cid_image".to_string()))
                         .body(image_data),
                 ),
         );
 
-        let email = match email {
-            Ok(email) => email,
-            Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR)
-        };
-
-        let env_email = match get_environment_variable("EMAIL_USER") {
-            Ok(env_email) => env_email,
-            Err(_) => return Err(StatusCode::BAD_REQUEST)
-        };
-
-        let env_password = match get_environment_variable("EMAIL_PASSWORD") {
-            Ok(env_password) => env_password,
-            Err(_) => return Err(StatusCode::BAD_REQUEST)
-        };
+    let email = match email {
+        Ok(email) => email,
+        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
+    };
 
     let creds = Credentials::new(env_email, env_password);
 
     let mailer = SmtpTransport::relay("smtp.gmail.com")
-        .unwrap()
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
         .credentials(creds)
         .build();
 
@@ -76,10 +90,10 @@ pub async fn send_otc_email(
     otc_code: &str,
     email: &str,
 ) -> Result<(), StatusCode> {
-        let client_base_url = match get_environment_variable("CLIENT_BASE_URL") {
-            Ok(client_base_url) => client_base_url,
-            Err(_) => return Err(StatusCode::BAD_REQUEST)
-        };
+    let client_base_url = match get_environment_variable("CLIENT_BASE_URL") {
+        Ok(client_base_url) => client_base_url,
+        Err(_) => return Err(StatusCode::BAD_REQUEST),
+    };
 
     if let Some(emails) = &translations.emails {
         if let Some(otc_translations) = emails.get("otc") {

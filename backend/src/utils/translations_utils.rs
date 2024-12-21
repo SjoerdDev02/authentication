@@ -1,7 +1,12 @@
 use http::StatusCode;
 use serde_json;
 
-use crate::{models::translations_models::Translations, translations::{DE_TRANSLATIONS, EN_TRANSLATIONS, ES_TRANSLATIONS, FR_TRANSLATIONS, NL_TRANSLATIONS}};
+use crate::{
+    models::translations_models::Translations,
+    translations::{
+        DE_TRANSLATIONS, EN_TRANSLATIONS, ES_TRANSLATIONS, FR_TRANSLATIONS, NL_TRANSLATIONS,
+    },
+};
 
 pub fn load_translations(lang: &str) -> Result<Translations, StatusCode> {
     let lang = lang.to_lowercase();

@@ -2,7 +2,12 @@ use crate::models::auth_models::AuthState;
 use axum::http::StatusCode;
 use redis::AsyncCommands;
 
-pub async fn set_token(state: &AuthState, key: &str, value: &str, expiration_seconds: i32) -> Result<(), StatusCode> {
+pub async fn set_token(
+    state: &AuthState,
+    key: &str,
+    value: &str,
+    expiration_seconds: i32,
+) -> Result<(), StatusCode> {
     let mut redis_con = state.redis.lock().await;
 
     let result: Result<(), redis::RedisError> = redis::cmd("SETEX")

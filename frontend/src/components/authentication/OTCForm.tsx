@@ -8,7 +8,7 @@ import { otcUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/OTCForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import userStore from "@/states/userStore";
-import { MinifiedAuthResponse } from "@/types/Authentication";
+import { MinifiedAuthResponse } from "@/types/authentication";
 import useTranslations from "@/utils/hooks/useTranslations";
 
 import { Flex } from "../common/Flex";
