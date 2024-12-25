@@ -55,7 +55,7 @@ async fn main() {
         redis: redis_connection,
     };
 
-    let app = backend::routes::auth_routes::app(state);
+    let app = backend::routes::auth::app(state);
 
     let allow_origin = match get_environment_variable("CLIENT_BASE_URL") {
         Ok(allow_origin_url) => allow_origin_url,

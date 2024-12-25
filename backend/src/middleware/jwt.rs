@@ -1,10 +1,10 @@
 use crate::{
-    constants::auth_constants::{BEARER_EXPIRATION_SECONDS, REFRESH_EXPIRATION_SECONDS},
+    constants::auth::{BEARER_EXPIRATION_SECONDS, REFRESH_EXPIRATION_SECONDS},
     models::auth_models::AuthState,
     utils::{
-        cookie_utils::{delete_cookie, get_cookie, set_cookie},
-        jwt_utils::{decode_jwt, encode_jwt, format_refresh_token_key, generate_refresh_token},
-        redis_utils::{get_token, remove_token, set_token},
+        cookie::{delete_cookie, get_cookie, set_cookie},
+        jwt::{decode_jwt, encode_jwt, format_refresh_token_key, generate_refresh_token},
+        redis::{get_token, remove_token, set_token},
     },
 };
 use axum::{

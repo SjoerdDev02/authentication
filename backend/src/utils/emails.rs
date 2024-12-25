@@ -1,7 +1,5 @@
 use crate::models::translations_models::Translations;
-use crate::templates::auth_templates::{
-    VERIFICATION_CODE_SUCCESS_TEMPLATE, VERIFICATION_CODE_TEMPLATE,
-};
+use crate::templates::auth::{VERIFICATION_CODE_SUCCESS_TEMPLATE, VERIFICATION_CODE_TEMPLATE};
 use crate::utils::env::get_environment_variable;
 use crate::utils::templates::generate_template;
 use axum::http::StatusCode;

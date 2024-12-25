@@ -1,4 +1,4 @@
-use crate::utils::{cookie_utils::get_cookie, translations_utils::load_translations};
+use crate::utils::{cookie::get_cookie, translations::load_translations};
 use axum::{
     body::Body,
     http::{Request, StatusCode},

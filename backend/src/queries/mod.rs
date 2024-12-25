@@ -1,1 +1,1 @@
-pub mod auth_queries;
+pub mod auth;

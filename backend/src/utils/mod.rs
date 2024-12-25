@@ -1,9 +1,9 @@
-pub mod auth_utils;
-pub mod cookie_utils;
+pub mod auth;
+pub mod cookie;
 pub mod dates;
 pub mod emails;
 pub mod env;
-pub mod jwt_utils;
-pub mod redis_utils;
+pub mod jwt;
+pub mod redis;
 pub mod templates;
-pub mod translations_utils;
+pub mod translations;

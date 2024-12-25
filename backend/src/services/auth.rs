@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::constants::auth_constants::{
+use crate::constants::auth::{
     BEARER_EXPIRATION_SECONDS, OTC_EXPIRATION_SECONDS, REFRESH_EXPIRATION_SECONDS,
 };
 use crate::models::auth_models::{
@@ -8,15 +8,15 @@ use crate::models::auth_models::{
     OtcPayloadAction, RegisterUser, UpdateUser,
 };
 use crate::models::translations_models::Translations;
-use crate::utils::auth_utils::{
+use crate::utils::auth::{
     confirm_user, create_otc, create_user, delete_user_by_id, format_otc_key, get_user_by_email,
     get_user_by_id, hash_password, update_user_email_and_name, update_user_password,
     verify_password,
 };
-use crate::utils::cookie_utils::set_cookie;
+use crate::utils::cookie::set_cookie;
 use crate::utils::emails::{send_otc_email, send_otc_success_email};
-use crate::utils::jwt_utils::{encode_jwt, format_refresh_token_key, generate_refresh_token};
-use crate::utils::redis_utils::{get_token, remove_token, set_token};
+use crate::utils::jwt::{encode_jwt, format_refresh_token_key, generate_refresh_token};
+use crate::utils::redis::{get_token, remove_token, set_token};
 use axum::{
     body::Body,
     extract::{Json, Query, State},
@@ -72,7 +72,9 @@ pub async fn register_user(
     let otc_payload =
         serde_json::to_string(&otc_payload).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    let _ = set_token(&state, &otc_key, &otc_payload, OTC_EXPIRATION_SECONDS).await;
+    set_token(&state, &otc_key, &otc_payload, OTC_EXPIRATION_SECONDS)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     send_otc_email(&translations, "confirm_account", &otc, &user_data.email)
         .await
@@ -112,13 +114,14 @@ pub async fn login_user(
     let new_refresh_token = generate_refresh_token();
     let new_redis_refresh_token_key = format_refresh_token_key(&new_refresh_token);
 
-    let _ = set_token(
+    set_token(
         &state,
         &new_redis_refresh_token_key,
         &id.to_string(),
         REFRESH_EXPIRATION_SECONDS,
     )
-    .await;
+    .await
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     let response_body = serde_json::to_string(&AuthResponse { id, name, email })
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
@@ -192,7 +195,9 @@ pub async fn update_user(
     let otc_payload =
         serde_json::to_string(&otc_payload).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    let _ = set_token(&state, &otc_key, &otc_payload, OTC_EXPIRATION_SECONDS).await;
+    set_token(&state, &otc_key, &otc_payload, OTC_EXPIRATION_SECONDS)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     let old_user = match get_user_by_id(&state, &user_data.id).await {
         Ok(user) => user,
@@ -228,7 +233,9 @@ pub async fn delete_user(
     let otc_payload_json =
         serde_json::to_string(&otc_payload).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    let _ = set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS).await;
+    set_token(&state, &otc_key, &otc_payload_json, OTC_EXPIRATION_SECONDS)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     send_otc_email(&translations, "delete_account", &otc, &claims.email)
         .await

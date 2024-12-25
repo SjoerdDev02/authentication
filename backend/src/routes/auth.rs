@@ -9,9 +9,9 @@ use std::time::Duration;
 use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
 
 use crate::{
-    middleware::{jwt_middleware::jwt_middleware, language_middleware::language_middleware},
+    middleware::{jwt::jwt_middleware, language::language_middleware},
     models::auth_models::AuthState,
-    services::auth_service::{delete_user, login_user, otc_user, register_user, update_user},
+    services::auth::{delete_user, login_user, otc_user, register_user, update_user},
 };
 
 pub fn app(state: AuthState) -> Router {

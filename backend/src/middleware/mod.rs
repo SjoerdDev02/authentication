@@ -1,2 +1,2 @@
-pub mod jwt_middleware;
-pub mod language_middleware;
+pub mod jwt;
+pub mod language;

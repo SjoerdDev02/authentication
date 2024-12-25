@@ -1,1 +1,1 @@
-pub mod auth_templates;
+pub mod auth;
