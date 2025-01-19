@@ -81,12 +81,6 @@ pub struct AuthResponse {
     pub email: String,
 }
 
-#[derive(Serialize)]
-pub struct MinifiedAuthResponse {
-    pub name: String,
-    pub email: String,
-}
-
 #[derive(Clone)]
 pub struct AuthState {
     pub db_pool: MySqlPool,

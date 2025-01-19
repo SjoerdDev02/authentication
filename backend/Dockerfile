@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y libssl3 ca-certificates && rm -rf /var/
 RUN update-ca-certificates
 
 # Copy the built binary and migration files from the builder stage
-COPY --from=builder /backend/target/release/auth_server /app/auth_server
+COPY --from=builder /backend/target/release/auth /app/auth_server
 COPY --from=builder /backend/migrations /app/migrations
 COPY --from=builder /usr/local/cargo/bin/sqlx /usr/local/bin/sqlx
 COPY src/static/images /app/src/static/images

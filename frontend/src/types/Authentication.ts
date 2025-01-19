@@ -1,10 +1,5 @@
-export type AuthResponse = {
-    id: number,
+export type AuthData = {
+	id: number,
     name: string,
     email: string,
-}
-
-export type MinifiedAuthResponse = {
-    name: string,
-    email: string,
-}
+} | null;

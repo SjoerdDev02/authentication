@@ -5,32 +5,20 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useActionState, useRef, useState } from "react";
 
 import { otcUser } from "@/app/actions/authentication";
+import { initialAuthFormState } from "@/app/constants/auth";
 import styles from '@/components/authentication/OTCForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import userStore from "@/states/userStore";
-import { MinifiedAuthResponse } from "@/types/authentication";
 import useTranslations from "@/utils/hooks/useTranslations";
 
 import { Flex } from "../common/Flex";
 import TextInput from "../common/input/text/TextInput";
 import AuthFormWrapper from "./AuthFormWrapper";
 
-type initialStateType = {
-	success: boolean;
-	message: string;
-	data: MinifiedAuthResponse | null;
-}
-
 const OTCForm = () => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const translations = useTranslations();
-
-	const initialState: initialStateType = {
-		success: true,
-		message: '',
-		data: null
-	};
 
 	const otcCode = searchParams.get('otc');
 	const initialCodeCharacters = otcCode ? otcCode.split('') : null;
@@ -53,7 +41,7 @@ const OTCForm = () => {
 
 	const [state, formAction, isPending] = useActionState(
 		handleOtcUser,
-		initialState
+		initialAuthFormState
 	);
 
 	const [characterOne, setCharacterOne] = useState(initialCodeCharacters?.[0] || '');
@@ -70,46 +58,40 @@ const OTCForm = () => {
 			inputName: 'characterOne',
 			inputValue: characterOne,
 			updateFunction: setCharacterOne,
-			refIndex: 0,
 		},
 		{
 			inputName: 'characterTwo',
 			inputValue: characterTwo,
 			updateFunction: setCharacterTwo,
-			refIndex: 1,
 		},
 		{
 			inputName: 'characterThree',
 			inputValue: characterThree,
 			updateFunction: setCharacterThree,
-			refIndex: 2,
 		},
 		{
 			inputName: 'characterFour',
 			inputValue: characterFour,
 			updateFunction: setCharacterFour,
-			refIndex: 3,
 		},
 		{
 			inputName: 'characterFive',
 			inputValue: characterFive,
 			updateFunction: setCharacterFive,
-			refIndex: 4,
 		},
 		{
 			inputName: 'characterSix',
 			inputValue: characterSix,
 			updateFunction: setCharacterSix,
-			refIndex: 5,
 		},
 	];
 
 	// eslint-disable-next-line no-unused-vars
-	const handleInputChange = (value: string, updateFunction: (v: string) => void, refIndex: number) => {
+	const handleInputChange = (value: string, updateFunction: (newValue: string) => void, index: number) => {
 		updateFunction(value);
 
-		if (value.length === 1 && refIndex < inputRefs.current.length - 1) {
-			inputRefs.current[refIndex + 1]?.focus();
+		if (value.length === 1 && index < inputRefs.current.length - 1) {
+			inputRefs.current[index + 1]?.focus();
 		}
 	};
 

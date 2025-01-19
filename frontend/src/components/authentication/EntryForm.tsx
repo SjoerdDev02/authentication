@@ -5,10 +5,10 @@ import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
 
 import { loginUser, registerUser } from "@/app/actions/authentication";
+import { initialAuthFormState } from "@/app/constants/auth";
 import styles from '@/components/authentication/EntryForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import userStore from "@/states/userStore";
-import { AuthResponse, MinifiedAuthResponse } from "@/types/authentication";
 import useTranslations from "@/utils/hooks/useTranslations";
 
 import { Flex } from "../common/Flex";
@@ -16,23 +16,11 @@ import TextInput from "../common/input/text/TextInput";
 import TabPill from "../common/tabs/TabPill";
 import AuthFormWrapper from "./AuthFormWrapper";
 
-type initialStateType = {
-	success: boolean;
-	message: string;
-	data: AuthResponse | MinifiedAuthResponse | null;
-}
-
 const EntryForm = () => {
 	const translations = useTranslations();
 	const router = useRouter();
 
 	const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
-
-	const initialState: initialStateType = {
-		success: true,
-		message: '',
-		data: null
-	};
 
 	const tabItems = [
 		{
@@ -51,8 +39,8 @@ const EntryForm = () => {
 		if (result.success) {
 			router.push('/otc');
 
-			userStore.name = result.data?.name;
-			userStore.email = result.data?.email;
+			userStore.name = result.data?.name || null;
+			userStore.email = result.data?.email || null;
 		}
 
 		return result;
@@ -64,9 +52,9 @@ const EntryForm = () => {
 		if (result.success) {
 			router.push('/welcome');
 
-			userStore.id = result.data?.id;
-			userStore.name = result.data?.name;
-			userStore.email = result.data?.email;
+			userStore.id = result.data?.id || null;
+			userStore.name = result.data?.name || null;
+			userStore.email = result.data?.email || null;
 		}
 
 		return result;
@@ -74,7 +62,7 @@ const EntryForm = () => {
 
 	const [state, formAction, isPending] = useActionState(
 		activeTab === 'register' ? handleRegisterUser : handleLoginUser,
-		initialState
+		initialAuthFormState
 	);
 
 	const [name, setName] = useState('');

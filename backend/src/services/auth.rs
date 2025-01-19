@@ -4,7 +4,7 @@ use crate::constants::auth::{
     BEARER_EXPIRATION_SECONDS, OTC_EXPIRATION_SECONDS, REFRESH_EXPIRATION_SECONDS,
 };
 use crate::models::auth_models::{
-    AuthResponse, AuthState, JwtClaims, LoginUser, MinifiedAuthResponse, Otc, OtcPayload,
+    AuthResponse, AuthState, JwtClaims, LoginUser, Otc, OtcPayload,
     OtcPayloadAction, RegisterUser, UpdateUser,
 };
 use crate::models::translations_models::Translations;
@@ -29,7 +29,7 @@ pub async fn register_user(
     State(state): State<AuthState>,
     Extension(translations): Extension<Arc<Translations>>,
     Json(user_data): Json<RegisterUser>,
-) -> Result<Json<MinifiedAuthResponse>, StatusCode> {
+) -> Result<Json<AuthResponse>, StatusCode> {
     if user_data.password != user_data.password_confirm {
         return Err(StatusCode::BAD_REQUEST);
     }
@@ -80,7 +80,8 @@ pub async fn register_user(
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-    let response = MinifiedAuthResponse {
+    let response = AuthResponse {
+        id: created_user_id,
         name: user_data.name,
         email: user_data.email,
     };

@@ -1,48 +1,47 @@
 import axios from 'axios';
 
+import { AuthData } from '@/types/authentication';
+import { ApiResult } from '@/types/response';
+import { gracefulFunction } from '@/utils/response';
 import { sanitize } from '@/utils/strings';
 
-export async function registerUser(prevState: any, formData: FormData) {
-	try {
-		let email = formData.get('email');
-		let name = formData.get('name');
-		let password = formData.get('password');
-		let passwordConfirm = formData.get('passwordConfirmation');
+export async function registerUser(
+	prevState: any,
+	formData: FormData
+): Promise<ApiResult<AuthData>> {
+	return gracefulFunction(async () => {
+	  let email = formData.get('email');
+	  let name = formData.get('name');
+	  let password = formData.get('password');
+	  let passwordConfirm = formData.get('passwordConfirmation');
 
-		if (!email || !name || !password || !passwordConfirm) {
-			return { success: false, message: 'Invalid credentials', data: null };
-		}
+	  if (!email || !name || !password || !passwordConfirm) {
+			throw new Error('Invalid credentials');
+	  }
 
-		email = sanitize(email);
-		name = sanitize(name);
-		password = sanitize(password);
-		passwordConfirm = sanitize(passwordConfirm);
+	  email = sanitize(email);
+	  name = sanitize(name);
+	  password = sanitize(password);
+	  passwordConfirm = sanitize(passwordConfirm);
 
-		const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/register`, {
+	  const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/register`, {
 			email,
-			name,
-			password,
-			passwordConfirm
+		 name,
+		 password,
+		 passwordConfirm
 		}, {
 			withCredentials: true
 		});
 
-		return {
-			success: true,
+	  return {
 			message: response.data.message,
-			data: response.data
-		};
-	} catch (error: any) {
-		return {
-			success: false,
-			message: error.response?.data?.message || 'An error occurred',
-			data: null
-		};
-	}
+			data: response.data,
+	  };
+	});
 }
 
-export async function updateUser(prevState: any, formData: FormData, userId: number | null) {
-	try {
+export async function updateUser(prevState: any, formData: FormData, userId: number | null): Promise<ApiResult<AuthData>> {
+	return gracefulFunction(async () => {
 		const id = userId;
 		let email = formData.get('email');
 		let name = formData.get('name');
@@ -50,7 +49,11 @@ export async function updateUser(prevState: any, formData: FormData, userId: num
 		let passwordConfirm = formData.get('passwordConfirmation');
 
 		if (!userId) {
-			return { success: false, message: 'Invalid credentials' };
+			return {
+				success: false,
+				message: 'Invalid credentials',
+				data: null
+			};
 		}
 
 		if (!!email && !!name) {
@@ -62,7 +65,8 @@ export async function updateUser(prevState: any, formData: FormData, userId: num
 		} else {
 			return {
 				success: false,
-				message: 'Invalid credentials'
+				message: 'Invalid credentials',
+				data: null
 			};
 		}
 
@@ -78,23 +82,23 @@ export async function updateUser(prevState: any, formData: FormData, userId: num
 
 		return {
 			success: true,
-			message: response.data.message
+			message: response.data.message,
+			data: null
 		};
-	} catch (error: any) {
-		return {
-			success: false,
-			message: error.response?.data?.message || 'An error occurred'
-		};
-	}
+	});
 }
 
-export async function loginUser(prevState: any, formData: FormData) {
-	try {
+export async function loginUser(prevState: any, formData: FormData): Promise<ApiResult<AuthData>> {
+	return gracefulFunction(async () => {
 		let email = formData.get('email');
 		let password = formData.get('password');
 
 		if (!email || !password) {
-			return { success: false, message: 'Invalid credentials', data: null };
+			return {
+				success: false,
+				message: 'Invalid credentials',
+				data: null
+			};
 		}
 
 		email = sanitize(email);
@@ -112,35 +116,25 @@ export async function loginUser(prevState: any, formData: FormData) {
 			message: response.data.message,
 			data: response.data
 		};
-	} catch (error: any) {
-		return {
-			success: false,
-			message: error.response?.data?.message || 'An error occurred',
-			data: null
-		};
-	}
+	});
 }
 
-export async function deleteUser() {
-	try {
+export async function deleteUser(): Promise<ApiResult<AuthData>> {
+	return gracefulFunction(async () => {
 		const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_BASE_URL}/delete`, {
 			withCredentials: true
 		});
 
 		return {
 			success: true,
-			message: response.data.message
+			message: response.data.message,
+			data: null
 		};
-	} catch (error: any) {
-		return {
-			success: false,
-			message: error.response?.data?.message || 'An error occurred'
-		};
-	}
+	});
 }
 
-export async function otcUser(prevState: any, formData: FormData) {
-	try {
+export async function otcUser(prevState: any, formData: FormData): Promise<ApiResult<AuthData>> {
+	return gracefulFunction(async () => {
 		let characterOne = formData.get('characterOne');
 		let characterTwo = formData.get('characterTwo');
 		let characterThree = formData.get('characterThree');
@@ -149,7 +143,11 @@ export async function otcUser(prevState: any, formData: FormData) {
 		let characterSix = formData.get('characterSix');
 
 		if (!characterOne || !characterTwo || !characterThree || !characterFour || !characterFive || !characterSix) {
-			return { success: false, message: 'Invalid credentials', data: null };
+			return {
+				success: false,
+				message: 'Invalid credentials',
+				data: null
+			};
 		}
 
 		characterOne = sanitize(characterOne);
@@ -177,11 +175,5 @@ export async function otcUser(prevState: any, formData: FormData) {
 			message: response.data.message,
 			data: response.data
 		};
-	} catch (error: any) {
-		return {
-			success: false,
-			message: error.response?.data?.message || 'An error occurred',
-			data: null
-		};
-	}
+	});
 }
