@@ -1,4 +1,4 @@
-import { entityMap } from "@/app/constants/general";
+import { entityMap } from "@/constants/general";
 
 export function sanitize(string: string | FormDataEntryValue) {
 	let sanitized_string = String(string).replace(/[&<>"'`=\/]/g, function (s) {

@@ -1,5 +1,5 @@
 import styles from '@/app/otc/[[...code]]/page.module.scss';
-import OTCForm from '@/components/authentication/OTCForm';
+import OTCForm from '@/components/authentication/otc/OTCForm';
 import Page from "@/components/common/page/Page";
 
 export default function OTC() {

@@ -5,15 +5,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useActionState, useRef, useState } from "react";
 
 import { otcUser } from "@/app/actions/authentication";
-import { initialAuthFormState } from "@/app/constants/auth";
-import styles from '@/components/authentication/OTCForm.module.scss';
+import styles from '@/components/authentication/otc/OTCForm.module.scss';
 import Button from "@/components/common/buttons/Button";
+import { initialAuthFormState } from "@/constants/auth";
 import userStore from "@/states/userStore";
 import useTranslations from "@/utils/hooks/useTranslations";
 
-import { Flex } from "../common/Flex";
-import TextInput from "../common/input/text/TextInput";
-import AuthFormWrapper from "./AuthFormWrapper";
+import { Flex } from "../../common/Flex";
+import TextInput from "../../common/input/text/TextInput";
+import AuthFormWrapper from "../AuthFormWrapper";
 
 const OTCForm = () => {
 	const router = useRouter();
@@ -27,7 +27,7 @@ const OTCForm = () => {
 		const result = await otcUser(prevState, formData);
 
 		if (result.success) {
-			router.push(userStore.name && userStore.email ? '/welcome' : '/');
+			router.push(userStore.name && userStore.email ? '/' : '/entry');
 
 			// Update new name and email here if they changed
 			if (result.data?.name && result.data?.email) {

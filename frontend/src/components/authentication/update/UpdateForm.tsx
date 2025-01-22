@@ -6,15 +6,15 @@ import { useActionState, useState } from "react";
 import { useSnapshot } from "valtio";
 
 import { deleteUser, updateUser } from "@/app/actions/authentication";
-import styles from '@/components/authentication/UpdateForm.module.scss';
+import styles from '@/components/authentication/update/UpdateForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import userStore from "@/states/userStore";
 import useTranslations from "@/utils/hooks/useTranslations";
 
-import { Flex } from "../common/Flex";
-import TextInput from "../common/input/text/TextInput";
-import TabPill from "../common/tabs/TabPill";
-import AuthFormWrapper from "./AuthFormWrapper";
+import { Flex } from "../../common/Flex";
+import TextInput from "../../common/input/text/TextInput";
+import TabPill from "../../common/tabs/TabPill";
+import AuthFormWrapper from "../AuthFormWrapper";
 
 const UpdateForm = () => {
 	const translations = useTranslations();
