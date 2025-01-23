@@ -14,7 +14,7 @@ import useTranslations from "@/utils/hooks/useTranslations";
 import { Flex } from "../../common/Flex";
 import TextInput from "../../common/input/text/TextInput";
 import TabPill from "../../common/tabs/TabPill";
-import AuthFormWrapper from "../AuthFormWrapper";
+import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
 const UpdateForm = () => {
 	const translations = useTranslations();

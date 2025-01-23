@@ -1,41 +1,40 @@
 'use client';
 
 import classNames from "classnames";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useActionState, useState } from "react";
 
 import { loginUser } from "@/app/actions/authentication";
-import styles from '@/components/authentication/login/LoginForm.module.scss';
+import styles from '@/components/authentication/password-reset/PasswordResetForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { Flex } from "@/components/common/Flex";
 import TextInput from "@/components/common/input/text/TextInput";
-import LoginIcon from "@/components/svg/LoginIcon";
+import PasswordResetIcon from "@/components/svg/PasswordResetIcon";
 import { initialAuthFormState } from "@/constants/auth";
 import { pages } from "@/constants/routes";
-import userStore from "@/states/userStore";
 import useTranslations from "@/utils/hooks/useTranslations";
 
 import AuthFormFooter from "../wrappers/AuthFormFooter";
 import AuthFormHeader from "../wrappers/AuthFormHeader";
 import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
-const LoginForm = () => {
+const PasswordResetForm = () => {
 	const translations = useTranslations();
 	const router = useRouter();
+	const searchParams = useSearchParams();
+
+	const passwordResetToken = searchParams.get("password-reset-token");
 
 	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
+	const [newPassword, setNewPassword] = useState('');
+	const [confirmPassword, setConfirmPassword] = useState('');
 
 	const handleLoginUser = async (prevState: any, formData: FormData) => {
 		const result = await loginUser(prevState, formData);
 
 		if (result.success) {
-			router.push('/');
-
-			if (result.data) {
-				userStore.id = result.data.id;
-				userStore.name = result.data.name;
-				userStore.email = result.data.email;
+			if (result.success) {
+				router.push('/otc');
 			}
 		}
 
@@ -49,22 +48,22 @@ const LoginForm = () => {
 
 	const FormHeader = (
 		<AuthFormHeader
-			icon={<LoginIcon />}
-			label={translations('Authentication.signIn')}
+			icon={<PasswordResetIcon />}
+			label={translations('Authentication.resetPassword')}
 		/>
 	);
 
 	const FormFooter = (
 		<AuthFormFooter
-			label={translations('Authentication.dontHaveAnAccount')}
-			linkHref={pages.Register.path}
-			linkText={translations('Authentication.signUp')}
+			label={translations('Authentication.dontNeedToResetPassword')}
+			linkHref={pages.Login.path}
+			linkText={translations('Authentication.signIn')}
 		/>
 	);
 
 	return (
 		<Flex
-			className={styles['login-form']}
+			className={styles['password-reset-form']}
 			flexDirection="column"
 			gap={5}
 		>
@@ -73,26 +72,35 @@ const LoginForm = () => {
 				footer={FormFooter}
 				header={FormHeader}
 			>
-				<Flex
-					flexDirection="column"
-					gap={3}
-				>
-					<TextInput
-						name="email"
-						onChange={(e) => setEmail(e)}
-						placeholder={translations('Authentication.emailPlaceholder')}
-						type="email"
-						value={email}
-				 	/>
+				{passwordResetToken ? (
+					<Flex
+						flexDirection="column"
+						gap={3}
+					>
+						<TextInput
+							name="newPassword"
+							onChange={(e) => setNewPassword(e)}
+							placeholder={translations('Authentication.passwordPlaceholder')}
+							type="password"
+							value={newPassword}
+						/>
 
-					<TextInput
-						name="password"
-						onChange={(e) => setPassword(e)}
-						placeholder={translations('Authentication.passwordPlaceholder')}
-						type="password"
-						value={password}
-				 	/>
-				</Flex>
+						<TextInput
+							name="newPasswordConfirmation"
+							onChange={(e) => setConfirmPassword(e)}
+							placeholder={translations('Authentication.passwordConfirmPlaceholder')}
+							type="password"
+							value={confirmPassword}
+						/>
+					</Flex>
+				) : (<TextInput
+					name="email"
+					onChange={(e) => setEmail(e)}
+					placeholder={translations('Authentication.emailPlaceholder')}
+					type="email"
+					value={email}
+				/>
+				)}
 
 				{state.message && (
 					<div className={classNames('label', `label--${state.success ? 'medium-success' : 'medium-error'}`)}>
@@ -106,7 +114,7 @@ const LoginForm = () => {
 					type="submit"
 				>
 					<span>
-						{translations('Authentication.loginLabel')}
+						{translations('Authentication.resetLabel')}
 					</span>
 				</Button>
 			</AuthFormWrapper>
@@ -114,4 +122,4 @@ const LoginForm = () => {
 	);
 };
 
-export default LoginForm;
+export default PasswordResetForm;

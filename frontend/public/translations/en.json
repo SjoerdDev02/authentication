@@ -2,6 +2,13 @@
     "Authentication": {
         "loginLabel": "Login",
         "registerLabel": "Register",
+        "signIn": "Sign in",
+        "signUp": "Sign up",
+        "dontHaveAnAccount": "Dont have an account?",
+        "alreadyHaveAnAccount": "Already have an account?",
+        "dontNeedToResetPassword": "Dont need to reset your password?",
+        "resetPassword": "Reset password",
+        "resetLabel": "Reset",
         "updateLabel": "Update",
         "deleteLabel": "Delete account",
         "sendLabel": "Send",

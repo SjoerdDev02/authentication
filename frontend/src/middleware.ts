@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { routes } from './constants/routes';
+import { Route, routeUrlToPageMap } from './constants/routes';
 
 const refreshAccessToken = async (refreshTokenValue: string) => {
 	try {
@@ -26,9 +26,11 @@ const refreshAccessToken = async (refreshTokenValue: string) => {
 export async function middleware(req: NextRequest) {
 	const bearerToken = req.cookies.get('Bearer');
 	const refreshToken = req.cookies.get('RefreshToken');
-	const url = req.nextUrl.clone();
+	const { pathname } = req.nextUrl.clone();
 
-	const currentRoute = routes.find((route) => url.pathname === route.path);
+	const currentRoute = pathname in routeUrlToPageMap
+		? routeUrlToPageMap[pathname as Route]
+		: null;
 
 	if (currentRoute?.protected) {
 		if (!bearerToken && !refreshToken) {

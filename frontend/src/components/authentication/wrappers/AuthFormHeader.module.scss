@@ -1,0 +1,8 @@
+.form-header {
+    color: var(--color-grayscale-900);
+
+    &__icon-wrapper {
+        background-color: var(--color-grayscale-200);
+        aspect-ratio: 1/1;
+    }
+}

@@ -9,11 +9,15 @@ import styles from '@/components/authentication/register/RegisterForm.module.scs
 import Button from "@/components/common/buttons/Button";
 import { Flex } from "@/components/common/Flex";
 import TextInput from "@/components/common/input/text/TextInput";
+import RegisterIcon from "@/components/svg/RegisterIcon";
 import { initialAuthFormState } from "@/constants/auth";
+import { pages } from "@/constants/routes";
 import userStore from "@/states/userStore";
 import useTranslations from "@/utils/hooks/useTranslations";
 
-import AuthFormWrapper from "../AuthFormWrapper";
+import AuthFormFooter from "../wrappers/AuthFormFooter";
+import AuthFormHeader from "../wrappers/AuthFormHeader";
+import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
 const Register = () => {
 	const translations = useTranslations();
@@ -45,13 +49,32 @@ const Register = () => {
 		initialAuthFormState
 	);
 
+	const FormHeader = (
+		<AuthFormHeader
+			icon={<RegisterIcon />}
+			label={translations('Authentication.signUp')}
+		/>
+	);
+
+	const FormFooter = (
+		<AuthFormFooter
+			label={translations('Authentication.alreadyHaveAnAccount')}
+			linkHref={pages.Login.path}
+			linkText={translations('Authentication.signIn')}
+		/>
+	);
+
 	return (
 		<Flex
 			className={styles['register-form']}
 			flexDirection="column"
 			gap={5}
 		>
-			<AuthFormWrapper action={formAction}>
+			<AuthFormWrapper
+				action={formAction}
+				footer={FormFooter}
+				header={FormHeader}
+			>
 				<div className={styles['register-form__input-wrapper']}>
 					<TextInput
 						name="email"

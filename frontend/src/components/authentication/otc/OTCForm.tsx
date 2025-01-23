@@ -13,7 +13,7 @@ import useTranslations from "@/utils/hooks/useTranslations";
 
 import { Flex } from "../../common/Flex";
 import TextInput from "../../common/input/text/TextInput";
-import AuthFormWrapper from "../AuthFormWrapper";
+import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
 const OTCForm = () => {
 	const router = useRouter();
