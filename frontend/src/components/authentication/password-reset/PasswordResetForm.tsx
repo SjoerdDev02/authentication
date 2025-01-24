@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useActionState, useState } from "react";
 
-import { loginUser } from "@/app/actions/authentication";
+import { requestResetPasswordToken, resetPasswordUnprotected } from "@/app/actions/authentication";
 import styles from '@/components/authentication/password-reset/PasswordResetForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { Flex } from "@/components/common/Flex";
@@ -29,20 +29,24 @@ const PasswordResetForm = () => {
 	const [newPassword, setNewPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
 
-	const handleLoginUser = async (prevState: any, formData: FormData) => {
-		const result = await loginUser(prevState, formData);
+	const handleRequestPasswordToken = async (prevState: any, formData: FormData) => {
+		const result = await requestResetPasswordToken(prevState, formData);
+
+		return result;
+	};
+
+	const handleResetPassword = async (prevState: any, formData: FormData) => {
+		const result = await resetPasswordUnprotected(prevState, formData, passwordResetToken);
 
 		if (result.success) {
-			if (result.success) {
-				router.push('/otc');
-			}
+			router.push(pages.Login.path);
 		}
 
 		return result;
 	};
 
 	const [state, formAction, isPending] = useActionState(
-		handleLoginUser,
+		passwordResetToken ? handleResetPassword : handleRequestPasswordToken,
 		initialAuthFormState
 	);
 
@@ -93,13 +97,14 @@ const PasswordResetForm = () => {
 							value={confirmPassword}
 						/>
 					</Flex>
-				) : (<TextInput
-					name="email"
-					onChange={(e) => setEmail(e)}
-					placeholder={translations('Authentication.emailPlaceholder')}
-					type="email"
-					value={email}
-				/>
+				) : (
+					<TextInput
+						name="email"
+						onChange={(e) => setEmail(e)}
+						placeholder={translations('Authentication.emailPlaceholder')}
+						type="email"
+						value={email}
+					/>
 				)}
 
 				{state.message && (

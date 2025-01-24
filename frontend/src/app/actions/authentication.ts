@@ -88,6 +88,67 @@ export async function updateUser(prevState: any, formData: FormData, userId: num
 	});
 }
 
+export async function requestResetPasswordToken(prevState: any, formData: FormData): Promise<ApiResult<AuthData>> {
+	return gracefulFunction(async () => {
+		let email = formData.get('email');
+
+		if (!!email) {
+			email = sanitize(email);
+		} else {
+			return {
+				success: false,
+				message: 'Invalid credentials',
+				data: null
+			};
+		}
+
+		const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/reset-password-token`, {
+			email
+		}, {
+			withCredentials: true
+		});
+
+		return {
+			success: true,
+			message: response.data.message,
+			data: null
+		};
+	});
+}
+
+export async function resetPasswordUnprotected(prevState: any, formData: FormData, token: string | null): Promise<ApiResult<AuthData>> {
+	return gracefulFunction(async () => {
+		let resetToken = token;
+		let password = formData.get('password');
+		let passwordConfirm = formData.get('passwordConfirmation');
+
+		if (!!resetToken && !!password && !!passwordConfirm) {
+			resetToken = sanitize(resetToken);
+			password = sanitize(password);
+			passwordConfirm = sanitize(passwordConfirm);
+		} else {
+			return {
+				success: false,
+				message: 'Invalid credentials',
+				data: null
+			};
+		}
+
+		const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/reset-password?otc=${resetToken}`, {
+			password,
+			passwordConfirm
+		}, {
+			withCredentials: true
+		});
+
+		return {
+			success: true,
+			message: response.data.message,
+			data: null
+		};
+	});
+}
+
 export async function loginUser(prevState: any, formData: FormData): Promise<ApiResult<AuthData>> {
 	return gracefulFunction(async () => {
 		let email = formData.get('email');

@@ -8,6 +8,7 @@ import { useSnapshot } from "valtio";
 import { deleteUser, updateUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/update/UpdateForm.module.scss';
 import Button from "@/components/common/buttons/Button";
+import { pages } from "@/constants/routes";
 import userStore from "@/states/userStore";
 import useTranslations from "@/utils/hooks/useTranslations";
 
@@ -49,7 +50,7 @@ const UpdateForm = () => {
 		const result = await updateUser(prevState, formData, userId);
 
 		if (result.success) {
-			router.push('/otc');
+			router.push(pages.Otc.path);
 		}
 
 		return result;
@@ -59,7 +60,7 @@ const UpdateForm = () => {
 		const result = await deleteUser();
 
 		if (result.success) {
-			router.push('/otc');
+			router.push(pages.Otc.path);
 		}
 
 		return result;

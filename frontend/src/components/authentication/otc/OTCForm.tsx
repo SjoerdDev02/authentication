@@ -8,6 +8,7 @@ import { otcUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/otc/OTCForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { initialAuthFormState } from "@/constants/auth";
+import { pages } from "@/constants/routes";
 import userStore from "@/states/userStore";
 import useTranslations from "@/utils/hooks/useTranslations";
 
@@ -27,7 +28,7 @@ const OTCForm = () => {
 		const result = await otcUser(prevState, formData);
 
 		if (result.success) {
-			router.push(userStore.name && userStore.email ? '/' : '/entry');
+			router.push(userStore.name && userStore.email ? pages.Home.path : pages.Login.path);
 
 			// Update new name and email here if they changed
 			if (result.data?.name && result.data?.email) {

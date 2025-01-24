@@ -30,7 +30,7 @@ const LoginForm = () => {
 		const result = await loginUser(prevState, formData);
 
 		if (result.success) {
-			router.push('/');
+			router.push(pages.Home.path);
 
 			if (result.data) {
 				userStore.id = result.data.id;

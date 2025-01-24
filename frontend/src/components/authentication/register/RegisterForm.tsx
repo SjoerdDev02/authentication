@@ -28,11 +28,11 @@ const Register = () => {
 	const [password, setPassword] = useState('');
 	const [passwordConfirmation, setPasswordConfirmation] = useState('');
 
-	const handleLoginUser = async (prevState: any, formData: FormData) => {
+	const handleRegsterUser = async (prevState: any, formData: FormData) => {
 		const result = await registerUser(prevState, formData);
 
 		if (result.success) {
-			router.push('/');
+			router.push(pages.Login.path);
 
 			if (result.data) {
 				userStore.id = result.data.id;
@@ -45,7 +45,7 @@ const Register = () => {
 	};
 
 	const [state, formAction, isPending] = useActionState(
-		handleLoginUser,
+		handleRegsterUser,
 		initialAuthFormState
 	);
 
