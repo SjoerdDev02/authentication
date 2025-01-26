@@ -55,7 +55,10 @@
         },
         "errors": {
             "password_mismatch": "Passwords do not match",
-            "email_already_exists": "Email already exists",
+            "email_already_exists": "Email already exists"
+        },
+        "success": {
+            "user_registered": "Successfully created account. Please check your email for a confirmation code"
         }
     }
 }

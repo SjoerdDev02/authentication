@@ -4,8 +4,8 @@ use crate::constants::auth::{
     BEARER_EXPIRATION_SECONDS, OTC_EXPIRATION_SECONDS, REFRESH_EXPIRATION_SECONDS,
 };
 use crate::models::auth_models::{
-    AuthResponse, AuthState, JwtClaims, LoginUser, Otc, OtcPayload,
-    OtcPayloadAction, RegisterUser, UpdateUser,
+    AuthResponse, AuthState, JwtClaims, LoginUser, Otc, OtcPayload, OtcPayloadAction, RegisterUser,
+    UpdateUser,
 };
 use crate::models::translations_models::Translations;
 use crate::utils::auth::{
@@ -15,9 +15,10 @@ use crate::utils::auth::{
 };
 use crate::utils::cookie::set_cookie;
 use crate::utils::emails::{send_otc_email, send_otc_success_email};
-use crate::utils::errors::AppError;
 use crate::utils::jwt::{encode_jwt, format_refresh_token_key, generate_refresh_token};
 use crate::utils::redis::{get_token, remove_token, set_token};
+use crate::utils::responses::{ApiResponse, AppError};
+use axum::response::IntoResponse;
 use axum::{
     body::Body,
     extract::{Json, Query, State},
@@ -30,15 +31,24 @@ pub async fn register_user(
     State(state): State<AuthState>,
     Extension(translations): Extension<Arc<Translations>>,
     Json(user_data): Json<RegisterUser>,
-) -> Result<(StatusCode, axum::Json<AuthResponse>), AppError> {
+) -> Result<impl IntoResponse, AppError> {
+    println!("1");
     if user_data.password != user_data.password_confirm {
-        return Err(AppError::format_error(&translations, StatusCode::BAD_REQUEST, "auth.errors.password_mismatch"));
-    }     
+        return Err(AppError::format_error(
+            &translations,
+            StatusCode::BAD_REQUEST,
+            "auth.errors.password_mismatch",
+        ));
+    }
 
     let existing_user = get_user_by_email(&state, &user_data.email).await;
 
     if existing_user.is_ok() {
-        return Err(AppError::format_error(&translations, StatusCode::CONFLICT, "auth.errors.email_already_exists"));
+        return Err(AppError::format_error(
+            &translations,
+            StatusCode::CONFLICT,
+            "auth.errors.email_already_exists",
+        ));
     }
 
     let create_user_result = match create_user(
@@ -87,7 +97,12 @@ pub async fn register_user(
         email: user_data.email,
     };
 
-    Ok((StatusCode::CREATED, Json(response)))
+    Ok(ApiResponse::format_success(
+        &translations,
+        StatusCode::CREATED,
+        "auth.success.user_registered",
+        Some(response),
+    ))
 }
 
 pub async fn login_user(

@@ -93,45 +93,46 @@ pub async fn send_otc_email(
         Err(_) => return Err(StatusCode::BAD_REQUEST),
     };
 
-    if let Some (auth_translations) = &translations.auth {
+    if let Some(auth_translations) = &translations.auth {
         if let Some(emails) = &auth_translations.get("emails") {
             if let Some(otc_translations) = emails.get("otc") {
                 if let Some(otc_data) = otc_translations.get(&otc_type) {
                     let mut template_variables: HashMap<&str, &str> = HashMap::new();
-    
+
                     if let Some(header) = otc_data.get("header").and_then(|str| str.as_str()) {
                         template_variables.insert("header_title", header);
                     }
-    
+
                     if let Some(code_description) = otc_data
                         .get("code_description")
                         .and_then(|str| str.as_str())
                     {
                         template_variables.insert("code_description", code_description);
                     }
-    
+
                     if let Some(link_description) = otc_data
                         .get("link_description")
                         .and_then(|str| str.as_str())
                     {
                         template_variables.insert("link_title", link_description);
                     }
-                    if let Some(footer_note) = otc_data.get("footer_note").and_then(|str| str.as_str())
+                    if let Some(footer_note) =
+                        otc_data.get("footer_note").and_then(|str| str.as_str())
                     {
                         template_variables.insert("footer_note", footer_note);
                     }
-    
+
                     template_variables.insert("otc", otc_code);
                     let otc_link = format!("{}/otc?otc={}", client_base_url, otc_code);
                     template_variables.insert("otc_link", otc_link.as_str());
-    
+
                     let mut image_file = File::open("/app/src/static/images/code_image.png")
                         .expect("Image file not found");
                     let mut image_data = Vec::new();
                     image_file
                         .read_to_end(&mut image_data)
                         .expect("Failed to read image");
-    
+
                     if let (Some(template_name), Some(subject)) = (
                         otc_data.get("template_name").and_then(|str| str.as_str()),
                         otc_data.get("subject").and_then(|str| str.as_str()),
@@ -142,9 +143,10 @@ pub async fn send_otc_email(
                             template_variables,
                         )
                         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-    
+
                         if let Err(_) =
-                            send_email_with_template(&email, &subject, &email_body, image_data).await
+                            send_email_with_template(&email, &subject, &email_body, image_data)
+                                .await
                         {
                             return Err(StatusCode::INTERNAL_SERVER_ERROR);
                         }
@@ -173,42 +175,47 @@ pub async fn send_otc_success_email(
     otc_type: &str,
     email: &str,
 ) -> Result<(), StatusCode> {
-    if let Some (auth_translations) = &translations.auth {
+    if let Some(auth_translations) = &translations.auth {
         if let Some(emails) = &auth_translations.get("emails") {
-        if let Some(otc_translations) = emails.get("otc_success") {
-            if let Some(otc_data) = otc_translations.get(&otc_type) {
-                let mut template_variables: HashMap<&str, &str> = HashMap::new();
+            if let Some(otc_translations) = emails.get("otc_success") {
+                if let Some(otc_data) = otc_translations.get(&otc_type) {
+                    let mut template_variables: HashMap<&str, &str> = HashMap::new();
 
-                if let Some(header) = otc_data.get("header").and_then(|str| str.as_str()) {
-                    template_variables.insert("header_title", header);
-                }
+                    if let Some(header) = otc_data.get("header").and_then(|str| str.as_str()) {
+                        template_variables.insert("header_title", header);
+                    }
 
-                if let Some(footer_note) = otc_data.get("footer_note").and_then(|str| str.as_str())
-                {
-                    template_variables.insert("footer_note", footer_note);
-                }
-
-                let mut image_file = File::open("/app/src/static/images/success_image.png")
-                    .expect("Image file not found");
-                let mut image_data = Vec::new();
-                image_file
-                    .read_to_end(&mut image_data)
-                    .expect("Failed to read image");
-
-                if let (Some(template_name), Some(subject)) = (
-                    otc_data.get("template_name").and_then(|str| str.as_str()),
-                    otc_data.get("subject").and_then(|str| str.as_str()),
-                ) {
-                    let email_body = generate_template(
-                        VERIFICATION_CODE_SUCCESS_TEMPLATE,
-                        template_name,
-                        template_variables,
-                    )
-                    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
-                    if let Err(_) =
-                        send_email_with_template(&email, &subject, &email_body, image_data).await
+                    if let Some(footer_note) =
+                        otc_data.get("footer_note").and_then(|str| str.as_str())
                     {
+                        template_variables.insert("footer_note", footer_note);
+                    }
+
+                    let mut image_file = File::open("/app/src/static/images/success_image.png")
+                        .expect("Image file not found");
+                    let mut image_data = Vec::new();
+                    image_file
+                        .read_to_end(&mut image_data)
+                        .expect("Failed to read image");
+
+                    if let (Some(template_name), Some(subject)) = (
+                        otc_data.get("template_name").and_then(|str| str.as_str()),
+                        otc_data.get("subject").and_then(|str| str.as_str()),
+                    ) {
+                        let email_body = generate_template(
+                            VERIFICATION_CODE_SUCCESS_TEMPLATE,
+                            template_name,
+                            template_variables,
+                        )
+                        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+                        if let Err(_) =
+                            send_email_with_template(&email, &subject, &email_body, image_data)
+                                .await
+                        {
+                            return Err(StatusCode::INTERNAL_SERVER_ERROR);
+                        }
+                    } else {
                         return Err(StatusCode::INTERNAL_SERVER_ERROR);
                     }
                 } else {
@@ -221,10 +228,6 @@ pub async fn send_otc_success_email(
             return Err(StatusCode::INTERNAL_SERVER_ERROR);
         }
     } else {
-        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-    } 
-}
-else {
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     }
 

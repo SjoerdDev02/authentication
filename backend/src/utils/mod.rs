@@ -5,6 +5,6 @@ pub mod emails;
 pub mod env;
 pub mod jwt;
 pub mod redis;
+pub mod responses;
 pub mod templates;
 pub mod translations;
-pub mod errors;
