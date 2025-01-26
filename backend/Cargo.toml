@@ -9,7 +9,7 @@ path = "src/bin/auth.rs"
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }
-axum = "0.7.7"
+axum = "0.8.1"
 tower = { version = "0.5.1", features = ["limit", "buffer"] }
 tower-http = { version = "0.6.2", features = ["cors"] }
 http = "1.1.0"

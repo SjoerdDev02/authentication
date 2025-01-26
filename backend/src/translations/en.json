@@ -1,50 +1,61 @@
 {
-    "emails": {
-        "otc": {
-            "confirm_account": {
-                "template_name": "Confirm account creation",
-                "subject": "Confirm your account",
-                "header": "Successfully created your account",
-                "code_description": "Enter this code to confirm your account",
-                "link_description": "You can also enter this link to confirm your account",
-                "footer_note": "If you did not create this account, please ignore this email."
+    "general": {
+        "errors": {
+            "internal_error": "An unexpected error occurred. We're investigating and will resolve it shortly. Please try again later."
+        }
+    },
+    "auth": {
+        "emails": {
+            "otc": {
+                "confirm_account": {
+                    "template_name": "Confirm account creation",
+                    "subject": "Confirm your account",
+                    "header": "Successfully created your account",
+                    "code_description": "Enter this code to confirm your account",
+                    "link_description": "You can also enter this link to confirm your account",
+                    "footer_note": "If you did not create this account, please ignore this email."
+                },
+                "update_account": {
+                    "template_name": "Confirm account update",
+                    "subject": "Confirm your account update",
+                    "header": "Account update code",
+                    "code_description": "Enter this code to confirm you want to update your account",
+                    "link_description": "You can also enter this link to confirm your account update",
+                    "footer_note": "If you did not intend to update your account, please ignore this email."
+                },
+                "delete_account": {
+                    "template_name": "Confirm account deletion",
+                    "subject": "Confirm your account deletion",
+                    "header": "Account deletion Code",
+                    "code_description": "Enter this code to confirm you want to delete your account",
+                    "link_description": "You can also enter this link to delete your account",
+                    "footer_note": "If you did not intend to delete your account, please ignore this email."
+                }
             },
-            "update_account": {
-                "template_name": "Confirm account update",
-                "subject": "Confirm your account update",
-                "header": "Account update code",
-                "code_description": "Enter this code to confirm you want to update your account",
-                "link_description": "You can also enter this link to confirm your account update",
-                "footer_note": "If you did not intend to update your account, please ignore this email."
-            },
-            "delete_account": {
-                "template_name": "Confirm account deletion",
-                "subject": "Confirm your account deletion",
-                "header": "Account deletion Code",
-                "code_description": "Enter this code to confirm you want to delete your account",
-                "link_description": "You can also enter this link to delete your account",
-                "footer_note": "If you did not intend to delete your account, please ignore this email."
+            "otc_success": {
+                "confirm_account": {
+                    "template_name": "Successfully confirmed account",
+                    "subject": "Successfully confirmed your account",
+                    "header": "Congratulations! You've successfully confirmed your account",
+                    "footer_note": "If you did not confirm this account, please contact us."
+                },
+                "update_account": {
+                    "template_name": "Successfully updated account",
+                    "subject": "Successfully updated your account",
+                    "header": "Successfully updated your account",
+                    "footer_note": "If you did not update this account, please contact us."
+                },
+                "delete_account": {
+                    "template_name": "Successfully deleted account",
+                    "subject": "Successfully deleted your account",
+                    "header": "We're sorry to see you go. You've successfully deleted your account",
+                    "footer_note": "If you did not delete this account, please contact us."
+                }
             }
         },
-        "otc_success": {
-            "confirm_account": {
-                "template_name": "Successfully confirmed account",
-                "subject": "Successfully confirmed your account",
-                "header": "Congratulations! You've successfully confirmed your account",
-                "footer_note": "If you did not confirm this account, please contact us."
-            },
-            "update_account": {
-                "template_name": "Successfully updated account",
-                "subject": "Successfully updated your account",
-                "header": "Successfully updated your account",
-                "footer_note": "If you did not update this account, please contact us."
-            },
-            "delete_account": {
-                "template_name": "Successfully deleted account",
-                "subject": "Successfully deleted your account",
-                "header": "We're sorry to see you go. You've successfully deleted your account",
-                "footer_note": "If you did not delete this account, please contact us."
-            }
+        "errors": {
+            "password_mismatch": "Passwords do not match",
+            "email_already_exists": "Email already exists",
         }
     }
 }

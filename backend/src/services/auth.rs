@@ -15,6 +15,7 @@ use crate::utils::auth::{
 };
 use crate::utils::cookie::set_cookie;
 use crate::utils::emails::{send_otc_email, send_otc_success_email};
+use crate::utils::errors::AppError;
 use crate::utils::jwt::{encode_jwt, format_refresh_token_key, generate_refresh_token};
 use crate::utils::redis::{get_token, remove_token, set_token};
 use axum::{
@@ -29,15 +30,15 @@ pub async fn register_user(
     State(state): State<AuthState>,
     Extension(translations): Extension<Arc<Translations>>,
     Json(user_data): Json<RegisterUser>,
-) -> Result<Json<AuthResponse>, StatusCode> {
+) -> Result<(StatusCode, axum::Json<AuthResponse>), AppError> {
     if user_data.password != user_data.password_confirm {
-        return Err(StatusCode::BAD_REQUEST);
-    }
+        return Err(AppError::format_error(&translations, StatusCode::BAD_REQUEST, "auth.errors.password_mismatch"));
+    }     
 
     let existing_user = get_user_by_email(&state, &user_data.email).await;
 
     if existing_user.is_ok() {
-        return Err(StatusCode::CONFLICT);
+        return Err(AppError::format_error(&translations, StatusCode::CONFLICT, "auth.errors.email_already_exists"));
     }
 
     let create_user_result = match create_user(
@@ -49,12 +50,12 @@ pub async fn register_user(
     .await
     {
         Ok(user) => user,
-        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
+        Err(_) => return Err(AppError::format_internal_error(&translations)),
     };
 
     let created_user_id: i32 = match create_user_result.last_insert_id().try_into() {
         Ok(id) => id,
-        Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
+        Err(_) => return Err(AppError::format_internal_error(&translations)),
     };
 
     let otc = create_otc();
@@ -69,16 +70,16 @@ pub async fn register_user(
         password_hash: None,
     };
 
-    let otc_payload =
-        serde_json::to_string(&otc_payload).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let otc_payload = serde_json::to_string(&otc_payload)
+        .map_err(|_| AppError::format_internal_error(&translations))?;
 
     set_token(&state, &otc_key, &otc_payload, OTC_EXPIRATION_SECONDS)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|_| AppError::format_internal_error(&translations))?;
 
     send_otc_email(&translations, "confirm_account", &otc, &user_data.email)
         .await
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+        .map_err(|_| AppError::format_internal_error(&translations))?;
 
     let response = AuthResponse {
         id: created_user_id,
@@ -86,7 +87,7 @@ pub async fn register_user(
         email: user_data.email,
     };
 
-    Ok(Json(response))
+    Ok((StatusCode::CREATED, Json(response)))
 }
 
 pub async fn login_user(

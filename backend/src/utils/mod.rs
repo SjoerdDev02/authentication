@@ -7,3 +7,4 @@ pub mod jwt;
 pub mod redis;
 pub mod templates;
 pub mod translations;
+pub mod errors;
