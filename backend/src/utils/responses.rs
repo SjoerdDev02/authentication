@@ -1,12 +1,14 @@
 use axum::response::{IntoResponse, Response};
 use http::StatusCode;
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+use serde_json::json;
 
 use crate::models::translations_models::Translations;
+use crate::utils::translations::get_translation_by_key;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct ApiResponse<T> {
+pub struct ApiResponse<T: Serialize> {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<T>,
     pub message: String,
 }
@@ -52,44 +54,30 @@ impl AppError {
         status_code: StatusCode,
         message_translation_key: &str,
     ) -> AppError {
-        let error_message = Self::get_translation(translations, message_translation_key);
+        let error_message = get_translation_by_key(translations, message_translation_key);
         AppError::new(status_code, error_message)
     }
 
     pub fn format_internal_error(translations: &Translations) -> AppError {
-        let error_message = Self::get_translation(translations, "general.errors.internal_error");
+        let error_message = get_translation_by_key(translations, "general.errors.internal_error");
         AppError::new(StatusCode::INTERNAL_SERVER_ERROR, error_message)
     }
-
-    fn get_translation(translations: &Translations, key: &str) -> String {
-        let keys: Vec<&str> = key.split('.').collect();
-        let mut current_value = translations.auth.as_ref();
-
-        for key in keys {
-            if let Some(Value::Object(map)) = current_value {
-                current_value = map.get(key);
-            } else {
-                return key.to_string();
-            }
-        }
-
-        if let Some(Value::String(message)) = current_value {
-            message.clone()
-        } else {
-            key.to_string()
-        }
-    }
 }
 
-impl ApiResponse<()> {
-    pub fn format_success<T: Serialize>(
-        translations: &Translations,
-        status_code: StatusCode,
-        message_translation_key: &str,
-        data: Option<T>,
-    ) -> (StatusCode, axum::Json<ApiResponse<T>>) {
-        let message = AppError::get_translation(translations, message_translation_key);
-        let response = ApiResponse { data, message };
-        (status_code, axum::Json(response))
-    }
-}
+    impl<T: Serialize> ApiResponse<T> {
+        pub fn format_success(
+            translations: &Translations,
+            status_code: StatusCode,
+            message_translation_key: &str,
+            data: Option<T>,
+        ) -> (StatusCode, axum::Json<ApiResponse<T>>) {
+            let message = get_translation_by_key(&translations, message_translation_key);
+    
+            let response = ApiResponse {
+                data,
+                message,
+            };
+    
+            (status_code, axum::Json(response))
+        }
+    }    

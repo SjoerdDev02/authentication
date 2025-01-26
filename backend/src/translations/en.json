@@ -55,10 +55,17 @@
         },
         "errors": {
             "password_mismatch": "Passwords do not match",
-            "email_already_exists": "Email already exists"
+            "email_already_exists": "Email already exists",
+            "invalid_credentials": "Invalid credentials. Please check your email and password",
+            "account_not_confirmed": "Please confirm your account with the confirmation code sent to your email",
+            "invalid_update_data": "Invalid data. Please provide your name and email or password",
+            "failed_to_read_token_payload": "Failed to read token payload. Please try again later",
+            "failed_to_remove_token": "Failed to remove token. Please try again later"
         },
         "success": {
-            "user_registered": "Successfully created account. Please check your email for a confirmation code"
+            "user_registered": "Successfully created account. Please check your email for a confirmation code",
+            "user_updated_to_otc": "Successfully stored new user details. Please check your email for a confirmation code",
+            "otc_processed": "Successfully processed OTC"
         }
     }
 }

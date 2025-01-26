@@ -1,5 +1,4 @@
 use http::StatusCode;
-use serde_json;
 
 use crate::{
     models::translations_models::Translations,
@@ -7,6 +6,7 @@ use crate::{
         DE_TRANSLATIONS, EN_TRANSLATIONS, ES_TRANSLATIONS, FR_TRANSLATIONS, NL_TRANSLATIONS,
     },
 };
+use serde_json::{from_str, Value};
 
 pub fn load_translations(lang: &str) -> Result<Translations, StatusCode> {
     let lang = lang.to_lowercase();
@@ -24,8 +24,27 @@ pub fn load_translations(lang: &str) -> Result<Translations, StatusCode> {
         return Err(StatusCode::BAD_REQUEST);
     }
 
-    match serde_json::from_str::<Translations>(&translations) {
+    match from_str::<Translations>(&translations) {
         Ok(translations) => Ok(translations),
         Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
+    }
+}
+
+pub fn get_translation_by_key(translations: &Translations, key: &str) -> String {
+    let keys: Vec<&str> = key.split('.').collect();
+    let mut current_value = translations.auth.as_ref();
+
+    for key in keys {
+        if let Some(Value::Object(map)) = current_value {
+            current_value = map.get(key);
+        } else {
+            return key.to_string();
+        }
+    }
+
+    if let Some(Value::String(message)) = current_value {
+        message.clone()
+    } else {
+        key.to_string()
     }
 }
