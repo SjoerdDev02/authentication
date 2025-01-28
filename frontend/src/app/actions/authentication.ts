@@ -102,7 +102,7 @@ export async function requestResetPasswordToken(prevState: any, formData: FormDa
 			};
 		}
 
-		const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/reset-password-token`, {
+		const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/password_reset/request_token`, {
 			email
 		}, {
 			withCredentials: true
@@ -119,8 +119,8 @@ export async function requestResetPasswordToken(prevState: any, formData: FormDa
 export async function resetPasswordUnprotected(prevState: any, formData: FormData, token: string | null): Promise<ApiResult<AuthData>> {
 	return gracefulFunction(async () => {
 		let resetToken = token;
-		let password = formData.get('password');
-		let passwordConfirm = formData.get('passwordConfirmation');
+		let password = formData.get('newPassword');
+		let passwordConfirm = formData.get('newPasswordConfirmation');
 
 		if (!!resetToken && !!password && !!passwordConfirm) {
 			resetToken = sanitize(resetToken);
@@ -134,7 +134,7 @@ export async function resetPasswordUnprotected(prevState: any, formData: FormDat
 			};
 		}
 
-		const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/reset-password?otc=${resetToken}`, {
+		const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/password_reset?token=${resetToken}`, {
 			password,
 			passwordConfirm
 		}, {

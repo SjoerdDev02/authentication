@@ -26,6 +26,12 @@ pub fn format_otc_key(otc: &str) -> String {
     otc_key
 }
 
+pub fn format_reset_token_key(token: &str) -> String {
+    let reset_token_key = format!("reset-token:{}", token);
+
+    reset_token_key
+}
+
 pub fn create_otc() -> String {
     let otc: String = thread_rng()
         .sample_iter(&Alphanumeric)

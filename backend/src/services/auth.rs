@@ -1,20 +1,17 @@
 use std::sync::Arc;
 
 use crate::constants::auth::{
-    BEARER_EXPIRATION_SECONDS, OTC_EXPIRATION_SECONDS, REFRESH_EXPIRATION_SECONDS,
+    BEARER_EXPIRATION_SECONDS, OTC_EXPIRATION_SECONDS, PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS, REFRESH_EXPIRATION_SECONDS
 };
 use crate::models::auth_models::{
-    AuthResponse, AuthState, JwtClaims, LoginUser, Otc, OtcPayload, OtcPayloadAction, RegisterUser,
-    UpdateUser,
+    AuthResponse, AuthState, JwtClaims, LoginUser, Otc, OtcPayload, OtcPayloadAction, PasswordResetToken, PasswordResetUser, RegisterUser, ResetPasswordTokenUser, UpdateUser
 };
 use crate::models::translations_models::Translations;
 use crate::utils::auth::{
-    confirm_user, create_otc, create_user, delete_user_by_id, format_otc_key, get_user_by_email,
-    get_user_by_id, hash_password, update_user_email_and_name, update_user_password,
-    verify_password,
+    confirm_user, create_otc, create_user, delete_user_by_id, format_otc_key, format_reset_token_key, get_user_by_email, get_user_by_id, hash_password, update_user_email_and_name, update_user_password, verify_password
 };
 use crate::utils::cookie::set_cookie;
-use crate::utils::emails::{send_otc_email, send_otc_success_email};
+use crate::utils::emails::{send_otc_email, send_otc_success_email, send_password_reset_email};
 use crate::utils::jwt::{encode_jwt, format_refresh_token_key, generate_refresh_token};
 use crate::utils::redis::{get_token, remove_token, set_token};
 use crate::utils::responses::{ApiResponse, AppError};
@@ -180,10 +177,19 @@ pub async fn login_user(
 pub async fn update_user(
     State(state): State<AuthState>,
     Extension(translations): Extension<Arc<Translations>>,
+    Extension(claims): Extension<JwtClaims>,
     Json(user_data): Json<UpdateUser>,
 ) -> Result<impl IntoResponse, AppError> {
     let otc = create_otc();
     let otc_key = format_otc_key(&otc);
+
+    if claims.id != user_data.id {
+        return Err(AppError::format_error(
+            &translations,
+            StatusCode::BAD_REQUEST,
+            "auth.errors.invalid_update_data_id"
+        ))
+    }
 
     let otc_payload = if let (Some(email), Some(name)) = (&user_data.email, &user_data.name) {
         OtcPayload {
@@ -419,5 +425,93 @@ pub async fn otc_user(
         StatusCode::OK,
         "auth.success.otc_processed",
         response_data,
+    ))
+}
+
+pub async fn password_reset_request_token(
+    State(state): State<AuthState>,
+    Extension(translations): Extension<Arc<Translations>>,
+    Json(user_data): Json<ResetPasswordTokenUser>,
+) -> Result<impl IntoResponse, AppError> {
+    let user_email_exists = get_user_by_email(&state, &user_data.email)
+        .await;
+
+    let user = match user_email_exists {
+        Ok(user) => user,
+        Err(_) => return Err(AppError::format_error(
+            &translations,
+            StatusCode::BAD_REQUEST,
+            "auth.errors.invalid_password_reset_email"
+        ))
+    };
+
+    let reset_token = create_otc();
+    let reset_token_key = format_reset_token_key(&reset_token);
+
+    set_token(&state, &reset_token_key, &user.0.to_string(), PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS)
+        .await
+        .map_err(|_| AppError::format_internal_error(&translations))?;
+
+        send_password_reset_email(&translations, &reset_token, &user_data.email)
+        .await
+        .map_err(|_| AppError::format_internal_error(&translations))?;
+
+    Ok(ApiResponse::<()>::format_success(
+        &translations,
+        StatusCode::NO_CONTENT,
+        "auth.success.otc_processed",
+        None
+    ))
+}
+
+pub async fn reset_password_with_token(
+    State(state): State<AuthState>,
+    Extension(translations): Extension<Arc<Translations>>,
+    Query(params): Query<PasswordResetToken>,
+    Json(user_data): Json<PasswordResetUser>,
+) -> Result<impl IntoResponse, AppError> {
+    if user_data.password != user_data.password_confirm {
+        return Err(AppError::format_error(
+            &translations,
+            StatusCode::BAD_REQUEST,
+            "auth.errors.password_mismatch"
+        ));
+    }
+
+    let reset_token_key = format_reset_token_key(&params.token);
+
+    let token_payload: Option<i32> = get_token(&state, &reset_token_key)
+    .await
+    .map_err(|_| AppError::format_error(
+        &translations,
+        StatusCode::UNAUTHORIZED,
+        "auth.errors.failed_to_read_token_payload"
+    ))?
+    .map(|json| serde_json::from_str(&json).map_err(|_| AppError::format_internal_error(&translations)))
+    .transpose()?;
+
+    let user_id = match token_payload {
+        Some(payload) => payload,
+        None => return Err(AppError::format_error(
+            &translations,
+            StatusCode::UNAUTHORIZED,
+            "auth.errors.failed_to_read_token_payload"
+        )),
+    };
+
+    let password_hash =
+        hash_password(&user_data.password).map_err(|_| AppError::format_internal_error(&translations))?;
+
+    update_user_password(&state, &user_id, &password_hash)
+    .await
+    .map_err(|_| AppError::format_internal_error(&translations))?;
+
+    // TODO: Add a success confirmation email here
+
+    Ok(ApiResponse::<()>::format_success(
+        &translations,
+        StatusCode::OK,
+        "auth.success.otc_processed",
+        None,
     ))
 }

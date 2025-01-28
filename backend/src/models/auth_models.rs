@@ -32,6 +32,23 @@ pub struct LoginUser {
 }
 
 #[derive(Serialize, Deserialize)]
+pub struct ResetPasswordTokenUser {
+    pub email: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct PasswordResetUser {
+    pub password: String,
+    #[serde(rename = "passwordConfirm")]
+    pub password_confirm: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct PasswordResetToken {
+    pub token: String,
+}
+
+#[derive(Serialize, Deserialize)]
 pub struct UpdateUser {
     pub id: i32,
     pub name: Option<String>,

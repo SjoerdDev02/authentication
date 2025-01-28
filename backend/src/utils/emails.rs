@@ -1,5 +1,5 @@
 use crate::models::translations_models::Translations;
-use crate::templates::auth::{VERIFICATION_CODE_SUCCESS_TEMPLATE, VERIFICATION_CODE_TEMPLATE};
+use crate::templates::auth::{PASSWORD_RESET_CODE_TEMPLATE, VERIFICATION_CODE_SUCCESS_TEMPLATE, VERIFICATION_CODE_TEMPLATE};
 use crate::utils::env::get_environment_variable;
 use crate::utils::templates::generate_template;
 use axum::http::StatusCode;
@@ -230,6 +230,81 @@ pub async fn send_otc_success_email(
     } else {
         return Err(StatusCode::INTERNAL_SERVER_ERROR);
     }
+
+    Ok(())
+}
+
+pub async fn send_password_reset_email(
+    translations: &Translations,
+    reset_password_code: &str,
+    email: &str,
+) -> Result<(), StatusCode> {
+    let client_base_url = match get_environment_variable("CLIENT_BASE_URL") {
+        Ok(client_base_url) => client_base_url,
+        Err(_) => return Err(StatusCode::BAD_REQUEST),
+    };
+
+    if let Some(auth_translations) = &translations.auth {
+        if let Some(emails) = &auth_translations.get("emails") {
+            if let Some(password_reset_translations) = emails.get("password_reset") {
+                    let mut template_variables: HashMap<&str, &str> = HashMap::new();
+
+                    if let Some(header) = password_reset_translations.get("header").and_then(|str| str.as_str()) {
+                        template_variables.insert("header_title", header);
+                    }
+
+                    if let Some(link_description) = password_reset_translations
+                        .get("link_description")
+                        .and_then(|str| str.as_str())
+                    {
+                        template_variables.insert("link_title", link_description);
+                    }
+                    if let Some(footer_note) =
+                    password_reset_translations.get("footer_note").and_then(|str| str.as_str())
+                    {
+                        template_variables.insert("footer_note", footer_note);
+                    }
+
+                    template_variables.insert("reset_token", reset_password_code);
+                    let password_reset_link = format!("{}?password-reset-token={}", client_base_url, reset_password_code);
+                    template_variables.insert("password_reset_link", password_reset_link.as_str());
+
+                    let mut image_file = File::open("/app/src/static/images/code_image.png")
+                        .expect("Image file not found");
+                    let mut image_data = Vec::new();
+                    image_file
+                        .read_to_end(&mut image_data)
+                        .expect("Failed to read image");
+
+                    if let (Some(template_name), Some(subject)) = (
+                        password_reset_translations.get("template_name").and_then(|str| str.as_str()),
+                        password_reset_translations.get("subject").and_then(|str| str.as_str()),
+                    ) {
+                        let email_body = generate_template(
+                            PASSWORD_RESET_CODE_TEMPLATE,
+                            template_name,
+                            template_variables,
+                        )
+                        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+                        if let Err(_) =
+                            send_email_with_template(&email, &subject, &email_body, image_data)
+                                .await
+                        {
+                            return Err(StatusCode::INTERNAL_SERVER_ERROR);
+                        }
+                    } else {
+                        return Err(StatusCode::INTERNAL_SERVER_ERROR);
+                    }
+                } else {
+                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
+                }
+            } else {
+                return Err(StatusCode::INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            return Err(StatusCode::INTERNAL_SERVER_ERROR);
+        }
 
     Ok(())
 }
