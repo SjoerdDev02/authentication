@@ -273,7 +273,7 @@ pub async fn send_password_reset_email(
 
                 template_variables.insert("reset_token", reset_password_code);
                 let password_reset_link = format!(
-                    "{}?password-reset-token={}",
+                    "{}/reset-password?password-reset-token={}",
                     client_base_url, reset_password_code
                 );
                 template_variables.insert("password_reset_link", password_reset_link.as_str());
