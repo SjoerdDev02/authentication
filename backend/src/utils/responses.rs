@@ -64,20 +64,17 @@ impl AppError {
     }
 }
 
-    impl<T: Serialize> ApiResponse<T> {
-        pub fn format_success(
-            translations: &Translations,
-            status_code: StatusCode,
-            message_translation_key: &str,
-            data: Option<T>,
-        ) -> (StatusCode, axum::Json<ApiResponse<T>>) {
-            let message = get_translation_by_key(&translations, message_translation_key);
-    
-            let response = ApiResponse {
-                data,
-                message,
-            };
-    
-            (status_code, axum::Json(response))
-        }
-    }    
+impl<T: Serialize> ApiResponse<T> {
+    pub fn format_success(
+        translations: &Translations,
+        status_code: StatusCode,
+        message_translation_key: &str,
+        data: Option<T>,
+    ) -> (StatusCode, axum::Json<ApiResponse<T>>) {
+        let message = get_translation_by_key(&translations, message_translation_key);
+
+        let response = ApiResponse { data, message };
+
+        (status_code, axum::Json(response))
+    }
+}

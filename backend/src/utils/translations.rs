@@ -32,19 +32,27 @@ pub fn load_translations(lang: &str) -> Result<Translations, StatusCode> {
 
 pub fn get_translation_by_key(translations: &Translations, key: &str) -> String {
     let keys: Vec<&str> = key.split('.').collect();
-    let mut current_value = translations.auth.as_ref();
+    let (root_key, sub_keys) = match keys.split_first() {
+        Some((root, remaining_keys)) => (root, remaining_keys),
+        None => return key.to_string(),
+    };
 
-    for key in keys {
+    let mut current_value = match *root_key {
+        "general" => translations.general.as_ref(),
+        "auth" => translations.auth.as_ref(),
+        _ => return key.to_string(),
+    };
+
+    for key in sub_keys {
         if let Some(Value::Object(map)) = current_value {
-            current_value = map.get(key);
+            current_value = map.get(*key);
         } else {
             return key.to_string();
         }
     }
 
-    if let Some(Value::String(message)) = current_value {
-        message.clone()
-    } else {
-        key.to_string()
+    match current_value {
+        Some(Value::String(message)) => message.clone(),
+        _ => key.to_string(),
     }
 }

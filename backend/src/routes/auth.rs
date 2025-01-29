@@ -11,7 +11,10 @@ use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
 use crate::{
     middleware::{jwt::jwt_middleware, language::language_middleware},
     models::auth_models::AuthState,
-    services::auth::{delete_user, login_user, otc_user, password_reset_request_token, register_user, reset_password_with_token, update_user},
+    services::auth::{
+        delete_user, login_user, otc_user, password_reset_request_token, register_user,
+        reset_password_with_token, update_user,
+    },
 };
 
 pub fn app(state: AuthState) -> Router {
@@ -19,12 +22,12 @@ pub fn app(state: AuthState) -> Router {
         .route("/register", post(register_user))
         .route("/login", post(login_user))
         .route(
-            "/update", 
-        patch(update_user).layer(middleware::from_fn_with_state(
-            state.clone(),
-            jwt_middleware,
-        )),
-    )
+            "/update",
+            patch(update_user).layer(middleware::from_fn_with_state(
+                state.clone(),
+                jwt_middleware,
+            )),
+        )
         .route(
             "/delete",
             delete(delete_user).layer(middleware::from_fn_with_state(
@@ -33,7 +36,10 @@ pub fn app(state: AuthState) -> Router {
             )),
         )
         .route("/otc", patch(otc_user))
-        .route("/password_reset/request_token", post(password_reset_request_token))
+        .route(
+            "/password_reset/request_token",
+            post(password_reset_request_token),
+        )
         .route("/password_reset", patch(reset_password_with_token))
         .with_state(state)
         .layer(middleware::from_fn(language_middleware))

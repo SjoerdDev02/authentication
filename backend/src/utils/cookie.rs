@@ -54,7 +54,8 @@ pub fn delete_cookie(
     translations: &Translations,
     mut response: Response<Body>,
     key: &str,
-) -> Result<Response<Body>, AppError> { // Explicitly specify the return type
+) -> Result<Response<Body>, AppError> {
+    // Explicitly specify the return type
     let cookie = format!("{}=; HttpOnly; Secure; Path=/; Max-Age=0;", key);
 
     let cookie_header_value = match HeaderValue::from_str(&cookie) {
