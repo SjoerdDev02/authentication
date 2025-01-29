@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 
 import { Route, routeUrlToPageMap } from './constants/routes';
 
+// ! /refresh does not exist yet. Check if this is even needed
 const refreshAccessToken = async (refreshTokenValue: string) => {
 	try {
 		const response = await axios.post(
@@ -76,3 +77,12 @@ export async function middleware(req: NextRequest) {
 
 	return NextResponse.next();
 }
+
+// This matcher applies middleware to all routes **except**:
+// - Static assets (_next) served by Next.js
+// - API routes (api)
+// - Publicly accessible assets (like images, public folder files)
+// It uses a negative lookahead regex pattern `(?!...)` to exclude these paths.
+export const config = {
+	matcher: ['/((?!_next|api|public).*)']
+};

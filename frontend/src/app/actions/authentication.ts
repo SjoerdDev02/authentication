@@ -35,7 +35,7 @@ export async function registerUser(
 
 	  return {
 			message: response.data.message,
-			data: response.data,
+			data: response.data.data,
 	  };
 	});
 }
@@ -175,7 +175,7 @@ export async function loginUser(prevState: any, formData: FormData): Promise<Api
 		return {
 			success: true,
 			message: response.data.message,
-			data: response.data
+			data: response.data.data
 		};
 	});
 }
@@ -234,7 +234,7 @@ export async function otcUser(prevState: any, formData: FormData): Promise<ApiRe
 		return {
 			success: true,
 			message: response.data.message,
-			data: response.data
+			data: response.data.data
 		};
 	});
 }
