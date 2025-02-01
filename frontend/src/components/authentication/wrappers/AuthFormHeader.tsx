@@ -1,10 +1,10 @@
-import { ReactNode } from 'react';
+import { Icon } from '@tabler/icons-react';
 
 import styles from '@/components/authentication/wrappers/AuthFormHeader.module.scss';
 import { Flex } from '@/components/common/Flex';
 
 type AuthFormHeaderProps = {
-    icon: ReactNode;
+    icon: Icon;
     label: string;
 }
 
@@ -23,7 +23,7 @@ const AuthFormHeader = (props: AuthFormHeaderProps) => {
 				justifyContent="center"
 				padding={3}
 			>
-				{props.icon}
+				<props.icon />
 			</Flex>
 
 			<span className="label label--dark-grayscale label--big">

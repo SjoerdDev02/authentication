@@ -1,18 +1,22 @@
 'use client';
 
+import { IconDotsVertical, IconLanguage, IconMoonFilled, IconPasswordUser, IconSettings, IconSun } from '@tabler/icons-react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useSnapshot } from 'valtio';
 
 import WrapperDropdown from '@/components/common/dropdowns/WrapperDropdown';
 import styles from '@/components/navigation/Navigation.module.scss';
+import { pages } from '@/constants/routes';
+import userStore from '@/states/userStore';
 import useLanguage from '@/utils/hooks/useLanguage';
 import useTheme from '@/utils/hooks/useTheme';
 import { LanguageType, ThemeType } from '@/utils/preferences/preferences';
 
 import Logo from '../../../public/logo.svg';
 import Button from '../common/buttons/Button';
+import LinkDropdown from '../common/dropdowns/LinkDropdown';
 import { Flex } from "../common/Flex";
-import LanguageIcon from '../svg/LanguageIcon';
-import { DarkModeIcon, LightModeIcon } from '../svg/ThemeIcons';
 
 type NavigationPropsType = {
 	initialTheme: ThemeType;
@@ -20,6 +24,7 @@ type NavigationPropsType = {
 }
 
 const Navigation = (props: NavigationPropsType) => {
+	const userStoreSnap = useSnapshot(userStore);
 	const { theme, setTheme } = useTheme();
 	const { language, setLanguage } = useLanguage();
 
@@ -46,6 +51,19 @@ const Navigation = (props: NavigationPropsType) => {
 		}
 	];
 
+	const linkDropdownItems = [
+		{
+			label: 'Settings',
+			icon: IconSettings,
+			href: pages.Update.path
+		},
+		{
+			label: 'OTC',
+			icon: IconPasswordUser,
+			href: pages.Otc.path
+		}
+	];
+
 	return (
 		<Flex
 			alignItems="center"
@@ -56,44 +74,62 @@ const Navigation = (props: NavigationPropsType) => {
 			tag="nav"
 			width="fill"
 		>
-			<Flex
-				alignItems="center"
-				gap={2}
-				 	justifyContent="flex-start"
-				 >
+			<Link
+				className={styles['navigation__logo']}
+				href={pages.Home.path}
+			>
 				<Image
 					alt="Logo"
-					 	src={Logo}
-					  />
-			</Flex>
+					src={Logo}
+				/>
+			</Link>
 
 			<Flex
 				alignItems="center"
-				gap={3}
+				gap={5}
 			>
-				<WrapperDropdown
-					activeValue={language}
-					items={languageItems}
-					onChangeValue={(language) => setLanguage(language)}
-				>
-					<LanguageIcon className={styles['navigation__icon']} />
-				</WrapperDropdown>
+				<Flex alignItems="center"
+					gap={3}>
+					<WrapperDropdown
+						activeValue={language}
+						items={languageItems}
+						onChangeValue={(language) => setLanguage(language)}
+					>
+						<IconLanguage />
+					</WrapperDropdown>
 
-				{(props.initialTheme === 'dark' && !theme) || theme === 'dark' ? (
-					<Button
-						color="blank"
-						onClick={() => setTheme('light')}
+					{(props.initialTheme === 'dark' && !theme) || theme === 'dark' ? (
+						<Button
+							color="blank"
+							onClick={() => setTheme('light')}
+						>
+							<IconMoonFilled />
+						</Button>
+					) : (
+						<Button
+							color="blank"
+							onClick={() => setTheme('dark')}
+						>
+							<IconSun />
+						</Button>
+					)}
+				</Flex>
+
+				<div className={styles['navigation__divider']} />
+
+				<LinkDropdown items={linkDropdownItems}>
+					<Flex
+						alignItems="center"
+						className={styles['navigation__dropdown-toggle']}
+						gap={1}
 					>
-						<DarkModeIcon className={styles['navigation__icon']} />
-					</Button>
-				) : (
-					<Button
-						color="blank"
-						onClick={() => setTheme('dark')}
-					>
-						<LightModeIcon className={styles['navigation__icon']} />
-					</Button>
-				)}
+						<span className="label label--bold-weight">
+							{userStoreSnap.name || 'Sjoerd'}
+						</span>
+
+						<IconDotsVertical />
+					</Flex>
+				</LinkDropdown>
 			</Flex>
 		</Flex>
 	);

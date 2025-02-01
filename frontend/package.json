@@ -10,6 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tabler/icons-react": "^3.29.0",
     "axios": "^1.7.7",
     "classnames": "^2.5.1",
     "eslint-plugin-react": "^7.37.2",

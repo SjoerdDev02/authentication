@@ -1,4 +1,31 @@
 .navigation {
     background-color: var(--color-grayscale-50);
     border-bottom: 1px solid var(--color-grayscale-300);
+
+    &__logo,
+    &__icon {
+        display: flex;
+        align-items: center;
+    }
+
+    &__icon {
+        color: var(--color-grayscale-700);
+
+        &:hover {
+            color: var(--color-grayscale-800);
+        }
+    }
+
+    &__divider {
+        width: 1px;
+        background-color: var(--color-grayscale-300);
+        align-self: stretch;
+        margin-block: var(--padding-200);
+    }    
+
+    &__dropdown-toggle {
+        background-color: var(--color-grayscale-100);
+        padding: var(--padding-300) 0 var(--padding-300) var(--padding-300);
+        border-radius: var(--border-radius-200);
+    }
 }

@@ -156,7 +156,7 @@ const UpdateForm = () => {
 				</AuthFormWrapper>
 
 				<Button
-					color="warning"
+					color="error"
 					onClick={handleDeleteUser}
 				>
 					<span>

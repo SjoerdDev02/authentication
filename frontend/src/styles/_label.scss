@@ -81,4 +81,10 @@
     &--unbreakable {
         white-space: nowrap
     }
+
+    &--link {
+        &:hover {
+            text-decoration: underline;
+        }
+    }
 }
