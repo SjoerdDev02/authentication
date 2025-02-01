@@ -115,21 +115,25 @@ const Navigation = (props: NavigationPropsType) => {
 					)}
 				</Flex>
 
-				<div className={styles['navigation__divider']} />
+				{userStoreSnap.id && (
+					<>
+						<div className={styles['navigation__divider']} />
 
-				<LinkDropdown items={linkDropdownItems}>
-					<Flex
-						alignItems="center"
-						className={styles['navigation__dropdown-toggle']}
-						gap={1}
-					>
-						<span className="label label--bold-weight">
-							{userStoreSnap.name || 'Sjoerd'}
-						</span>
+						<LinkDropdown items={linkDropdownItems}>
+							<Flex
+								alignItems="center"
+								className={styles['navigation__dropdown-toggle']}
+								gap={1}
+							>
+								<span className="label label--bold-weight">
+									{userStoreSnap.name || 'Sjoerd'}
+								</span>
 
-						<IconDotsVertical />
-					</Flex>
-				</LinkDropdown>
+								<IconDotsVertical />
+							</Flex>
+						</LinkDropdown>
+					</>
+				)}
 			</Flex>
 		</Flex>
 	);

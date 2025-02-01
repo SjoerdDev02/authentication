@@ -1,5 +1,5 @@
-export type Route = '/' | '/login' | '/register' | '/update' | '/otc';
-export type Page = 'Home' | 'Login' | 'Register' | 'Update' | 'Otc';
+export type Route = '/' | '/login' | '/register' | '/update' | '/otc' | 'reset-password';
+export type Page = 'Home' | 'Login' | 'Register' | 'Update' | 'Otc' | 'ResetPassword';
 
 export const pages = {
 	'Home': {
@@ -20,6 +20,10 @@ export const pages = {
 	},
 	'Otc': {
 		path: '/otc',
+		protected: false
+	},
+	'ResetPassword': {
+		path: 'reset-password',
 		protected: false
 	}
 } satisfies Record<Page, { path: Route, protected: boolean }>;
@@ -43,6 +47,10 @@ export const routeUrlToPageMap = {
 	},
 	'/otc': {
 		page: 'Otc',
+		protected: false
+	 },
+	 'reset-password': {
+		page: 'ResetPassword',
 		protected: false
 	 }
 } satisfies Record<Route, { page: Page, protected: boolean }>;
