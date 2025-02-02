@@ -38,13 +38,7 @@ function useTranslations(initialTranslations = {}) {
 	});
 
 	useEffect(() => {
-		if (
-			language
-			&& (
-				Object.keys(translations).length === 0
-				|| language.toLowerCase() !== Object.keys(translations)[0].toLowerCase()
-			)
-		) {
+		if (language.toLowerCase() !== Object.keys(translations)[0].toLowerCase()) {
 			fetchTranslations(language);
 		}
 	}, [language]);
