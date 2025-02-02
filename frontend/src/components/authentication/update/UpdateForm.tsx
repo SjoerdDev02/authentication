@@ -9,8 +9,8 @@ import { deleteUser, updateUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/update/UpdateForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { pages } from "@/constants/routes";
-import userStore from "@/states/userStore";
-import useTranslations from "@/utils/hooks/useTranslations";
+import { useTranslationsContext } from "@/stores/translationsStore";
+import userStore from "@/stores/userStore";
 
 import { Flex } from "../../common/Flex";
 import TextInput from "../../common/input/text/TextInput";
@@ -18,7 +18,7 @@ import TabPill from "../../common/tabs/TabPill";
 import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
 const UpdateForm = () => {
-	const translations = useTranslations();
+	const getTranslation = useTranslationsContext();
 	const router = useRouter();
 	const userStoreSnap = useSnapshot(userStore);
 
@@ -37,11 +37,11 @@ const UpdateForm = () => {
 
 	const tabItems = [
 		{
-			label: translations('Authentication.changeOtherLabel'),
+			label: getTranslation('Authentication.changeOtherLabel'),
 			value: 'other'
 		},
 		{
-			label: translations('Authentication.changePasswordLabel'),
+			label: getTranslation('Authentication.changePasswordLabel'),
 			value: 'password'
 		}
 	];
@@ -104,7 +104,7 @@ const UpdateForm = () => {
 								<TextInput
 									name="password"
 									onChange={(e) => setPassword(e)}
-									placeholder={translations('Authentication.passwordPlaceholder')}
+									placeholder={getTranslation('Authentication.passwordPlaceholder')}
 									type="password"
 									value={password}
 								/>
@@ -112,7 +112,7 @@ const UpdateForm = () => {
 								<TextInput
 									name="passwordConfirmation"
 									onChange={(e) => setPasswordConfirmation(e)}
-									placeholder={translations('Authentication.passwordConfirmPlaceholder')}
+									placeholder={getTranslation('Authentication.passwordConfirmPlaceholder')}
 									type="password"
 									value={passwordConfirmation}
 								/>
@@ -122,7 +122,7 @@ const UpdateForm = () => {
 								<TextInput
 									name="email"
 									onChange={(e) => setEmail(e)}
-									placeholder={translations('Authentication.emailPlaceholder')}
+									placeholder={getTranslation('Authentication.emailPlaceholder')}
 									type="email"
 									value={email}
 								/>
@@ -130,7 +130,7 @@ const UpdateForm = () => {
 								<TextInput
 									name="name"
 									onChange={(e) => setName(e)}
-									placeholder={translations('Authentication.namePlaceholder')}
+									placeholder={getTranslation('Authentication.namePlaceholder')}
 									type="text"
 									value={name}
 								/>
@@ -144,7 +144,7 @@ const UpdateForm = () => {
 						type="submit"
 					>
 						<span>
-							{translations('Authentication.updateLabel')}
+							{getTranslation('Authentication.updateLabel')}
 						</span>
 					</Button>
 
@@ -160,7 +160,7 @@ const UpdateForm = () => {
 					onClick={handleDeleteUser}
 				>
 					<span>
-						{translations('Authentication.deleteLabel')}
+						{getTranslation('Authentication.deleteLabel')}
 					</span>
 				</Button>
 			</Flex>

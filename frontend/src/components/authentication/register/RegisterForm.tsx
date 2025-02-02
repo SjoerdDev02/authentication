@@ -12,15 +12,15 @@ import { Flex } from "@/components/common/Flex";
 import TextInput from "@/components/common/input/text/TextInput";
 import { initialAuthFormState } from "@/constants/auth";
 import { pages } from "@/constants/routes";
-import userStore from "@/states/userStore";
-import useTranslations from "@/utils/hooks/useTranslations";
+import { useTranslationsContext } from "@/stores/translationsStore";
+import userStore from "@/stores/userStore";
 
 import AuthFormFooter from "../wrappers/AuthFormFooter";
 import AuthFormHeader from "../wrappers/AuthFormHeader";
 import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
 const Register = () => {
-	const translations = useTranslations();
+	const getTranslation = useTranslationsContext();
 	const router = useRouter();
 
 	const [name, setName] = useState('');
@@ -52,15 +52,15 @@ const Register = () => {
 	const FormHeader = (
 		<AuthFormHeader
 			icon={IconBrandZapier}
-			label={translations('Authentication.signUp')}
+			label={getTranslation('Authentication.signUp')}
 		/>
 	);
 
 	const FormFooter = (
 		<AuthFormFooter
-			label={translations('Authentication.alreadyHaveAnAccount')}
+			label={getTranslation('Authentication.alreadyHaveAnAccount')}
 			linkHref={pages.Login.path}
-			linkText={translations('Authentication.signIn')}
+			linkText={getTranslation('Authentication.signIn')}
 		/>
 	);
 
@@ -79,7 +79,7 @@ const Register = () => {
 					<TextInput
 						name="email"
 						onChange={(e) => setEmail(e)}
-						placeholder={translations('Authentication.emailPlaceholder')}
+						placeholder={getTranslation('Authentication.emailPlaceholder')}
 						type="email"
 						value={email}
 				 	/>
@@ -87,7 +87,7 @@ const Register = () => {
 					<TextInput
 						name="name"
 						onChange={(e) => setName(e)}
-						placeholder={translations('Authentication.namePlaceholder')}
+						placeholder={getTranslation('Authentication.namePlaceholder')}
 						type="text"
 						value={name}
 				 		/>
@@ -95,7 +95,7 @@ const Register = () => {
 					<TextInput
 						name="password"
 						onChange={(e) => setPassword(e)}
-						placeholder={translations('Authentication.passwordPlaceholder')}
+						placeholder={getTranslation('Authentication.passwordPlaceholder')}
 						type="password"
 						value={password}
 				 	/>
@@ -103,7 +103,7 @@ const Register = () => {
 					<TextInput
 						name="passwordConfirmation"
 						onChange={(e) => setPasswordConfirmation(e)}
-						placeholder={translations('Authentication.passwordConfirmPlaceholder')}
+						placeholder={getTranslation('Authentication.passwordConfirmPlaceholder')}
 						type="password"
 						value={passwordConfirmation}
 				 	/>
@@ -121,7 +121,7 @@ const Register = () => {
 					type="submit"
 				>
 					<span>
-						{translations('Authentication.registerLabel')}
+						{getTranslation('Authentication.registerLabel')}
 					</span>
 				</Button>
 			</AuthFormWrapper>

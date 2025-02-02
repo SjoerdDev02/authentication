@@ -12,15 +12,15 @@ import { Flex } from "@/components/common/Flex";
 import TextInput from "@/components/common/input/text/TextInput";
 import { initialAuthFormState } from "@/constants/auth";
 import { pages } from "@/constants/routes";
-import userStore from "@/states/userStore";
-import useTranslations from "@/utils/hooks/useTranslations";
+import { useTranslationsContext } from "@/stores/translationsStore";
+import userStore from "@/stores/userStore";
 
 import AuthFormFooter from "../wrappers/AuthFormFooter";
 import AuthFormHeader from "../wrappers/AuthFormHeader";
 import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
 const LoginForm = () => {
-	const translations = useTranslations();
+	const getTranslation = useTranslationsContext();
 	const router = useRouter();
 
 	const [email, setEmail] = useState('');
@@ -50,15 +50,15 @@ const LoginForm = () => {
 	const FormHeader = (
 		<AuthFormHeader
 			icon={IconBrandInertia}
-			label={translations('Authentication.signIn')}
+			label={getTranslation('Authentication.signIn')}
 		/>
 	);
 
 	const FormFooter = (
 		<AuthFormFooter
-			label={translations('Authentication.dontHaveAnAccount')}
+			label={getTranslation('Authentication.dontHaveAnAccount')}
 			linkHref={pages.Register.path}
-			linkText={translations('Authentication.signUp')}
+			linkText={getTranslation('Authentication.signUp')}
 		/>
 	);
 
@@ -80,7 +80,7 @@ const LoginForm = () => {
 					<TextInput
 						name="email"
 						onChange={(e) => setEmail(e)}
-						placeholder={translations('Authentication.emailPlaceholder')}
+						placeholder={getTranslation('Authentication.emailPlaceholder')}
 						type="email"
 						value={email}
 				 	/>
@@ -88,7 +88,7 @@ const LoginForm = () => {
 					<TextInput
 						name="password"
 						onChange={(e) => setPassword(e)}
-						placeholder={translations('Authentication.passwordPlaceholder')}
+						placeholder={getTranslation('Authentication.passwordPlaceholder')}
 						type="password"
 						value={password}
 				 	/>
@@ -106,7 +106,7 @@ const LoginForm = () => {
 					type="submit"
 				>
 					<span>
-						{translations('Authentication.loginLabel')}
+						{getTranslation('Authentication.loginLabel')}
 					</span>
 				</Button>
 			</AuthFormWrapper>

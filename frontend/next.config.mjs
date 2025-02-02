@@ -10,6 +10,7 @@ const nextConfig = {
     sassOptions: {
         includePaths: [path.join(__dirname, 'styles')],
         prependData: `@import "@/styles/_responsiveness.scss";`,
+        silenceDeprecations: ['legacy-js-api'],
     },
 };
 

@@ -1,4 +1,6 @@
+import fs from "fs/promises";
 import { cookies, headers } from 'next/headers';
+import path from "path";
 
 export type ThemeType = 'light' | 'dark';
 export type LanguageType = 'NL' | 'EN' | 'FR' | 'DE' | 'ES';
@@ -46,4 +48,16 @@ export async function getPreferredLanguage(): Promise<LanguageType> {
 	}
 
 	return preferredLanguage;
+}
+
+export async function getTranslations(lang: string) {
+	const filePath = path.join(process.cwd(), "public", "translations", `${lang.toLowerCase()}.json`);
+	try {
+		const fileContents = await fs.readFile(filePath, "utf8");
+
+		return JSON.parse(fileContents);
+	} catch (error) {
+		console.error("Error reading translation file:", error);
+		// return {};
+	}
 }

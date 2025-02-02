@@ -4,7 +4,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 
 import Navigation from "@/components/navigation/Navigation";
-import { getPreferredLanguage, getPreferredTheme } from "@/utils/preferences/preferences";
+import { TranslationsProvider } from "@/stores/translationsStore";
+import { getPreferredLanguage, getPreferredTheme, getTranslations } from "@/utils/preferences/preferences";
 
 const inter = localFont({
 	src: "./fonts/InterVariable.woff2",
@@ -24,6 +25,7 @@ export default async function RootLayout({
 }>) {
 	const initialTheme = await getPreferredTheme();
 	const initialLanguage = await getPreferredLanguage();
+	const initialTranslations = await getTranslations(initialLanguage);
 
 	return (
 		<html
@@ -32,14 +34,16 @@ export default async function RootLayout({
 			lang="en"
 		>
 			<body className={inter.variable}>
-				<Navigation
-					initialLanguage={initialLanguage}
-					initialTheme={initialTheme}
-				/>
+				<TranslationsProvider initialTranslations={initialTranslations}>
+					<Navigation
+						initialLanguage={initialLanguage}
+						initialTheme={initialTheme}
+					/>
 
-				<main>{children}</main>
+					<main>{children}</main>
 
-				<div id="modal" />
+					<div id="modal" />
+				</TranslationsProvider>
 			</body>
 		</html>
 	);

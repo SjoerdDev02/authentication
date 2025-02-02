@@ -2,6 +2,13 @@
     "Authentication": {
         "loginLabel": "Inloggen",
         "registerLabel": "Registreren",
+        "signIn": "Login",
+        "signUp": "Registreer",
+        "dontHaveAnAccount": "Nog geen account?",
+        "alreadyHaveAnAccount": "Al een account?",
+        "dontNeedToResetPassword": "Niet je wachtwoord aanpassen?",
+        "resetPassword": "Verander password",
+        "resetLabel": "Verander",
         "updateLabel": "Bijwerken",
         "deleteLabel": "Account verwijderen",
         "sendLabel": "Verzenden",

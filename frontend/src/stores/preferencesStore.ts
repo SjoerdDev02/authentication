@@ -9,8 +9,8 @@ type PreferencesStoreType = {
 
 const initialLanguage = getClientCookie('language') as LanguageType | null;
 
-const preferencesStoreStore: PreferencesStoreType = proxy({
-	language: initialLanguage || 'ES'
+const preferencesStore: PreferencesStoreType = proxy({
+	language: initialLanguage || 'EN'
 });
 
-export default preferencesStoreStore;
+export default preferencesStore;

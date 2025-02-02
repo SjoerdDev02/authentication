@@ -8,7 +8,7 @@ import { useSnapshot } from 'valtio';
 import WrapperDropdown from '@/components/common/dropdowns/WrapperDropdown';
 import styles from '@/components/navigation/Navigation.module.scss';
 import { pages } from '@/constants/routes';
-import userStore from '@/states/userStore';
+import userStore from '@/stores/userStore';
 import useLanguage from '@/utils/hooks/useLanguage';
 import useTheme from '@/utils/hooks/useTheme';
 import { LanguageType, ThemeType } from '@/utils/preferences/preferences';
@@ -126,7 +126,7 @@ const Navigation = (props: NavigationPropsType) => {
 								gap={1}
 							>
 								<span className="label label--bold-weight">
-									{userStoreSnap.name || 'Sjoerd'}
+									{userStoreSnap.name}
 								</span>
 
 								<IconDotsVertical />

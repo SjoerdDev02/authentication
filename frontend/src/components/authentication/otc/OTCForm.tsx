@@ -9,8 +9,8 @@ import styles from '@/components/authentication/otc/OTCForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { initialAuthFormState } from "@/constants/auth";
 import { pages } from "@/constants/routes";
-import userStore from "@/states/userStore";
-import useTranslations from "@/utils/hooks/useTranslations";
+import { useTranslationsContext } from "@/stores/translationsStore";
+import userStore from "@/stores/userStore";
 
 import { Flex } from "../../common/Flex";
 import TextInput from "../../common/input/text/TextInput";
@@ -19,7 +19,7 @@ import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 const OTCForm = () => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
-	const translations = useTranslations();
+	const getTranslation = useTranslationsContext();
 
 	const otcCode = searchParams.get('otc');
 	const initialCodeCharacters = otcCode ? otcCode.split('') : null;
@@ -103,9 +103,9 @@ const OTCForm = () => {
 			flexDirection="column"
 			gap={2}
 		>
-			<h1 className={styles['otc-form__header']}>{translations('Authentication.otcHeader')}</h1>
+			<h1 className={styles['otc-form__header']}>{getTranslation('Authentication.otcHeader')}</h1>
 
-			<h2 className={styles['otc-form__sub-header']}>{translations('Authentication.otcSubHeader')}</h2>
+			<h2 className={styles['otc-form__sub-header']}>{getTranslation('Authentication.otcSubHeader')}</h2>
 
 			<AuthFormWrapper action={formAction}>
 				<Flex
@@ -135,7 +135,7 @@ const OTCForm = () => {
 					type="submit"
 				>
 					<span>
-						{translations('Authentication.sendLabel')}
+						{getTranslation('Authentication.sendLabel')}
 					</span>
 				</Button>
 

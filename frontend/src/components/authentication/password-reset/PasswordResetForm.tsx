@@ -12,14 +12,14 @@ import { Flex } from "@/components/common/Flex";
 import TextInput from "@/components/common/input/text/TextInput";
 import { initialAuthFormState } from "@/constants/auth";
 import { pages } from "@/constants/routes";
-import useTranslations from "@/utils/hooks/useTranslations";
+import { useTranslationsContext } from "@/stores/translationsStore";
 
 import AuthFormFooter from "../wrappers/AuthFormFooter";
 import AuthFormHeader from "../wrappers/AuthFormHeader";
 import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
 const PasswordResetForm = () => {
-	const translations = useTranslations();
+	const getTranslation = useTranslationsContext();
 	const router = useRouter();
 	const searchParams = useSearchParams();
 
@@ -53,15 +53,15 @@ const PasswordResetForm = () => {
 	const FormHeader = (
 		<AuthFormHeader
 			icon={IconLock}
-			label={translations('Authentication.resetPassword')}
+			label={getTranslation('Authentication.resetPassword')}
 		/>
 	);
 
 	const FormFooter = (
 		<AuthFormFooter
-			label={translations('Authentication.dontNeedToResetPassword')}
+			label={getTranslation('Authentication.dontNeedToResetPassword')}
 			linkHref={pages.Login.path}
-			linkText={translations('Authentication.signIn')}
+			linkText={getTranslation('Authentication.signIn')}
 		/>
 	);
 
@@ -84,7 +84,7 @@ const PasswordResetForm = () => {
 						<TextInput
 							name="newPassword"
 							onChange={(e) => setNewPassword(e)}
-							placeholder={translations('Authentication.passwordPlaceholder')}
+							placeholder={getTranslation('Authentication.passwordPlaceholder')}
 							type="password"
 							value={newPassword}
 						/>
@@ -92,7 +92,7 @@ const PasswordResetForm = () => {
 						<TextInput
 							name="newPasswordConfirmation"
 							onChange={(e) => setConfirmPassword(e)}
-							placeholder={translations('Authentication.passwordConfirmPlaceholder')}
+							placeholder={getTranslation('Authentication.passwordConfirmPlaceholder')}
 							type="password"
 							value={confirmPassword}
 						/>
@@ -101,7 +101,7 @@ const PasswordResetForm = () => {
 					<TextInput
 						name="email"
 						onChange={(e) => setEmail(e)}
-						placeholder={translations('Authentication.emailPlaceholder')}
+						placeholder={getTranslation('Authentication.emailPlaceholder')}
 						type="email"
 						value={email}
 					/>
@@ -119,7 +119,7 @@ const PasswordResetForm = () => {
 					type="submit"
 				>
 					<span>
-						{translations('Authentication.resetLabel')}
+						{getTranslation('Authentication.resetLabel')}
 					</span>
 				</Button>
 			</AuthFormWrapper>
