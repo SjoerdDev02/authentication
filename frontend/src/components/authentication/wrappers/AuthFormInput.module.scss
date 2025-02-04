@@ -1,0 +1,7 @@
+.auth-form-input {
+    @include phone {
+        &__input-wrapper {
+            flex-direction: column;
+        }
+    }
+}

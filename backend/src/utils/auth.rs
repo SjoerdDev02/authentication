@@ -2,7 +2,7 @@ use crate::{
     models::auth_models::AuthState,
     queries::auth::{
         CONFIRM_USER, CREATE_USER, DELETE_USER, GET_USER_BY_EMAIL, GET_USER_BY_ID,
-        UPDATE_USER_EMAIL_AND_NAME, UPDATE_USER_PASSWORD,
+        UPDATE_NON_SENSITIVE_USER_FIELDS, UPDATE_USER_EMAIL, UPDATE_USER_PASSWORD,
     },
 };
 use axum::http::StatusCode;
@@ -46,8 +46,8 @@ pub fn create_otc() -> String {
 pub async fn get_user_by_email(
     state: &AuthState,
     email: &str,
-) -> Result<(i32, String, String, String, bool), StatusCode> {
-    let user = sqlx::query_as::<_, (i32, String, String, String, bool)>(GET_USER_BY_EMAIL)
+) -> Result<(i32, String, String, String, String, bool), StatusCode> {
+    let user = sqlx::query_as::<_, (i32, String, String, String, String, bool)>(GET_USER_BY_EMAIL)
         .bind(email)
         .fetch_one(&state.db_pool)
         .await
@@ -91,15 +91,30 @@ pub async fn create_user(
     created_user_result
 }
 
-pub async fn update_user_email_and_name(
+pub async fn update_non_sensitive_user_fields(
     state: &AuthState,
     id: &i32,
     name: &str,
+    phone: Option<&str>,
+) -> Result<MySqlQueryResult, StatusCode> {
+    let update_user_result = sqlx::query(UPDATE_NON_SENSITIVE_USER_FIELDS)
+        .bind(name)
+        .bind(phone)
+        .bind(id)
+        .execute(&state.db_pool)
+        .await
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR);
+
+    update_user_result
+}
+
+pub async fn update_user_email(
+    state: &AuthState,
+    id: &i32,
     email: &str,
 ) -> Result<MySqlQueryResult, StatusCode> {
-    let update_user_result = sqlx::query(UPDATE_USER_EMAIL_AND_NAME)
+    let update_user_result = sqlx::query(UPDATE_USER_EMAIL)
         .bind(email)
-        .bind(name)
         .bind(id)
         .execute(&state.db_pool)
         .await

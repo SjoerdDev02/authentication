@@ -1,59 +1,57 @@
 'use client';
 
+import { IconUserCheck } from "@tabler/icons-react";
 import classNames from "classnames";
 import { useRouter } from "next/navigation";
-import { useActionState, useState } from "react";
-import { useSnapshot } from "valtio";
+import { useState } from "react";
 
 import { deleteUser, updateUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/update/UpdateForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
-import userStore from "@/stores/userStore";
+import { User } from "@/stores/userStore";
+import { Defined } from "@/types/helpers";
+import { useUpdateUser } from "@/utils/hooks/updateUser";
 
 import { Flex } from "../../common/Flex";
 import TextInput from "../../common/input/text/TextInput";
-import TabPill from "../../common/tabs/TabPill";
+import AuthFormHeader from "../wrappers/AuthFormHeader";
+import AuthFormInput from "../wrappers/AuthFormInput";
 import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
-const UpdateForm = () => {
+type UpdateFormProps = {
+	user: Defined<User>
+}
+
+const UpdateForm = (props: UpdateFormProps) => {
 	const getTranslation = useTranslationsContext();
 	const router = useRouter();
-	const userStoreSnap = useSnapshot(userStore);
 
-	const [activeTab, setActiveTab] = useState<'other' | 'password'>('other');
+	const {
+		user,
+		hasChanges,
+		updateErrors,
+		hasUpdateErrors,
+		updateName,
+		updatePhone,
+		updateEmail,
+		updatePassword
+	} = useUpdateUser(props.user);
 
-	const userId = userStoreSnap.id;
-	const [name, setName] = useState('');
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [passwordConfirmation, setPasswordConfirmation] = useState('');
+	const [isPending, setIsPending] = useState(false);
+	const [isError, setIsError] = useState(false);
+	const [message, setMessage] = useState<string | null>(null);
 
-	const initialState = {
-		success: true,
-		message: ''
-	};
+	const handleUpdateUser = async () => {
+		setIsPending(true);
 
-	const tabItems = [
-		{
-			label: getTranslation('Authentication.changeOtherLabel'),
-			value: 'other'
-		},
-		{
-			label: getTranslation('Authentication.changePasswordLabel'),
-			value: 'password'
-		}
-	];
+		const result = await updateUser(user);
 
-	const handleUpdateUser = async (prevState: any, formData: FormData) => {
-		const result = await updateUser(prevState, formData, userId);
+		setIsError(!result.success);
+		setMessage(result.message);
 
-		if (result.success) {
-			router.push(pages.Otc.path);
-		}
-
-		return result;
+		setIsPending(false);
 	};
 
 	const handleDeleteUser = async () => {
@@ -66,81 +64,147 @@ const UpdateForm = () => {
 		return result;
 	};
 
-	const [state, formAction, isPending] = useActionState(handleUpdateUser, initialState);
+	const FormHeader = (
+		<AuthFormHeader
+			icon={IconUserCheck}
+			label="Account settings"
+		/>
+	);
 
-	const onChangeTab = (value: 'other' | 'password') => {
-		setName('');
-		setEmail('');
-		setPassword('');
-		setPasswordConfirmation('');
-		setActiveTab(value);
-		state.message = '';
-	};
+	const nameInput = [{
+		label: 'Name',
+		element: (
+			<TextInput
+				onChange={(e) => updateName(e)}
+				placeholder={getTranslation('Authentication.namePlaceholder')}
+				type="text"
+				value={user.name}
+			/>
+		)
+	}];
+
+	const phoneInput = [{
+		label: 'Phone number',
+		element: (
+			<TextInput
+				onChange={(e) => updatePhone(e)}
+				placeholder={"Phone number"}
+				type="phone"
+				value={user.phone}
+			/>
+		)
+	}];
+
+	const emailInputs = [
+		{
+			label: 'New email',
+			element: (
+				<TextInput
+					onChange={(e) => updateEmail(e, user.confirmEmail)}
+					placeholder={getTranslation('Authentication.emailPlaceholder')}
+					type="email"
+					value={user.email}
+				/>
+			)
+		},
+		{
+			label: 'Confirm email',
+			element: (
+				<TextInput
+					onChange={(e) => updateEmail(user.email, e)}
+					placeholder={'Confirm email'}
+					type="email"
+					value={user.confirmEmail || null}
+				/>
+			)
+		}
+	];
+
+	const passwordInputs = [
+		{
+			label: 'Current password',
+			element: (
+				<TextInput
+					onChange={(e) => updatePassword(e, user.confirmPassword)}
+					placeholder={getTranslation('Authentication.passwordPlaceholder')}
+					type="password"
+					value={user.password || null}
+				/>
+			)
+		},
+		{
+			label: 'New password',
+			element: (
+				<TextInput
+					onChange={(e) => updatePassword(user.password, e)}
+					placeholder={getTranslation('Authentication.passwordConfirmPlaceholder')}
+					type="password"
+					value={user.confirmPassword || null}
+				/>
+			)
+		}
+	];
+
+	const submitDisabled = isPending || !hasChanges || hasUpdateErrors;
 
 	return (
 		<Flex
 			className={styles['update-user']}
 			flexDirection="column"
-			gap={5}
+			gap={8}
 		>
-			<TabPill
-				activeValue={activeTab}
-				items={tabItems}
-				onChangeValue={onChangeTab}
-			/>
+			<Flex
+				flexDirection="column"
+				gap={2}
+			>
+				<AuthFormWrapper
+					header={FormHeader}
+				>
+					<Flex
+						className={styles['update-user__input-wrapper']}
+						flexDirection="column"
+						gap={5}
+					>
+						<hr />
 
-			<Flex flexDirection="column"
-				gap={2}>
-				<AuthFormWrapper action={formAction}>
-					<div className={styles['update-user__input-wrapper']}>
-						<TextInput
-							name="userId"
-							type="hidden"
-							value={userId}
+						<Flex gap={4}>
+							<AuthFormInput
+								error={updateErrors.name}
+								header="Full name"
+								inputElements={nameInput}
+							/>
+
+							<AuthFormInput
+								error={updateErrors.phone}
+								header="Phone number"
+								inputElements={phoneInput}
+							/>
+						</Flex>
+
+						<hr />
+
+						<AuthFormInput
+							error={updateErrors.email}
+							header="Email address"
+							inputElements={emailInputs}
 						/>
 
-						{activeTab === 'password' ? (
-							<>
-								<TextInput
-									name="password"
-									onChange={(e) => setPassword(e)}
-									placeholder={getTranslation('Authentication.passwordPlaceholder')}
-									type="password"
-									value={password}
-								/>
+						<hr />
 
-								<TextInput
-									name="passwordConfirmation"
-									onChange={(e) => setPasswordConfirmation(e)}
-									placeholder={getTranslation('Authentication.passwordConfirmPlaceholder')}
-									type="password"
-									value={passwordConfirmation}
-								/>
-							</>
-						): (
-							<>
-								<TextInput
-									name="email"
-									onChange={(e) => setEmail(e)}
-									placeholder={getTranslation('Authentication.emailPlaceholder')}
-									type="email"
-									value={email}
-								/>
+						<AuthFormInput
+							error={updateErrors.password}
+							header="Password"
+							inputElements={passwordInputs}
+						/>
 
-								<TextInput
-									name="name"
-									onChange={(e) => setName(e)}
-									placeholder={getTranslation('Authentication.namePlaceholder')}
-									type="text"
-									value={name}
-								/>
-							</>
-						)}
-					</div>
+						<hr />
+					</Flex>
 
 					<Button
 						color="primary"
+						disabled={submitDisabled}
 						loading={isPending}
+						onClick={handleUpdateUser}
 						type="submit"
 					>
 						<span>
@@ -148,9 +212,9 @@ const UpdateForm = () => {
 						</span>
 					</Button>
 
-					{state.message && (
-						<div className={classNames('label', `label--${state.success ? 'medium-success' : 'medium-error'}`)}>
-							{state.message}
+					{message && (
+						<div className={classNames('label', `label--${isError ? 'medium-success' : 'medium-error'}`)}>
+							{message}
 						</div>
 					)}
 				</AuthFormWrapper>

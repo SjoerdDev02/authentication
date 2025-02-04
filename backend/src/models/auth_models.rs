@@ -9,6 +9,7 @@ use tokio::sync::Mutex;
 pub struct CurrentUser {
     pub id: i32,
     pub name: String,
+    pub phone: Option<String>,
     pub email: String,
     pub password_hash: String,
     pub is_confirmed: bool,
@@ -51,8 +52,11 @@ pub struct PasswordResetToken {
 #[derive(Serialize, Deserialize)]
 pub struct UpdateUser {
     pub id: i32,
-    pub name: Option<String>,
-    pub email: Option<String>,
+    pub name: String,
+    pub phone: Option<String>,
+    pub email: String,
+    #[serde(rename = "emailConfirm")]
+    pub email_confirm: Option<String>,
     pub password: Option<String>,
     #[serde(rename = "passwordConfirm")]
     pub password_confirm: Option<String>,
@@ -77,8 +81,7 @@ pub struct Otc {
 pub enum OtcPayloadAction {
     ConfirmAccount,
     DeleteAccount,
-    UpdateNameAndEmail,
-    UpdatePassword,
+    UpdateAccount,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -86,8 +89,9 @@ pub struct OtcPayload {
     pub otc: String,
     pub user_id: i32,
     pub action: OtcPayloadAction,
-    pub name: Option<String>,
-    pub email: Option<String>,
+    pub name: String,
+    pub phone: Option<String>,
+    pub email: String,
     pub password_hash: Option<String>,
 }
 
@@ -95,6 +99,7 @@ pub struct OtcPayload {
 pub struct AuthResponse {
     pub id: i32,
     pub name: String,
+    pub phone: Option<String>,
     pub email: String,
 }
 

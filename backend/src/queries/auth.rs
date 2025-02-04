@@ -14,9 +14,15 @@ pub const CONFIRM_USER: &str = r#"
     WHERE id = ?;
 "#;
 
-pub const UPDATE_USER_EMAIL_AND_NAME: &str = r#"
+pub const UPDATE_NON_SENSITIVE_USER_FIELDS: &str = r#"
     UPDATE users 
-    SET email = ?, name = ?
+    SET name = ?, phone = ?
+    WHERE id = ?;
+"#;
+
+pub const UPDATE_USER_EMAIL: &str = r#"
+    UPDATE users 
+    SET email = ?
     WHERE id = ?;
 "#;
 
@@ -27,7 +33,7 @@ pub const UPDATE_USER_PASSWORD: &str = r#"
 "#;
 
 pub const GET_USER_BY_EMAIL: &str = r#"
-    SELECT id, name, email, password_hash, is_confirmed
+    SELECT id, name, email, password_hash, phone, is_confirmed
     FROM users
     WHERE email = ?;
 "#;

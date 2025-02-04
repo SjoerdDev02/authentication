@@ -2,6 +2,7 @@ import axios from 'axios';
 
 import { AuthData } from '@/types/authentication';
 import { ApiResult } from '@/types/response';
+import { UpdateUser } from '@/utils/hooks/updateUser';
 import { gracefulFunction } from '@/utils/response';
 import { sanitize } from '@/utils/strings';
 
@@ -40,40 +41,22 @@ export async function registerUser(
 	});
 }
 
-export async function updateUser(prevState: any, formData: FormData, userId: number | null): Promise<ApiResult<AuthData>> {
+export async function updateUser(user: UpdateUser): Promise<ApiResult<AuthData>> {
 	return gracefulFunction(async () => {
-		const id = userId;
-		let email = formData.get('email');
-		let name = formData.get('name');
-		let password = formData.get('password');
-		let passwordConfirm = formData.get('passwordConfirmation');
-
-		if (!userId) {
-			return {
-				success: false,
-				message: 'Invalid credentials',
-				data: null
-			};
-		}
-
-		if (!!email && !!name) {
-			email = sanitize(email);
-			name = sanitize(name);
-		} else if (!!password && !!passwordConfirm) {
-			password = sanitize(password);
-			passwordConfirm = sanitize(passwordConfirm);
-		} else {
-			return {
-				success: false,
-				message: 'Invalid credentials',
-				data: null
-			};
-		}
+		const userId = user.id;
+		const name = sanitize(user.name);
+		const phone = user.phone ? sanitize(user.phone) : null;
+		const email = sanitize(user.email);
+		const emailConfirm = user.confirmEmail ? sanitize(user.confirmEmail) : null;
+		const password = user.password ? sanitize(user.password) : null;
+		const passwordConfirm = user.confirmPassword ? sanitize(user.confirmPassword) : null;
 
 		const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/update`, {
-			id,
-			...(email && { email }),
-			...(name && { name }),
+			userId,
+			name,
+			...(phone && { phone }),
+			email,
+			...(emailConfirm && { emailConfirm }),
 			...(password && { password }),
 			...(passwordConfirm && { passwordConfirm })
 		}, {

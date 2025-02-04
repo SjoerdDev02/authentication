@@ -12,7 +12,7 @@ use crate::models::translations_models::Translations;
 use crate::utils::auth::{
     confirm_user, create_otc, create_user, delete_user_by_id, format_otc_key,
     format_reset_token_key, get_user_by_email, get_user_by_id, hash_password,
-    update_user_email_and_name, update_user_password, verify_password,
+    update_non_sensitive_user_fields, update_user_email, update_user_password, verify_password,
 };
 use crate::utils::cookie::set_cookie;
 use crate::utils::emails::{send_otc_email, send_otc_success_email, send_password_reset_email};
@@ -76,9 +76,10 @@ pub async fn register_user(
         otc: otc.to_string(),
         user_id: created_user_id,
         action: OtcPayloadAction::ConfirmAccount,
-        name: None,
-        email: None,
+        name: user_data.name.clone(),
+        email: user_data.email.clone(),
         password_hash: None,
+        phone: None,
     };
 
     let otc_payload = serde_json::to_string(&otc_payload)
@@ -96,6 +97,7 @@ pub async fn register_user(
         id: created_user_id,
         name: user_data.name,
         email: user_data.email,
+        phone: None,
     };
 
     Ok(ApiResponse::format_success(
@@ -122,7 +124,7 @@ pub async fn login_user(
         }
     };
 
-    let (id, name, email, password_hash, is_confirmed) = user;
+    let (id, name, email, password_hash, phone, is_confirmed) = user;
 
     if !is_confirmed {
         return Err(AppError::format_error(
@@ -160,7 +162,12 @@ pub async fn login_user(
         &translations,
         StatusCode::OK,
         "auth.success.user_logged_in",
-        Some(AuthResponse { id, name, email }),
+        Some(AuthResponse {
+            id,
+            name,
+            email,
+            phone: Some(phone),
+        }),
     );
 
     let mut response = response_body.into_response();
@@ -198,9 +205,6 @@ pub async fn update_user(
     Extension(claims): Extension<JwtClaims>,
     Json(user_data): Json<UpdateUser>,
 ) -> Result<impl IntoResponse, AppError> {
-    let otc = create_otc();
-    let otc_key = format_otc_key(&otc);
-
     if claims.id != user_data.id {
         return Err(AppError::format_error(
             &translations,
@@ -209,19 +213,11 @@ pub async fn update_user(
         ));
     }
 
-    let otc_payload = if let (Some(email), Some(name)) = (&user_data.email, &user_data.name) {
-        OtcPayload {
-            otc: otc.to_string(),
-            user_id: user_data.id,
-            action: OtcPayloadAction::UpdateNameAndEmail,
-            name: Some(name.to_string()),
-            email: Some(email.to_string()),
-            password_hash: None,
-        }
-    } else if let (Some(password), Some(password_confirm)) =
-        (&user_data.password, &user_data.password_confirm)
-    {
-        if password != password_confirm {
+    let needs_otc = user_data.email_confirm.is_some()
+        || user_data.password.is_some() && user_data.password_confirm.is_some();
+
+    if needs_otc {
+        if user_data.password != user_data.password_confirm {
             return Err(AppError::format_error(
                 &translations,
                 StatusCode::BAD_REQUEST,
@@ -229,47 +225,75 @@ pub async fn update_user(
             ));
         }
 
-        let password_hash =
-            hash_password(password).map_err(|_| AppError::format_internal_error(&translations))?;
+        if let Some(email_confirm) = user_data.email_confirm {
+            if user_data.email != email_confirm {
+                return Err(AppError::format_error(
+                    &translations,
+                    StatusCode::BAD_REQUEST,
+                    "auth.errors.email_mismatch",
+                ));
+            }
+        }        
 
-        OtcPayload {
+        let password_hash = match user_data.password {
+            Some(password) => Some(
+                hash_password(&password)
+                    .map_err(|_| AppError::format_internal_error(&translations))?,
+            ),
+            None => None,
+        };
+
+        let otc = create_otc();
+        let otc_key = format_otc_key(&otc);
+        let otc_payload = OtcPayload {
             otc: otc.to_string(),
             user_id: user_data.id,
-            action: OtcPayloadAction::UpdatePassword,
-            name: None,
-            email: None,
-            password_hash: Some(password_hash),
-        }
+            action: OtcPayloadAction::UpdateAccount,
+            name: user_data.name,
+            phone: user_data.phone,
+            email: user_data.email,
+            password_hash,
+        };
+
+        let otc_payload = serde_json::to_string(&otc_payload)
+            .map_err(|_| AppError::format_internal_error(&translations))?;
+
+        set_token(&state, &otc_key, &otc_payload, OTC_EXPIRATION_SECONDS)
+            .await
+            .map_err(|_| AppError::format_internal_error(&translations))?;
+
+        let old_user = match get_user_by_id(&state, &user_data.id).await {
+            Ok(user) => user,
+            Err(_) => return Err(AppError::format_internal_error(&translations)),
+        };
+
+        let (_, _, email) = old_user;
+
+        send_otc_email(&translations, "update_account", &otc, &email)
+            .await
+            .map_err(|_| AppError::format_internal_error(&translations))?;
     } else {
-        return Err(AppError::format_error(
-            &translations,
-            StatusCode::BAD_REQUEST,
-            "auth.errors.invalid_update_data",
-        ));
-    };
-
-    let otc_payload = serde_json::to_string(&otc_payload)
-        .map_err(|_| AppError::format_internal_error(&translations))?;
-
-    set_token(&state, &otc_key, &otc_payload, OTC_EXPIRATION_SECONDS)
+        update_non_sensitive_user_fields(
+            &state,
+            &user_data.id,
+            &user_data.name,
+            user_data.phone.as_deref(),
+        )
         .await
         .map_err(|_| AppError::format_internal_error(&translations))?;
+    }
 
-    let old_user = match get_user_by_id(&state, &user_data.id).await {
-        Ok(user) => user,
-        Err(_) => return Err(AppError::format_internal_error(&translations)),
+    let success_message = if needs_otc {
+        "auth.success.user_updated_to_otc"
+    } else {
+        "auth.success.user_updated"
     };
-
-    let (_, _, email) = old_user;
-
-    send_otc_email(&translations, "update_account", &otc, &email)
-        .await
-        .map_err(|_| AppError::format_internal_error(&translations))?;
+    
 
     Ok(ApiResponse::<()>::format_success(
         &translations,
         StatusCode::OK,
-        "auth.success.user_updated_to_otc",
+        success_message,
         None,
     ))
 }
@@ -286,9 +310,10 @@ pub async fn delete_user(
         otc: otc.to_string(),
         user_id: claims.id,
         action: OtcPayloadAction::DeleteAccount,
-        name: None,
-        email: None,
+        name: claims.name,
+        email: claims.email.clone(),
         password_hash: None,
+        phone: None,
     };
 
     let otc_payload_json = serde_json::to_string(&otc_payload)
@@ -344,29 +369,6 @@ pub async fn otc_user(
 
     let action = token_payload.action;
     let user_id = token_payload.user_id;
-    let email = match token_payload.email {
-        Some(email) => email,
-        None => "".to_string(),
-    };
-    let name = match token_payload.name {
-        Some(email) => email,
-        None => "".to_string(),
-    };
-    let password_hash = match token_payload.password_hash {
-        Some(email) => email,
-        None => "".to_string(),
-    };
-
-    let confirm_mail_email = if action == OtcPayloadAction::UpdateNameAndEmail {
-        &email
-    } else {
-        let (_, _, fetched_email) = match get_user_by_id(&state, &user_id).await {
-            Ok(user) => user,
-            Err(_) => return Err(AppError::format_internal_error(&translations)),
-        };
-
-        &fetched_email.to_string()
-    };
 
     let confirm_mail_type: &str;
 
@@ -374,42 +376,42 @@ pub async fn otc_user(
     let mut response_data: Option<AuthResponse> = None;
 
     match action {
-        OtcPayloadAction::UpdateNameAndEmail => {
+        OtcPayloadAction::UpdateAccount => {
             confirm_mail_type = "update_account";
 
-            update_user_email_and_name(&state, &user_id, &name, &email)
-                .await
-                .map_err(|_| AppError::format_internal_error(&translations))?;
+            if let Some(password) = &token_payload.password_hash {
+                update_user_password(&state, &user_id, &password)
+                    .await
+                    .map_err(|_| AppError::format_internal_error(&translations))?;
+            } else {
+                update_user_email(&state, &user_id, &token_payload.email)
+                    .await
+                    .map_err(|_| AppError::format_internal_error(&translations))?;
 
-            let new_jwt = encode_jwt(&user_id, &name, &email)
-                .map_err(|_| AppError::format_internal_error(&translations))?;
+                let new_jwt = encode_jwt(&user_id, &token_payload.name, &token_payload.email)
+                    .map_err(|_| AppError::format_internal_error(&translations))?;
 
-            response = set_cookie(
-                &translations,
-                response,
-                "Bearer",
-                &new_jwt,
-                Some(BEARER_EXPIRATION_SECONDS),
-            )?;
+                response = set_cookie(
+                    &translations,
+                    response,
+                    "Bearer",
+                    &new_jwt,
+                    Some(BEARER_EXPIRATION_SECONDS),
+                )?;
 
-            response.headers_mut().insert(
-                header::CONTENT_TYPE,
-                HeaderValue::from_str("application/json")
-                    .map_err(|_| AppError::format_internal_error(&translations))?,
-            );
+                response.headers_mut().insert(
+                    header::CONTENT_TYPE,
+                    HeaderValue::from_str("application/json")
+                        .map_err(|_| AppError::format_internal_error(&translations))?,
+                );
 
-            response_data = Some(AuthResponse {
-                id: user_id,
-                name,
-                email: email.to_string(),
-            });
-        }
-        OtcPayloadAction::UpdatePassword => {
-            confirm_mail_type = "update_account";
-
-            update_user_password(&state, &user_id, &password_hash)
-                .await
-                .map_err(|_| AppError::format_internal_error(&translations))?;
+                response_data = Some(AuthResponse {
+                    id: user_id,
+                    name: token_payload.name,
+                    email: token_payload.email.clone(),
+                    phone: token_payload.phone,
+                });
+            }
         }
         OtcPayloadAction::DeleteAccount => {
             confirm_mail_type = "delete_account";
@@ -433,7 +435,7 @@ pub async fn otc_user(
         }
     }
 
-    send_otc_success_email(&translations, confirm_mail_type, &confirm_mail_email)
+    send_otc_success_email(&translations, confirm_mail_type, &token_payload.email)
         .await
         .map_err(|_| AppError::format_internal_error(&translations))?;
 

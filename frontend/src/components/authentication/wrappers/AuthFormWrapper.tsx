@@ -5,7 +5,7 @@ import { Flex } from "@/components/common/Flex";
 
 type AuthFormWrapperProps = {
     // eslint-disable-next-line no-unused-vars
-    action: (payload: FormData) => void;
+    action?: (payload: FormData) => void;
 	header?: ReactNode;
 	footer?: ReactNode;
     children: ReactNode;
