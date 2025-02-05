@@ -28,12 +28,10 @@ const OTCForm = () => {
 		const result = await otcUser(prevState, formData);
 
 		if (result.success) {
-			router.push(userStore.name && userStore.email ? pages.Home.path : pages.Login.path);
+			router.push(userStore.user?.name && userStore.user?.email ? pages.Home.path : pages.Login.path);
 
-			// Update new name and email here if they changed
-			if (result.data?.name && result.data?.email) {
-				userStore.name = result.data?.name;
-				userStore.email = result.data?.email;
+			if (result.data) {
+				userStore.user = result.data;
 			}
 		}
 

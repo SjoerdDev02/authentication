@@ -7,6 +7,7 @@ type TextInputProps = {
 	className?: string;
     disabled?: boolean;
     name?: string;
+	dataTest?: string;
 	// eslint-disable-next-line no-unused-vars
     onChange?: (value: string) => void;
     placeholder?: string;
@@ -32,6 +33,7 @@ const TextInput = (props: TextInputProps) => {
 		<input
 			aria-disabled={props.disabled}
 			className={classNames(styles['text-input'], props.className)}
+			data-test={props.dataTest}
 			disabled={props.disabled}
 			maxLength={props.maxLength}
 			name={props.name}

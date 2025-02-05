@@ -33,9 +33,7 @@ const LoginForm = () => {
 			router.push(pages.Home.path);
 
 			if (result.data) {
-				userStore.id = result.data.id;
-				userStore.name = result.data.name;
-				userStore.email = result.data.email;
+				userStore.user = result.data;
 			}
 		}
 
@@ -78,6 +76,7 @@ const LoginForm = () => {
 					gap={3}
 				>
 					<TextInput
+						dataTest="login-email-input"
 						name="email"
 						onChange={(e) => setEmail(e)}
 						placeholder={getTranslation('Authentication.emailPlaceholder')}
@@ -86,6 +85,7 @@ const LoginForm = () => {
 				 	/>
 
 					<TextInput
+						dataTest="login-password-input"
 						name="password"
 						onChange={(e) => setPassword(e)}
 						placeholder={getTranslation('Authentication.passwordPlaceholder')}
@@ -95,7 +95,11 @@ const LoginForm = () => {
 				</Flex>
 
 				{state.message && (
-					<div className={classNames('label', `label--${state.success ? 'medium-success' : 'medium-error'}`)}>
+					<div
+						className={classNames('label', `label--${state.success ? 'medium-success' : 'medium-error'}`)}
+						data-error={!state.success}
+						data-test="login-message"
+					>
 						{state.message}
 					</div>
 				)}

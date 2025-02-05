@@ -115,7 +115,7 @@ const Navigation = (props: NavigationPropsType) => {
 					)}
 				</Flex>
 
-				{userStoreSnap.id && (
+				{userStoreSnap.user?.id && (
 					<>
 						<div className={styles['navigation__divider']} />
 
@@ -126,7 +126,7 @@ const Navigation = (props: NavigationPropsType) => {
 								gap={1}
 							>
 								<span className="label label--bold-weight">
-									{userStoreSnap.name}
+									{userStoreSnap.user.name}
 								</span>
 
 								<IconDotsVertical />

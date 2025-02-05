@@ -35,9 +35,7 @@ const Register = () => {
 			router.push(pages.Login.path);
 
 			if (result.data) {
-				userStore.id = result.data.id;
-				userStore.name = result.data.name;
-				userStore.email = result.data.email;
+				userStore.user = result.data;
 			}
 		}
 
