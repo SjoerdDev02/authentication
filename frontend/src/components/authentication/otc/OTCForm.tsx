@@ -2,12 +2,11 @@
 
 import classNames from "classnames";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useActionState, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import { otcUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/otc/OTCForm.module.scss';
 import Button from "@/components/common/buttons/Button";
-import { initialAuthFormState } from "@/constants/auth";
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
 import userStore from "@/stores/userStore";
@@ -24,8 +23,33 @@ const OTCForm = () => {
 	const otcCode = searchParams.get('otc');
 	const initialCodeCharacters = otcCode ? otcCode.split('') : null;
 
-	const handleOtcUser = async (prevState: any, formData: FormData) => {
-		const result = await otcUser(prevState, formData);
+	const [isPending, setIsPending] = useState(false);
+	const [isError, setIsError] = useState(false);
+	const [message, setMessage] = useState<string | null>(null);
+
+	const [characterOne, setCharacterOne] = useState(initialCodeCharacters?.[0] || '');
+	const [characterTwo, setCharacterTwo] = useState(initialCodeCharacters?.[1] || '');
+	const [characterThree, setCharacterThree] = useState(initialCodeCharacters?.[2] || '');
+	const [characterFour, setCharacterFour] = useState(initialCodeCharacters?.[3] || '');
+	const [characterFive, setCharacterFive] = useState(initialCodeCharacters?.[4] || '');
+	const [characterSix, setCharacterSix] = useState(initialCodeCharacters?.[5] || '');
+
+	const handleOtcUser = async () => {
+		setIsPending(true);
+
+		const result = await otcUser(
+			characterOne,
+			characterTwo,
+			characterThree,
+			characterFour,
+			characterFive,
+			characterSix
+		);
+
+		setIsError(!result.success);
+		setMessage(result.message);
+
+		setIsPending(false);
 
 		if (result.success) {
 			router.push(userStore.user?.name && userStore.user?.email ? pages.Home.path : pages.Login.path);
@@ -34,21 +58,7 @@ const OTCForm = () => {
 				userStore.user = result.data;
 			}
 		}
-
-		return result;
 	};
-
-	const [state, formAction, isPending] = useActionState(
-		handleOtcUser,
-		initialAuthFormState
-	);
-
-	const [characterOne, setCharacterOne] = useState(initialCodeCharacters?.[0] || '');
-	const [characterTwo, setCharacterTwo] = useState(initialCodeCharacters?.[1] || '');
-	const [characterThree, setCharacterThree] = useState(initialCodeCharacters?.[2] || '');
-	const [characterFour, setCharacterFour] = useState(initialCodeCharacters?.[3] || '');
-	const [characterFive, setCharacterFive] = useState(initialCodeCharacters?.[4] || '');
-	const [characterSix, setCharacterSix] = useState(initialCodeCharacters?.[5] || '');
 
 	const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
@@ -105,7 +115,7 @@ const OTCForm = () => {
 
 			<h2 className={styles['otc-form__sub-header']}>{getTranslation('Authentication.otcSubHeader')}</h2>
 
-			<AuthFormWrapper action={formAction}>
+			<AuthFormWrapper>
 				<Flex
 					gap={2}
 					justifyContent="center"
@@ -130,6 +140,7 @@ const OTCForm = () => {
 				<Button
 					color="primary"
 					loading={isPending}
+					onClick={handleOtcUser}
 					type="submit"
 				>
 					<span>
@@ -137,9 +148,9 @@ const OTCForm = () => {
 					</span>
 				</Button>
 
-				{state.message && (
-					<div className={classNames('label', `label--${state.success ? 'medium-success' : 'medium-error'}`)}>
-						{state.message}
+				{!!message && (
+					<div className={classNames('label', `label--${isError ? 'medium-error' : 'medium-success'}`)}>
+						{message}
 					</div>
 				)}
 			</AuthFormWrapper>

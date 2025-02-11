@@ -42,6 +42,7 @@ const Button = (props: ButtonProps) => {
 				[styles['button--fill']]: props.fill,
 				[styles['button--round']]: props.round
 			})}
+			data-test="submit-button"
 			disabled={props.disabled}
 			onClick={props.onClick}
 			ref={buttonRef}

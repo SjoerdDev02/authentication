@@ -4,8 +4,6 @@ import styles from '@/components/authentication/wrappers/AuthFormWrapper.module.
 import { Flex } from "@/components/common/Flex";
 
 type AuthFormWrapperProps = {
-    // eslint-disable-next-line no-unused-vars
-    action?: (payload: FormData) => void;
 	header?: ReactNode;
 	footer?: ReactNode;
     children: ReactNode;
@@ -16,17 +14,17 @@ const AuthFormWrapper = (props: AuthFormWrapperProps) => {
 	return (
 		<Flex
 			className="form"
+			dataTest="form"
 			flexDirection="column"
 			gap={7}
 		>
 			{props.header}
 
-			<form
-				action={props.action}
+			<div
 				className={styles['form']}
 			>
 				{props.children}
-			</form>
+			</div>
 
 			{props.footer}
 		</Flex>

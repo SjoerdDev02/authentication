@@ -6,12 +6,14 @@ use crate::utils::env::get_environment_variable;
 use crate::utils::templates::generate_template;
 use axum::http::StatusCode;
 use lettre::message::{header, MultiPart, SinglePart};
-use lettre::transport::smtp::authentication::Credentials;
+use lettre::transport::smtp::client::Tls;
+// use lettre::transport::smtp::authentication::Credentials;
 use lettre::{Message, SmtpTransport, Transport};
 use std::collections::HashMap;
 use std::fs::File;
 use std::io::Read;
 
+// TODO: Handle logic for both production and test environment
 pub async fn send_email_with_template(
     recipient: &str,
     subject: &str,
@@ -23,10 +25,10 @@ pub async fn send_email_with_template(
         Err(_) => return Err(StatusCode::BAD_REQUEST),
     };
 
-    let env_password = match get_environment_variable("EMAIL_PASSWORD") {
-        Ok(env_password) => env_password,
-        Err(_) => return Err(StatusCode::BAD_REQUEST),
-    };
+    // let env_password = match get_environment_variable("EMAIL_PASSWORD") {
+    //     Ok(env_password) => env_password,
+    //     Err(_) => return Err(StatusCode::BAD_REQUEST),
+    // };
 
     let from_header = match env_email.parse() {
         Ok(header) => header,
@@ -70,16 +72,34 @@ pub async fn send_email_with_template(
         Err(_) => return Err(StatusCode::INTERNAL_SERVER_ERROR),
     };
 
-    let creds = Credentials::new(env_email, env_password);
+    // let creds = Credentials::new(env_email, env_password);
+    
+    // let smtp_host = match get_environment_variable("SMTP_HOST") {
+    //     Ok(smtp_host) => smtp_host,
+    //     Err(_) => return Err(StatusCode::BAD_REQUEST),
+    // };
 
-    let mailer = SmtpTransport::relay("smtp.gmail.com")
-        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
-        .credentials(creds)
-        .build();
+    // let smtp_port = match get_environment_variable("SMTP_PORT") {
+    //     Ok(smtp_port) => smtp_port,
+    //     Err(_) => return Err(StatusCode::BAD_REQUEST),
+    // };
+
+    // let smtp_address = format!("{smtp_host}:{smtp_port}");
+
+    // let mailer = SmtpTransport::relay("smtp.gmail.com")
+    let mailer = SmtpTransport::relay("mailpit")
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+    .port(1025)
+    .tls(Tls::None)
+    // .credentials(creds) (optional)
+    .build();
 
     match mailer.send(&email) {
         Ok(_) => Ok(()),
-        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
+        Err(e) => {
+            eprintln!("Failed to send email: {:?}", e);
+            Err(StatusCode::INTERNAL_SERVER_ERROR)
+        }
     }
 }
 

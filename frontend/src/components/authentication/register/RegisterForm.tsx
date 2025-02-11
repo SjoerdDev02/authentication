@@ -2,15 +2,13 @@
 
 import { IconBrandZapier } from "@tabler/icons-react";
 import classNames from "classnames";
-import { useRouter } from "next/navigation";
-import { useActionState, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { registerUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/register/RegisterForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { Flex } from "@/components/common/Flex";
 import TextInput from "@/components/common/input/text/TextInput";
-import { initialAuthFormState } from "@/constants/auth";
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
 import userStore from "@/stores/userStore";
@@ -19,33 +17,50 @@ import AuthFormFooter from "../wrappers/AuthFormFooter";
 import AuthFormHeader from "../wrappers/AuthFormHeader";
 import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
+export type RegisterUser = {
+	name: string;
+	email: string;
+	password: string;
+	passwordConfirm: string;
+}
+
 const Register = () => {
 	const getTranslation = useTranslationsContext();
-	const router = useRouter();
+	const [isPending, setIsPending] = useState(false);
+	const [isError, setIsError] = useState(false);
+	const [message, setMessage] = useState<string | null>(null);
 
 	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	const [passwordConfirmation, setPasswordConfirmation] = useState('');
+	const [passwordConfirm, setPasswordConfirm] = useState('');
 
-	const handleRegsterUser = async (prevState: any, formData: FormData) => {
-		const result = await registerUser(prevState, formData);
+	const handleRegsterUser = async () => {
+		setIsPending(true);
+
+		const result = await registerUser({
+			name,
+			email,
+			password,
+			passwordConfirm
+		});
+
+		setIsError(!result.success);
+		setMessage(result.message);
+
+		setIsPending(false);
 
 		if (result.success) {
-			router.push(pages.Login.path);
+			setName('');
+			setEmail('');
+			setPassword('');
+			setPasswordConfirm('');
 
 			if (result.data) {
 				userStore.user = result.data;
 			}
 		}
-
-		return result;
 	};
-
-	const [state, formAction, isPending] = useActionState(
-		handleRegsterUser,
-		initialAuthFormState
-	);
 
 	const FormHeader = (
 		<AuthFormHeader
@@ -62,6 +77,15 @@ const Register = () => {
 		/>
 	);
 
+	useEffect(() => {
+		if (!!message && isError) {
+			setIsError(false);
+			setMessage(null);
+		}
+	}, [name || email || password || passwordConfirm]);
+
+	const submitDisabled = !name || !email || !password || !passwordConfirm;
+
 	return (
 		<Flex
 			className={styles['register-form']}
@@ -69,12 +93,12 @@ const Register = () => {
 			gap={5}
 		>
 			<AuthFormWrapper
-				action={formAction}
 				footer={FormFooter}
 				header={FormHeader}
 			>
 				<div className={styles['register-form__input-wrapper']}>
 					<TextInput
+						dataTest="register-email-input"
 						name="email"
 						onChange={(e) => setEmail(e)}
 						placeholder={getTranslation('Authentication.emailPlaceholder')}
@@ -83,6 +107,7 @@ const Register = () => {
 				 	/>
 
 					<TextInput
+						dataTest="register-name-input"
 						name="name"
 						onChange={(e) => setName(e)}
 						placeholder={getTranslation('Authentication.namePlaceholder')}
@@ -91,6 +116,7 @@ const Register = () => {
 				 		/>
 
 					<TextInput
+						dataTest="register-password-input"
 						name="password"
 						onChange={(e) => setPassword(e)}
 						placeholder={getTranslation('Authentication.passwordPlaceholder')}
@@ -99,24 +125,30 @@ const Register = () => {
 				 	/>
 
 					<TextInput
+						dataTest="register-password-confirm-input"
 						name="passwordConfirmation"
-						onChange={(e) => setPasswordConfirmation(e)}
+						onChange={(e) => setPasswordConfirm(e)}
 						placeholder={getTranslation('Authentication.passwordConfirmPlaceholder')}
 						type="password"
-						value={passwordConfirmation}
+						value={passwordConfirm}
 				 	/>
 				</div>
 
-				{state.message && (
-					<div className={classNames('label', `label--${state.success ? 'medium-success' : 'medium-error'}`)}>
-						{state.message}
+				{!!message && (
+					<div
+						className={classNames('label', `label--${isError ? 'medium-error' : 'medium-success'}`)}
+						data-error={isError}
+						data-test="register-message"
+					>
+						{message}
 					</div>
 				)}
 
 				<Button
 					color="primary"
+					disabled={submitDisabled}
 					loading={isPending}
-					type="submit"
+					onClick={handleRegsterUser}
 				>
 					<span>
 						{getTranslation('Authentication.registerLabel')}

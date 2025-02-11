@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+import { RegisterUser } from '@/components/authentication/register/RegisterForm';
 import { AuthData } from '@/types/authentication';
 import { ApiResult } from '@/types/response';
 import { UpdateUser } from '@/utils/hooks/updateUser';
@@ -7,29 +8,23 @@ import { gracefulFunction } from '@/utils/response';
 import { sanitize } from '@/utils/strings';
 
 export async function registerUser(
-	prevState: any,
-	formData: FormData
+	user: RegisterUser,
 ): Promise<ApiResult<AuthData>> {
 	return gracefulFunction(async () => {
-	  let email = formData.get('email');
-	  let name = formData.get('name');
-	  let password = formData.get('password');
-	  let passwordConfirm = formData.get('passwordConfirmation');
-
-	  if (!email || !name || !password || !passwordConfirm) {
+	  if (!user.email || !user.name || !user.password || !user.passwordConfirm) {
 			throw new Error('Invalid credentials');
 	  }
 
-	  email = sanitize(email);
-	  name = sanitize(name);
-	  password = sanitize(password);
-	  passwordConfirm = sanitize(passwordConfirm);
+	  const email = sanitize(user.email);
+	  const name = sanitize(user.name);
+	  const password = sanitize(user.password);
+	  const passwordConfirm = sanitize(user.passwordConfirm);
 
 	  const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/register`, {
 			email,
-		 name,
-		 password,
-		 passwordConfirm
+			name,
+			password,
+			passwordConfirm
 		}, {
 			withCredentials: true
 		});
@@ -177,15 +172,8 @@ export async function deleteUser(): Promise<ApiResult<AuthData>> {
 	});
 }
 
-export async function otcUser(prevState: any, formData: FormData): Promise<ApiResult<AuthData>> {
+export async function otcUser(characterOne: string, characterTwo: string, characterThree: string, characterFour: string, characterFive: string, characterSix: string): Promise<ApiResult<AuthData>> {
 	return gracefulFunction(async () => {
-		let characterOne = formData.get('characterOne');
-		let characterTwo = formData.get('characterTwo');
-		let characterThree = formData.get('characterThree');
-		let characterFour = formData.get('characterFour');
-		let characterFive = formData.get('characterFive');
-		let characterSix = formData.get('characterSix');
-
 		if (!characterOne || !characterTwo || !characterThree || !characterFour || !characterFive || !characterSix) {
 			return {
 				success: false,
@@ -194,20 +182,13 @@ export async function otcUser(prevState: any, formData: FormData): Promise<ApiRe
 			};
 		}
 
-		characterOne = sanitize(characterOne);
-		characterTwo = sanitize(characterTwo);
-		characterThree = sanitize(characterThree);
-		characterFour = sanitize(characterFour);
-		characterFive = sanitize(characterFive);
-		characterSix = sanitize(characterSix);
-
 		const otc = [
-			characterOne,
-			characterTwo,
-			characterThree,
-			characterFour,
-			characterFive,
-			characterSix
+			sanitize(characterOne),
+			sanitize(characterTwo),
+			sanitize(characterThree),
+			sanitize(characterFour),
+			sanitize(characterFive),
+			sanitize(characterSix)
 		].join('');
 
 		const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/otc?otc=${otc}`, undefined, {

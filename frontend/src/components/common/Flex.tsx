@@ -73,6 +73,7 @@ type FlexProps = {
 	tag?: keyof JSX.IntrinsicElements;
 	children?: React.ReactNode;
 	className?: string;
+	dataTest?: string;
 
 	/****** Container Props ********/
 	flexDirection?: FlexDirectionOptions;
@@ -143,6 +144,7 @@ export const Flex = (props: FlexProps) => {
 				[styles['flex--max-width']]: !!props.maxWidth,
 				[styles['flex--max-height']]: !!props.maxHeight
 			})}
+			data-test={props.dataTest}
 			onClick={props.onClick}
 			style={{ ...flexStyleVariables } as CSSProperties}
 		>
