@@ -1,13 +1,23 @@
 import { Page } from "@playwright/test";
 
 import { generateRandomString } from "../common";
-import { generateEmailAddress } from "../mock-data";
+import { generateEmailAddress, generatePassword } from "../mock-data";
 import { getRegisterFormLocators } from "./register-locators";
 
-export async function fillRegisterForm(page: Page) {
-	const name = generateRandomString(10);
-	const email = generateEmailAddress();
-	const password = generateRandomString(10);
+type fillRegisterFormOptions = {
+	preDefinedFields?: {
+		name?: string;
+		email?: string;
+		password?: string;
+		passwordConfirm?: string;
+	};
+}
+
+export async function fillRegisterForm(page: Page, options?: fillRegisterFormOptions) {
+	const name = options?.preDefinedFields?.name || generateRandomString(10);
+	const email = options?.preDefinedFields?.email || generateEmailAddress();
+	const password = options?.preDefinedFields?.password || generatePassword();
+	const passwordConfirm = options?.preDefinedFields?.passwordConfirm || password;
 
 	const {
 		nameInput,
@@ -19,7 +29,7 @@ export async function fillRegisterForm(page: Page) {
 	await nameInput.fill(name);
 	await emailInput.fill(email);
 	await passwordInput.fill(password);
-	await passwordConfirmInput.fill(password);
+	await passwordConfirmInput.fill(passwordConfirm);
 
 	return {
 		name,

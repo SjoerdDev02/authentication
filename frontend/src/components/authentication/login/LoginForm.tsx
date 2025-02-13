@@ -1,49 +1,49 @@
 'use client';
 
 import { IconBrandInertia } from "@tabler/icons-react";
-import classNames from "classnames";
-import { useRouter } from "next/navigation";
-import { useActionState, useState } from "react";
+// import classNames from "classnames";
+// import { useRouter } from "next/navigation";
+import { useState } from "react";
 
-import { loginUser } from "@/app/actions/authentication";
+// import { loginUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/login/LoginForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { Flex } from "@/components/common/Flex";
 import TextInput from "@/components/common/input/text/TextInput";
-import { initialAuthFormState } from "@/constants/auth";
+// import { initialAuthFormState } from "@/constants/auth";
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
-import userStore from "@/stores/userStore";
 
+// import userStore from "@/stores/userStore";
 import AuthFormFooter from "../wrappers/AuthFormFooter";
 import AuthFormHeader from "../wrappers/AuthFormHeader";
 import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
 const LoginForm = () => {
 	const getTranslation = useTranslationsContext();
-	const router = useRouter();
+	// const router = useRouter();
 
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 
-	const handleLoginUser = async (prevState: any, formData: FormData) => {
-		const result = await loginUser(prevState, formData);
+	const handleLoginUser = async () => {
+		// const result = await loginUser(prevState, formData);
 
-		if (result.success) {
-			router.push(pages.Home.path);
+		// if (result.success) {
+		// 	router.push(pages.Home.path);
 
-			if (result.data) {
-				userStore.user = result.data;
-			}
-		}
+		// 	if (result.data) {
+		// 		userStore.user = result.data;
+		// 	}
+		// }
 
-		return result;
+		// return result;
 	};
 
-	const [state, formAction, isPending] = useActionState(
-		handleLoginUser,
-		initialAuthFormState
-	);
+	// const [state, formAction, isPending] = useActionState(
+	// 	handleLoginUser,
+	// 	initialAuthFormState
+	// );
 
 	const FormHeader = (
 		<AuthFormHeader
@@ -67,7 +67,7 @@ const LoginForm = () => {
 			gap={5}
 		>
 			<AuthFormWrapper
-				action={formAction}
+				// action={formAction}
 				footer={FormFooter}
 				header={FormHeader}
 			>
@@ -94,7 +94,7 @@ const LoginForm = () => {
 				 	/>
 				</Flex>
 
-				{state.message && (
+				{/* {state.message && (
 					<div
 						className={classNames('label', `label--${state.success ? 'medium-success' : 'medium-error'}`)}
 						data-error={!state.success}
@@ -102,11 +102,12 @@ const LoginForm = () => {
 					>
 						{state.message}
 					</div>
-				)}
+				)} */}
 
 				<Button
 					color="primary"
-					loading={isPending}
+					// loading={isPending}
+					onClick={handleLoginUser}
 					type="submit"
 				>
 					<span>

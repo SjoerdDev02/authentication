@@ -12,6 +12,7 @@ import TextInput from "@/components/common/input/text/TextInput";
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
 import userStore from "@/stores/userStore";
+import { isValidEmail, isValidPassword } from "@/utils/regex";
 
 import AuthFormFooter from "../wrappers/AuthFormFooter";
 import AuthFormHeader from "../wrappers/AuthFormHeader";
@@ -78,13 +79,28 @@ const Register = () => {
 	);
 
 	useEffect(() => {
-		if (!!message && isError) {
+		if (!!email && !isValidEmail(email)) {
+			setIsError(true);
+			setMessage(getTranslation('Authentication.Errors.invalidEmail'));
+
+			return;
+		} else if (!!password && !isValidPassword(password)) {
+			setIsError(true);
+			setMessage(getTranslation('Authentication.Errors.invalidPassword'));
+
+			return;
+		} else if (!!password && !!passwordConfirm && password !== passwordConfirm) {
+			setIsError(true);
+			setMessage(getTranslation('Authentication.Errors.passwordMismatch'));
+
+			return;
+		} else if (!!message && isError) {
 			setIsError(false);
 			setMessage(null);
 		}
-	}, [name || email || password || passwordConfirm]);
+	}, [name, email, password, passwordConfirm]);
 
-	const submitDisabled = !name || !email || !password || !passwordConfirm;
+	const submitDisabled = !name || !email || !password || !passwordConfirm || isError;
 
 	return (
 		<Flex
