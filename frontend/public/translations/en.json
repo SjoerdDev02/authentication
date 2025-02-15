@@ -21,9 +21,17 @@
         "otcHeader": "Verify Your Identity",
         "otcSubHeader": "Check Your Inbox for the Code",
         "Errors": {
-            "invalidEmail": "Invalid email address",
-            "invalidPassword": "Invalid password",
-            "passwordMismatch": "Passwords do not match"
+            "passwordMismatch": "Passwords do not match",
+            "invalidEmailStart": "Email must start with 2 to 20 letters or numbers.",
+            "missingAtSymbol": "Email must contain an '@' symbol.",
+            "invalidDomainName": "Domain name must be 2 to 10 lowercase letters.",
+            "missingOrInvalidTLD": "Email must have a valid top-level domain (2 to 5 lowercase letters).",
+            "invalidEmailCharacters": "Email contains invalid characters. Only letters, numbers, '.', '@', and '-' are allowed.",
+            "passwordTooShort": "Password must be at least 8 characters long.",
+            "missingUppercase": "Password must contain at least one uppercase letter.",
+            "missingNumber": "Password must contain at least one number.",
+            "missingSpecialCharacter": "Password must contain at least one special character ('-' or '!').",
+            "invalidPasswordCharacters": "Password contains invalid characters. Only letters, numbers, '-', and '!' are allowed."
         }
     }
 }

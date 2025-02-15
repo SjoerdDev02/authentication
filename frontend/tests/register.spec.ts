@@ -1,7 +1,8 @@
 
 import { expect } from '@playwright/test';
-import { test as base } from './test';
 import dotenv from 'dotenv-flow';
+
+import { test as base } from './test';
 
 dotenv.config({
 	silent: true
@@ -17,17 +18,19 @@ import { fillRegisterForm } from './utils/register/register-actions';
 import { getRegisterFormLocators } from './utils/register/register-locators';
 import { registerUserResponsePromise } from './utils/register/register-requests';
 
-const test = base.extend<{
+const test = base.extend<
+{
 	registerFormLocators: ReturnType<typeof getRegisterFormLocators>
-  }>({
-	registerFormLocators: async ({ page }, use) => {
+}>({
+  	registerFormLocators: async ({ page }, use) => {
 	  const locators = getRegisterFormLocators(page);
 	  await use(locators);
-	},
-  });
-  
+  	},
+});
+
 test.beforeEach(async ({ page }) => {
 	await page.goto(pages.Register.path);
+
 	await page.waitForURL(`${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}${pages.Register.path}`);
 });
 

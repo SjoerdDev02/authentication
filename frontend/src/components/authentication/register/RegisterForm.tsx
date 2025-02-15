@@ -12,7 +12,7 @@ import TextInput from "@/components/common/input/text/TextInput";
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
 import userStore from "@/stores/userStore";
-import { isValidEmail, isValidPassword } from "@/utils/regex";
+import { getEmailFeedbackMessage, getPasswordFeedbackMessage, isValidEmail, isValidPassword } from "@/utils/regex";
 
 import AuthFormFooter from "../wrappers/AuthFormFooter";
 import AuthFormHeader from "../wrappers/AuthFormHeader";
@@ -81,12 +81,12 @@ const Register = () => {
 	useEffect(() => {
 		if (!!email && !isValidEmail(email)) {
 			setIsError(true);
-			setMessage(getTranslation('Authentication.Errors.invalidEmail'));
+			setMessage(getTranslation(getEmailFeedbackMessage(email)));
 
 			return;
 		} else if (!!password && !isValidPassword(password)) {
 			setIsError(true);
-			setMessage(getTranslation('Authentication.Errors.invalidPassword'));
+			setMessage(getTranslation(getPasswordFeedbackMessage(password)));
 
 			return;
 		} else if (!!password && !!passwordConfirm && password !== passwordConfirm) {
