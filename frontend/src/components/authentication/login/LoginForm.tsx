@@ -1,49 +1,62 @@
 'use client';
 
 import { IconBrandInertia } from "@tabler/icons-react";
-// import classNames from "classnames";
-// import { useRouter } from "next/navigation";
+import classNames from "classnames";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-// import { loginUser } from "@/app/actions/authentication";
+import { loginUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/login/LoginForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { Flex } from "@/components/common/Flex";
 import TextInput from "@/components/common/input/text/TextInput";
-// import { initialAuthFormState } from "@/constants/auth";
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
+import userStore from "@/stores/userStore";
 
-// import userStore from "@/stores/userStore";
 import AuthFormFooter from "../wrappers/AuthFormFooter";
 import AuthFormHeader from "../wrappers/AuthFormHeader";
 import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
+export type LoginUser = {
+	email: string;
+	password: string;
+}
+
 const LoginForm = () => {
 	const getTranslation = useTranslationsContext();
-	// const router = useRouter();
+	const router = useRouter();
+
+	const [isPending, setIsPending] = useState(false);
+	const [isError, setIsError] = useState(false);
+	const [message, setMessage] = useState<string | null>(null);
 
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 
 	const handleLoginUser = async () => {
-		// const result = await loginUser(prevState, formData);
+		setIsPending(true);
 
-		// if (result.success) {
-		// 	router.push(pages.Home.path);
+		const result = await loginUser({
+			email,
+			password
+		});
 
-		// 	if (result.data) {
-		// 		userStore.user = result.data;
-		// 	}
-		// }
+		setIsError(!result.success);
+		setMessage(result.message);
 
-		// return result;
+		setIsPending(false);
+
+		if (result.success) {
+			setEmail('');
+			setPassword('');
+			router.push(pages.Home.path);
+
+			if (result.data) {
+				userStore.user = result.data;
+			}
+		}
 	};
-
-	// const [state, formAction, isPending] = useActionState(
-	// 	handleLoginUser,
-	// 	initialAuthFormState
-	// );
 
 	const FormHeader = (
 		<AuthFormHeader
@@ -60,6 +73,8 @@ const LoginForm = () => {
 		/>
 	);
 
+	const submitDisabled = !email || !password || isError;
+
 	return (
 		<Flex
 			className={styles['login-form']}
@@ -67,7 +82,6 @@ const LoginForm = () => {
 			gap={5}
 		>
 			<AuthFormWrapper
-				// action={formAction}
 				footer={FormFooter}
 				header={FormHeader}
 			>
@@ -94,19 +108,20 @@ const LoginForm = () => {
 				 	/>
 				</Flex>
 
-				{/* {state.message && (
+				{!!message && (
 					<div
-						className={classNames('label', `label--${state.success ? 'medium-success' : 'medium-error'}`)}
-						data-error={!state.success}
+						className={classNames('label', `label--${isError ? 'medium-error' : 'medium-success'}`)}
+						data-error={isError}
 						data-test="login-message"
 					>
-						{state.message}
+						{message}
 					</div>
-				)} */}
+				)}
 
 				<Button
 					color="primary"
-					// loading={isPending}
+					disabled={submitDisabled}
+					loading={isPending}
 					onClick={handleLoginUser}
 					type="submit"
 				>

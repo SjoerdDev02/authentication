@@ -166,7 +166,7 @@ pub async fn login_user(
             id,
             name,
             email,
-            phone: Some(phone),
+            phone,
         }),
     );
 

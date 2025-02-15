@@ -11,7 +11,6 @@ import { Flex } from "@/components/common/Flex";
 import TextInput from "@/components/common/input/text/TextInput";
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
-import userStore from "@/stores/userStore";
 import { getEmailFeedbackMessage, getPasswordFeedbackMessage, isValidEmail, isValidPassword } from "@/utils/regex";
 
 import AuthFormFooter from "../wrappers/AuthFormFooter";
@@ -56,10 +55,6 @@ const Register = () => {
 			setEmail('');
 			setPassword('');
 			setPasswordConfirm('');
-
-			if (result.data) {
-				userStore.user = result.data;
-			}
 		}
 	};
 
@@ -114,6 +109,15 @@ const Register = () => {
 			>
 				<div className={styles['register-form__input-wrapper']}>
 					<TextInput
+						dataTest="register-name-input"
+						name="name"
+						onChange={(e) => setName(e)}
+						placeholder={getTranslation('Authentication.namePlaceholder')}
+						type="text"
+						value={name}
+				 	/>
+
+					<TextInput
 						dataTest="register-email-input"
 						name="email"
 						onChange={(e) => setEmail(e)}
@@ -121,15 +125,6 @@ const Register = () => {
 						type="email"
 						value={email}
 				 	/>
-
-					<TextInput
-						dataTest="register-name-input"
-						name="name"
-						onChange={(e) => setName(e)}
-						placeholder={getTranslation('Authentication.namePlaceholder')}
-						type="text"
-						value={name}
-				 		/>
 
 					<TextInput
 						dataTest="register-password-input"

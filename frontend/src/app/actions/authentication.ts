@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+import { LoginUser } from '@/components/authentication/login/LoginForm';
 import { RegisterUser } from '@/components/authentication/register/RegisterForm';
 import { AuthData } from '@/types/authentication';
 import { ApiResult } from '@/types/response';
@@ -127,12 +128,9 @@ export async function resetPasswordUnprotected(prevState: any, formData: FormDat
 	});
 }
 
-export async function loginUser(prevState: any, formData: FormData): Promise<ApiResult<AuthData>> {
+export async function loginUser(user: LoginUser): Promise<ApiResult<AuthData>> {
 	return gracefulFunction(async () => {
-		let email = formData.get('email');
-		let password = formData.get('password');
-
-		if (!email || !password) {
+		if (!user.email || !user.password) {
 			return {
 				success: false,
 				message: 'Invalid credentials',
@@ -140,8 +138,8 @@ export async function loginUser(prevState: any, formData: FormData): Promise<Api
 			};
 		}
 
-		email = sanitize(email);
-		password = sanitize(password);
+		const email = sanitize(user.email);
+		const password = sanitize(user.password);
 
 		const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/login`, {
 			email,
