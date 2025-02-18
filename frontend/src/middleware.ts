@@ -4,7 +4,6 @@ import { NextResponse } from 'next/server';
 
 import { Route, routeUrlToPageMap } from './constants/routes';
 
-// ! /refresh does not exist yet. Check if this is even needed
 const refreshAccessToken = async (refreshTokenValue: string) => {
 	try {
 		const response = await axios.post(
@@ -12,14 +11,14 @@ const refreshAccessToken = async (refreshTokenValue: string) => {
 			{},
 			{
 				withCredentials: true,
-				headers: {
+				headers: { // TODO: Check if headers can be removed
 					Cookie: `RefreshToken=${refreshTokenValue}`,
-				},
+				}
 			}
 		);
+
 		return response.data.accessToken;
-	} catch (error) {
-		console.error('Token refresh failed:', error);
+	} catch {
 		return null;
 	}
 };
@@ -34,43 +33,17 @@ export async function middleware(req: NextRequest) {
 		: null;
 
 	if (currentRoute?.protected) {
-		if (!bearerToken && !refreshToken) {
+		if (!bearerToken?.value && !refreshToken?.value) {
 			return NextResponse.redirect(new URL('/login', req.url));
-		} else if (!bearerToken && !!refreshToken) {
+		} else if (!bearerToken?.value && !!refreshToken?.value) {
 			const newBearerToken = await refreshAccessToken(refreshToken.value);
 
 			if (newBearerToken) {
-				const response = NextResponse.next();
-
-				response.cookies.set('Bearer', newBearerToken, {
-					httpOnly: true,
-					secure: true,
-					path: '/'
-				});
-
-				return response;
+				console.log('New bearer token obtained');
+				// You might want to set the new bearer token in the response here
+				return NextResponse.next();
 			} else {
 				return NextResponse.redirect(new URL('/login', req.url));
-			}
-		}
-	}
-
-	if (!currentRoute?.protected) {
-		if (bearerToken && refreshToken) {
-			return NextResponse.redirect(new URL('/', req.url));
-		} else if (!bearerToken && refreshToken) {
-			const newBearerToken = await refreshAccessToken(refreshToken.value);
-
-			if (newBearerToken) {
-				const res = NextResponse.redirect(new URL('/', req.url));
-
-				res.cookies.set('Bearer', newBearerToken, {
-					httpOnly: true,
-					secure: true,
-					path: '/'
-				});
-
-				return res;
 			}
 		}
 	}
@@ -84,5 +57,5 @@ export async function middleware(req: NextRequest) {
 // - Publicly accessible assets (like images, public folder files)
 // It uses a negative lookahead regex pattern `(?!...)` to exclude these paths.
 export const config = {
-	matcher: ['/((?!_next|api|public).*)']
+	matcher: ['/((?!_next|api|public|translations).*)']
 };

@@ -77,6 +77,7 @@ const Navigation = (props: NavigationPropsType) => {
 			<Link
 				className={styles['navigation__logo']}
 				href={pages.Home.path}
+				prefetch={false}
 			>
 				<Image
 					alt="Logo"

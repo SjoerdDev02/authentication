@@ -47,11 +47,12 @@ pub async fn get_user_by_email(
     state: &AuthState,
     email: &str,
 ) -> Result<(i32, String, String, String, Option<String>, bool), StatusCode> {
-    let user = sqlx::query_as::<_, (i32, String, String, String, Option<String>, bool)>(GET_USER_BY_EMAIL)
-        .bind(email)
-        .fetch_one(&state.db_pool)
-        .await
-        .map_err(|_| StatusCode::UNAUTHORIZED);
+    let user =
+        sqlx::query_as::<_, (i32, String, String, String, Option<String>, bool)>(GET_USER_BY_EMAIL)
+            .bind(email)
+            .fetch_one(&state.db_pool)
+            .await
+            .map_err(|_| StatusCode::UNAUTHORIZED);
 
     user
 }

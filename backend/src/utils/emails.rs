@@ -73,7 +73,7 @@ pub async fn send_email_with_template(
     };
 
     // let creds = Credentials::new(env_email, env_password);
-    
+
     // let smtp_host = match get_environment_variable("SMTP_HOST") {
     //     Ok(smtp_host) => smtp_host,
     //     Err(_) => return Err(StatusCode::BAD_REQUEST),
@@ -88,18 +88,15 @@ pub async fn send_email_with_template(
 
     // let mailer = SmtpTransport::relay("smtp.gmail.com")
     let mailer = SmtpTransport::relay("mailpit")
-    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
-    .port(1025)
-    .tls(Tls::None)
-    // .credentials(creds) (optional)
-    .build();
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
+        .port(1025)
+        .tls(Tls::None)
+        // .credentials(creds) (optional)
+        .build();
 
     match mailer.send(&email) {
         Ok(_) => Ok(()),
-        Err(e) => {
-            eprintln!("Failed to send email: {:?}", e);
-            Err(StatusCode::INTERNAL_SERVER_ERROR)
-        }
+        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR)
     }
 }
 

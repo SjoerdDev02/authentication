@@ -50,6 +50,7 @@ const LoginForm = () => {
 		if (result.success) {
 			setEmail('');
 			setPassword('');
+
 			router.push(pages.Home.path);
 
 			if (result.data) {

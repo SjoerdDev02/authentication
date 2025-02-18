@@ -19,8 +19,11 @@ const AuthFormFooter = (props: AuthFormFooterProps) => {
 				{props.label}
 			</span>
 
-			<Link className="label label--dark-grayscale"
-				href={props.linkHref}>
+			<Link
+				className="label label--dark-grayscale"
+				href={props.linkHref}
+				prefetch={false}
+			>
 				{props.linkText}
 			</Link>
 		</Flex>

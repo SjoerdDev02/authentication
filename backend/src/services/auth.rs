@@ -14,7 +14,7 @@ use crate::utils::auth::{
     format_reset_token_key, get_user_by_email, get_user_by_id, hash_password,
     update_non_sensitive_user_fields, update_user_email, update_user_password, verify_password,
 };
-use crate::utils::cookie::set_cookie;
+use crate::utils::cookie::{delete_cookie, get_cookie, set_cookie};
 use crate::utils::emails::{send_otc_email, send_otc_success_email, send_password_reset_email};
 use crate::utils::jwt::{encode_jwt, format_refresh_token_key, generate_refresh_token};
 use crate::utils::redis::{get_token, remove_token, set_token};
@@ -24,7 +24,7 @@ use axum::{
     body::Body,
     extract::{Json, Query, State},
     http::StatusCode,
-    http::{header, Response},
+    http::{header, Request, Response},
     Extension,
 };
 use http::HeaderValue;
@@ -233,7 +233,7 @@ pub async fn update_user(
                     "auth.errors.email_mismatch",
                 ));
             }
-        }        
+        }
 
         let password_hash = match user_data.password {
             Some(password) => Some(
@@ -288,7 +288,6 @@ pub async fn update_user(
     } else {
         "auth.success.user_updated"
     };
-    
 
     Ok(ApiResponse::<()>::format_success(
         &translations,
@@ -559,5 +558,87 @@ pub async fn reset_password_with_token(
         StatusCode::OK,
         "auth.success.otc_processed",
         None,
+    ))
+}
+
+pub async fn refresh(
+    State(state): State<AuthState>,
+    Extension(translations): Extension<Arc<Translations>>,
+    req: Request<Body>,
+) -> Result<impl IntoResponse, AppError> {
+    let user_id = match get_cookie(&req, "RefreshToken") {
+        Some(id) => id,
+        None => return Err(AppError::format_internal_error(&translations)),
+    };
+
+    let numeric_user_id = match user_id.parse::<i32>() {
+        Ok(id) => id,
+        Err(_) => return Err(AppError::format_internal_error(&translations)),
+    };
+
+    let user_data = match get_user_by_id(&state, &numeric_user_id).await {
+        Ok(user) => user,
+        Err(_) => return Err(AppError::format_internal_error(&translations)),
+    };
+
+    let mut response = Response::new(Body::empty());
+    let mut response_data: Option<AuthResponse> = None;
+
+    //     let formatted_refresh_token_key = format_refresh_token_key(&refresh_token);
+
+    //     remove_token(&state, &formatted_refresh_token_key)
+    //     .await
+    //     .map_err(|_| AppError::format_internal_error(&translations))?;
+
+    // response = delete_cookie(&translations, response, "RefreshToken")?;
+
+    let new_refresh_token = generate_refresh_token();
+    let new_refresh_token_key = format_refresh_token_key(&new_refresh_token);
+
+    let _ = set_token(
+        &state,
+        &new_refresh_token_key,
+        &user_id.to_string(),
+        REFRESH_EXPIRATION_SECONDS,
+    )
+    .await;
+
+    response = set_cookie(
+        &translations,
+        response,
+        "RefreshToken",
+        &new_refresh_token,
+        Some(REFRESH_EXPIRATION_SECONDS),
+    )?;
+
+    let new_jwt = encode_jwt(&numeric_user_id, &user_data.1, &user_data.2)
+        .map_err(|_| AppError::format_internal_error(&translations))?;
+
+    response = set_cookie(
+        &translations,
+        response,
+        "Bearer",
+        &new_jwt,
+        Some(BEARER_EXPIRATION_SECONDS),
+    )?;
+
+    response.headers_mut().insert(
+        header::CONTENT_TYPE,
+        HeaderValue::from_str("application/json")
+            .map_err(|_| AppError::format_internal_error(&translations))?,
+    );
+
+    response_data = Some(AuthResponse {
+        id: numeric_user_id,
+        name: user_data.1,
+        email: user_data.2,
+        phone: None,
+    });
+
+    Ok(ApiResponse::format_success(
+        &translations,
+        StatusCode::OK,
+        "auth.success.refresh_processed",
+        response_data,
     ))
 }

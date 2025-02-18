@@ -16,7 +16,8 @@ pub fn set_cookie(
     max_age: Option<i32>,
 ) -> Result<Response<Body>, AppError> {
     // Replace the cookie with "{}={}; HttpOnly; SameSite=None; Path=/;" when your frontend and backend are on different domains
-    let mut cookie = format!("{}={}; HttpOnly; Secure; Path=/;", key, value);
+    let mut cookie = format!("{}={}; HttpOnly; SameSite=Lax; Path=/;", key, value);
+    // let mut cookie = format!("{}={}; HttpOnly; SameSite=None; Path=/;", key, value);
 
     if let Some(seconds) = max_age {
         cookie.push_str(&format!(" Max-Age={};", seconds));

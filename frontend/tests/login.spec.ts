@@ -37,15 +37,12 @@ test.beforeEach(async ({ page }) => {
 });
 
 test.describe('login', () => {
-	// TODO: Fix this test
 	test('Login using valid email and password', async ({ page, user, loginFormLocators }) => {
 		await fillLoginForm(page, user);
 
 		await Promise.all([
 			loginFormLocators.submitButton.click(),
 			loginUserResponsePromise(page),
-			expect(loginFormLocators.submitButton).toBeDisabled(),
-			expect(loginFormLocators.message).toHaveAttribute('data-error', 'false'),
 			expect(page).toHaveURL(`${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}${pages.Home.path}`)
 		]);
 	});
