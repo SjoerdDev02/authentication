@@ -77,7 +77,8 @@
             "user_registered": "Successfully created account. Please check your email for a confirmation code",
             "user_updated": "Successfully stored new user details. Please check your email for a confirmation code",
             "user_updated_to_otc": "Successfully stored new user details. Please check your email for a confirmation code",
-            "otc_processed": "Successfully processed OTC"
+            "otc_processed": "Successfully processed OTC",
+            "refresh_processed": "Successfully processed refresh"
         }
     }
 }

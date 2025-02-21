@@ -96,7 +96,7 @@ pub async fn send_email_with_template(
 
     match mailer.send(&email) {
         Ok(_) => Ok(()),
-        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR)
+        Err(_) => Err(StatusCode::INTERNAL_SERVER_ERROR),
     }
 }
 

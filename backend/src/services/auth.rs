@@ -566,31 +566,46 @@ pub async fn refresh(
     Extension(translations): Extension<Arc<Translations>>,
     req: Request<Body>,
 ) -> Result<impl IntoResponse, AppError> {
-    let user_id = match get_cookie(&req, "RefreshToken") {
-        Some(id) => id,
+    let refresh_token = match get_cookie(&req, "RefreshToken") {
+        Some(payload) => payload,
         None => return Err(AppError::format_internal_error(&translations)),
     };
 
-    let numeric_user_id = match user_id.parse::<i32>() {
-        Ok(id) => id,
-        Err(_) => return Err(AppError::format_internal_error(&translations)),
+    let formatted_refresh_token_key = format_refresh_token_key(&refresh_token);
+
+    let token_payload: Option<i32> = get_token(&state, &formatted_refresh_token_key)
+        .await
+        .map_err(|_| {
+            AppError::format_error(
+                &translations,
+                StatusCode::UNAUTHORIZED,
+                "auth.errors.failed_to_read_token_payload",
+            )
+        })?
+        .map(|json| {
+            serde_json::from_str(&json).map_err(|_| AppError::format_internal_error(&translations))
+        })
+        .transpose()?;
+
+    let user_id = match token_payload {
+        Some(payload) => payload,
+        None => {
+            return Err(AppError::format_error(
+                &translations,
+                StatusCode::UNAUTHORIZED,
+                "auth.errors.failed_to_read_token_payload",
+            ))
+        }
     };
 
-    let user_data = match get_user_by_id(&state, &numeric_user_id).await {
+    let user_data = match get_user_by_id(&state, &user_id).await {
         Ok(user) => user,
         Err(_) => return Err(AppError::format_internal_error(&translations)),
     };
 
-    let mut response = Response::new(Body::empty());
-    let mut response_data: Option<AuthResponse> = None;
-
-    //     let formatted_refresh_token_key = format_refresh_token_key(&refresh_token);
-
-    //     remove_token(&state, &formatted_refresh_token_key)
-    //     .await
-    //     .map_err(|_| AppError::format_internal_error(&translations))?;
-
-    // response = delete_cookie(&translations, response, "RefreshToken")?;
+    remove_token(&state, &formatted_refresh_token_key)
+        .await
+        .map_err(|_| AppError::format_internal_error(&translations))?;
 
     let new_refresh_token = generate_refresh_token();
     let new_refresh_token_key = format_refresh_token_key(&new_refresh_token);
@@ -603,16 +618,28 @@ pub async fn refresh(
     )
     .await;
 
-    response = set_cookie(
-        &translations,
-        response,
-        "RefreshToken",
-        &new_refresh_token,
-        Some(REFRESH_EXPIRATION_SECONDS),
-    )?;
-
-    let new_jwt = encode_jwt(&numeric_user_id, &user_data.1, &user_data.2)
+    let new_jwt = encode_jwt(&user_id, &user_data.1, &user_data.2)
         .map_err(|_| AppError::format_internal_error(&translations))?;
+
+    let response_body = ApiResponse::format_success(
+        &translations,
+        StatusCode::OK,
+        "auth.success.refresh_processed",
+        Some(AuthResponse {
+            id: user_data.0,
+            name: user_data.1,
+            email: user_data.2,
+            phone: None,
+        }),
+    );
+
+    let mut response = response_body.into_response();
+
+    response.headers_mut().insert(
+        header::CONTENT_TYPE,
+        HeaderValue::from_str("application/json")
+            .map_err(|_| AppError::format_internal_error(&translations))?,
+    );
 
     response = set_cookie(
         &translations,
@@ -622,23 +649,14 @@ pub async fn refresh(
         Some(BEARER_EXPIRATION_SECONDS),
     )?;
 
-    response.headers_mut().insert(
-        header::CONTENT_TYPE,
-        HeaderValue::from_str("application/json")
-            .map_err(|_| AppError::format_internal_error(&translations))?,
-    );
-
-    response_data = Some(AuthResponse {
-        id: numeric_user_id,
-        name: user_data.1,
-        email: user_data.2,
-        phone: None,
-    });
-
-    Ok(ApiResponse::format_success(
+    // Don't need to delete the old RefreshToken from the cookies, because it is overwritten here
+    response = set_cookie(
         &translations,
-        StatusCode::OK,
-        "auth.success.refresh_processed",
-        response_data,
-    ))
+        response,
+        "RefreshToken",
+        &new_refresh_token,
+        Some(REFRESH_EXPIRATION_SECONDS),
+    )?;
+
+    Ok(response)
 }

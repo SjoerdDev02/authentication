@@ -1,27 +1,37 @@
-import axios from 'axios';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { Route, routeUrlToPageMap } from './constants/routes';
+import { User } from './stores/userStore';
+import { ApiResult } from './types/response';
+import { gracefulFunction } from './utils/response';
 
-const refreshAccessToken = async (refreshTokenValue: string) => {
-	try {
-		const response = await axios.post(
+export async function refreshAccessToken(refreshToken: string): Promise<ApiResult<User>> {
+	return gracefulFunction(async () => {
+	  const response = await fetch(
 			`${process.env.NEXT_PUBLIC_API_BASE_URL}/refresh`,
-			{},
 			{
-				withCredentials: true,
-				headers: { // TODO: Check if headers can be removed
-					Cookie: `RefreshToken=${refreshTokenValue}`,
-				}
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Cookie': `RefreshToken=${refreshToken}` // TODO: Check if you can remove this as you include credentials already
+				},
+				credentials: 'include',
 			}
 		);
 
-		return response.data.accessToken;
-	} catch {
-		return null;
-	}
-};
+	  if (!response.ok) {
+			throw new Error('Failed to refresh token');
+	  }
+
+	  const data = await response.json();
+
+	  return {
+			message: data.message,
+			data: data.data
+	  };
+	});
+}
 
 export async function middleware(req: NextRequest) {
 	const bearerToken = req.cookies.get('Bearer');
@@ -36,13 +46,10 @@ export async function middleware(req: NextRequest) {
 		if (!bearerToken?.value && !refreshToken?.value) {
 			return NextResponse.redirect(new URL('/login', req.url));
 		} else if (!bearerToken?.value && !!refreshToken?.value) {
-			const newBearerToken = await refreshAccessToken(refreshToken.value);
+			// TODO: Check why you see the set-cookie headers but they are not set
+			const refreshResponse = await refreshAccessToken(refreshToken.value);
 
-			if (newBearerToken) {
-				console.log('New bearer token obtained');
-				// You might want to set the new bearer token in the response here
-				return NextResponse.next();
-			} else {
+			if (!refreshResponse.success) {
 				return NextResponse.redirect(new URL('/login', req.url));
 			}
 		}

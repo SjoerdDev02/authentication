@@ -81,6 +81,7 @@ const Navigation = (props: NavigationPropsType) => {
 			>
 				<Image
 					alt="Logo"
+					priority
 					src={Logo}
 				/>
 			</Link>

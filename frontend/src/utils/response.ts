@@ -5,6 +5,7 @@ export async function gracefulFunction<T>(
 ): Promise<ApiResult<T>> {
 	try {
 		const { message, data } = await asyncFunction();
+
 		return {
 			success: true,
 			message,
