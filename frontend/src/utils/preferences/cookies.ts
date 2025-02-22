@@ -1,3 +1,5 @@
+import { Tokens } from "@/types/authentication";
+
 export function setCookie(name: string, value: string, days: number) {
 	let expires = "";
 	if (days) {
@@ -28,4 +30,18 @@ export function getClientCookie(cookieName: string): string | undefined {
 
 export function eraseCookie(name: string) {
 	document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+}
+
+export function extractSetCookieTokens(setCookieArray: string[]): Tokens {
+	const tokens: Tokens = { bearer: null, refreshToken: null };
+
+	setCookieArray.forEach(cookie => {
+	  if (cookie.startsWith('Bearer=')) {
+			tokens.bearer = cookie.split(';')[0].split('=')[1];
+	  } else if (cookie.startsWith('RefreshToken=')) {
+			tokens.refreshToken = cookie.split(';')[0].split('=')[1];
+	  }
+	});
+
+	return tokens;
 }

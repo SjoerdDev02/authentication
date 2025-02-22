@@ -14,7 +14,7 @@ use crate::utils::auth::{
     format_reset_token_key, get_user_by_email, get_user_by_id, hash_password,
     update_non_sensitive_user_fields, update_user_email, update_user_password, verify_password,
 };
-use crate::utils::cookie::{delete_cookie, get_cookie, set_cookie};
+use crate::utils::cookie::{get_cookie, set_cookie};
 use crate::utils::emails::{send_otc_email, send_otc_success_email, send_password_reset_email};
 use crate::utils::jwt::{encode_jwt, format_refresh_token_key, generate_refresh_token};
 use crate::utils::redis::{get_token, remove_token, set_token};
