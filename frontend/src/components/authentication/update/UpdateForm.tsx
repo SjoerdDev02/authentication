@@ -30,6 +30,7 @@ const UpdateForm = (props: UpdateFormProps) => {
 
 	const {
 		user,
+		resetUser,
 		hasChanges,
 		updateErrors,
 		hasUpdateErrors,
@@ -52,6 +53,10 @@ const UpdateForm = (props: UpdateFormProps) => {
 		setMessage(result.message);
 
 		setIsPending(false);
+
+		if (result.success) {
+			resetUser();
+		}
 	};
 
 	const handleDeleteUser = async () => {
@@ -75,6 +80,7 @@ const UpdateForm = (props: UpdateFormProps) => {
 		label: 'Name',
 		element: (
 			<TextInput
+				dataTest="update-name-input"
 				onChange={(e) => updateName(e)}
 				placeholder={getTranslation('Authentication.namePlaceholder')}
 				type="text"
@@ -87,6 +93,7 @@ const UpdateForm = (props: UpdateFormProps) => {
 		label: 'Phone number',
 		element: (
 			<TextInput
+				dataTest="update-phone-input"
 				onChange={(e) => updatePhone(e)}
 				placeholder={"Phone number"}
 				type="phone"
@@ -100,6 +107,7 @@ const UpdateForm = (props: UpdateFormProps) => {
 			label: 'New email',
 			element: (
 				<TextInput
+					dataTest="update-email-input"
 					onChange={(e) => updateEmail(e, user.confirmEmail)}
 					placeholder={getTranslation('Authentication.emailPlaceholder')}
 					type="email"
@@ -111,6 +119,7 @@ const UpdateForm = (props: UpdateFormProps) => {
 			label: 'Confirm email',
 			element: (
 				<TextInput
+					dataTest="update-email-confirm-input"
 					onChange={(e) => updateEmail(user.email, e)}
 					placeholder={'Confirm email'}
 					type="email"
@@ -125,6 +134,7 @@ const UpdateForm = (props: UpdateFormProps) => {
 			label: 'Current password',
 			element: (
 				<TextInput
+					dataTest="update-password-input"
 					onChange={(e) => updatePassword(e, user.confirmPassword)}
 					placeholder={getTranslation('Authentication.passwordPlaceholder')}
 					type="password"
@@ -136,6 +146,7 @@ const UpdateForm = (props: UpdateFormProps) => {
 			label: 'New password',
 			element: (
 				<TextInput
+					dataTest="update-password-confirm-input"
 					onChange={(e) => updatePassword(user.password, e)}
 					placeholder={getTranslation('Authentication.passwordConfirmPlaceholder')}
 					type="password"
@@ -212,8 +223,12 @@ const UpdateForm = (props: UpdateFormProps) => {
 						</span>
 					</Button>
 
-					{message && (
-						<div className={classNames('label', `label--${isError ? 'medium-success' : 'medium-error'}`)}>
+					{!!message && (
+						<div
+							className={classNames('label', `label--${isError ? 'medium-error' : 'medium-success'}`)}
+							data-error={isError}
+							data-test="update-message"
+						>
 							{message}
 						</div>
 					)}
@@ -221,6 +236,7 @@ const UpdateForm = (props: UpdateFormProps) => {
 
 				<Button
 					color="error"
+					dataTest="delete-button"
 					onClick={handleDeleteUser}
 				>
 					<span>

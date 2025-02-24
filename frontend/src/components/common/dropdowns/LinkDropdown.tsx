@@ -14,6 +14,7 @@ import styles from './LinkDropdown.module.scss';
 
 export type LinkDropdownItemType = {
 	label: string;
+	dataTest: string;
 	icon: Icon;
 	href: string;
 };
@@ -43,23 +44,29 @@ const LinkDropdown = (props: LinkDropdownProps) => {
 			className={classNames(styles['link-dropdown'], {
 				[styles['link-dropdown--active']]: isOpen
 			})}
+			data-test="link-dropdown"
 			ref={ref}
 		>
 			<Button
 				color="blank"
+				dataTest="link-dropdown-toggle"
 				onClick={toggleDropdown}
 			>
 				{props.children}
 			</Button>
 
 			{isOpen && (
-				<Flex className={styles['link-dropdown__body']}
-					flexDirection="column">
+				<Flex
+					className={styles['link-dropdown__body']}
+					dataTest="link-dropdown-menu"
+					flexDirection="column"
+				>
 					{props.items.map((item, index) => (
 						<Link
 							className={classNames(styles['link-dropdown__list-item'], {
 								[styles['link-dropdown__list-item--active']]: item.href === pathName
 							})}
+							data-test={item.dataTest}
 							href={item.href}
 							key={`link-dropdown-list-item-${index}`}
 						>

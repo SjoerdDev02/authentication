@@ -8,9 +8,9 @@ use crate::utils::translations::get_translation_by_key;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ApiResponse<T: Serialize> {
+    pub message: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<T>,
-    pub message: String,
 }
 
 impl<T: Serialize> IntoResponse for ApiResponse<T> {

@@ -22,13 +22,14 @@ pub fn app(state: AuthState) -> Router {
         .route("/refresh", post(refresh))
         .route("/register", post(register_user))
         .route("/login", post(login_user))
-        .route(
-            "/update",
-            patch(update_user).layer(middleware::from_fn_with_state(
-                state.clone(),
-                jwt_middleware,
-            )),
-        )
+        .route("/update", patch(update_user))
+        // .route(
+        //     "/update",
+        //     patch(update_user).layer(middleware::from_fn_with_state(
+        //         state.clone(),
+        //         jwt_middleware,
+        //     )),
+        // )
         .route(
             "/delete",
             delete(delete_user).layer(middleware::from_fn_with_state(

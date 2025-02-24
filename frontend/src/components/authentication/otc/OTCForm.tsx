@@ -52,11 +52,14 @@ const OTCForm = () => {
 		setIsPending(false);
 
 		if (result.success) {
-			router.push(userStore.user?.name && userStore.user?.email ? pages.Home.path : pages.Login.path);
-
 			if (result.data) {
 				userStore.user = result.data;
 			}
+
+			router.push(userStore.user?.name && userStore.user?.email
+				? pages.Home.path
+				: pages.Login.path
+			);
 		}
 	};
 

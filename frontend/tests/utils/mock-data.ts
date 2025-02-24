@@ -1,6 +1,6 @@
 import { randomItemFromArray } from "@/utils/arrays";
 
-import { generateRandomString } from "./common";
+import { generateRandomNumber, generateRandomString } from "./common";
 
 export function generateEmailAddress() {
 	const name = generateRandomString(5);
@@ -37,4 +37,19 @@ export function generatePassword() {
 
 	// Shuffle the password to avoid predictable patterns
 	return password.sort(() => Math.random() - 0.5).join('');
+}
+
+export function generatePhoneNumber() {
+	const countryCodes = ['+1', '+31', '+44', '+91', '+61', '+81']; // Common country codes
+	const areaCode = generateRandomNumber(100, 999); // 3-digit area code
+	const firstPart = generateRandomNumber(100, 999); // First 3 digits
+	const secondPart = generateRandomNumber(1000, 9999); // Last 4 digits
+
+	const formats = [
+		`${areaCode}-${firstPart}-${secondPart}`,
+		`(${areaCode}) ${firstPart}-${secondPart}`,
+		`${countryCodes[Math.floor(Math.random() * countryCodes.length)]} ${areaCode}-${firstPart}-${secondPart}`,
+	];
+
+	return randomItemFromArray(formats);
 }

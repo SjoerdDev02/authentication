@@ -1,6 +1,7 @@
 'use client';
 
 import { IconDotsVertical, IconLanguage, IconMoonFilled, IconPasswordUser, IconSettings, IconSun } from '@tabler/icons-react';
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSnapshot } from 'valtio';
@@ -15,8 +16,9 @@ import { LanguageType, ThemeType } from '@/utils/preferences/preferences';
 
 import Logo from '../../../public/logo.svg';
 import Button from '../common/buttons/Button';
-import LinkDropdown from '../common/dropdowns/LinkDropdown';
 import { Flex } from "../common/Flex";
+
+const LinkDropdown = dynamic(() => import('../common/dropdowns/LinkDropdown'));
 
 type NavigationPropsType = {
 	initialTheme: ThemeType;
@@ -54,11 +56,13 @@ const Navigation = (props: NavigationPropsType) => {
 	const linkDropdownItems = [
 		{
 			label: 'Settings',
+			dataTest: 'settings-option',
 			icon: IconSettings,
 			href: pages.Update.path
 		},
 		{
 			label: 'OTC',
+			dataTest: 'otc-option',
 			icon: IconPasswordUser,
 			href: pages.Otc.path
 		}
@@ -68,6 +72,7 @@ const Navigation = (props: NavigationPropsType) => {
 		<Flex
 			alignItems="center"
 			className={styles.navigation}
+			dataTest="navbar"
 			justifyContent="space-between"
 			paddingBlock={4}
 			paddingInline={6}
@@ -76,6 +81,7 @@ const Navigation = (props: NavigationPropsType) => {
 		>
 			<Link
 				className={styles['navigation__logo']}
+				data-test="navbar-logo"
 				href={pages.Home.path}
 				prefetch={false}
 			>

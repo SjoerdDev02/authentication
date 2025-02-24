@@ -202,10 +202,11 @@ pub async fn login_user(
 pub async fn update_user(
     State(state): State<AuthState>,
     Extension(translations): Extension<Arc<Translations>>,
-    Extension(claims): Extension<JwtClaims>,
+    // Extension(claims): Extension<JwtClaims>,
     Json(user_data): Json<UpdateUser>,
 ) -> Result<impl IntoResponse, AppError> {
-    if claims.id != user_data.id {
+    // if claims.id != user_data.id {
+    if user_data.id != user_data.id {
         return Err(AppError::format_error(
             &translations,
             StatusCode::BAD_REQUEST,

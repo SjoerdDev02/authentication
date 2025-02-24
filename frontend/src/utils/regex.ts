@@ -53,3 +53,25 @@ export function getPasswordFeedbackMessage(password: string) {
 		return '';
 	}
 }
+
+export function isValidPhoneNumber(phone: string) {
+	// This regex validates a phone number format with the following rules:
+	// - Optional '+' followed by country code (1-3 digits).
+	// - Optional spaces, dashes, or parentheses.
+	// - A sequence of 10 digits with optional separators.
+	const regex = /^\+?\d{1,3}?[\s-]?(\(\d{3}\)|\d{3})[\s-]?\d{3}[\s-]?\d{4}$/;
+
+	return regex.test(phone);
+}
+
+export function getPhoneNumberFeedbackMessage(phone: string) {
+	if (!/^\+?\d{1,3}?/.test(phone)) {
+		return 'Authentication.Errors.invalidCountryCode';
+	} else if (!/\d{10,}/.test(phone.replace(/\D/g, ''))) {
+		return 'Authentication.Errors.invalidLength';
+	} else if (/[^0-9\s()+-]/.test(phone)) {
+		return 'Authentication.Errors.invalidCharacters';
+	} else {
+		return '';
+	}
+}

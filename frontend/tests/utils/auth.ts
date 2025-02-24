@@ -13,7 +13,7 @@ export async function createUser(page: Page) {
 
 	await page.goto(pages.Register.path);
 
-	const { email, password } = await fillRegisterForm(page);
+	const { name, email, password } = await fillRegisterForm(page);
 
 	const { submitButton } = getRegisterFormLocators(page);
 
@@ -35,6 +35,7 @@ export async function createUser(page: Page) {
 	await expect(page).toHaveURL(`${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}${pages.Login.path}`);
 
 	return {
+		name,
 		email,
 		password
 	};

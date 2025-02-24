@@ -29,8 +29,8 @@ Before you start, make sure you have the following installed on your machine:
 Clone the repository to your local machine:
 
 ```bash
-git clone https://github.com/SjoerdDev02/todo-list
-cd todo-list
+git clone https://github.com/SjoerdDev02/authentication
+cd authentication
 ```
 
 ### 2. Setup the MySQL Database

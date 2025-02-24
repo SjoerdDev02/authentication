@@ -12,6 +12,7 @@ type ButtonType = 'button' | 'submit';
 type ButtonProps = {
 	children: ReactNode;
 	color: ButtonColorType;
+	dataTest?: string;
 	disabled?: boolean;
 	fill?: boolean;
 	round?: boolean;
@@ -42,7 +43,7 @@ const Button = (props: ButtonProps) => {
 				[styles['button--fill']]: props.fill,
 				[styles['button--round']]: props.round
 			})}
-			data-test="submit-button"
+			data-test={props.dataTest || "submit-button"}
 			disabled={props.disabled}
 			onClick={props.onClick}
 			ref={buttonRef}

@@ -39,7 +39,7 @@ export async function registerUser(
 
 export async function updateUser(user: UpdateUser): Promise<ApiResult<AuthData>> {
 	return gracefulFunction(async () => {
-		const userId = user.id;
+		const id = user.id;
 		const name = sanitize(user.name);
 		const phone = user.phone ? sanitize(user.phone) : null;
 		const email = sanitize(user.email);
@@ -48,7 +48,7 @@ export async function updateUser(user: UpdateUser): Promise<ApiResult<AuthData>>
 		const passwordConfirm = user.confirmPassword ? sanitize(user.confirmPassword) : null;
 
 		const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/update`, {
-			userId,
+			id,
 			name,
 			...(phone && { phone }),
 			email,

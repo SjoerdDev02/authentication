@@ -13,6 +13,7 @@ import { createUser } from './utils/auth';
 import { fillLoginForm } from './utils/login/login-actions';
 import { getLoginFormLocators } from './utils/login/login-locators';
 import { loginUserResponsePromise } from './utils/login/login-requests';
+import { getNavbarLocators } from './utils/navbar/navbar-locators';
 
 const test = base.extend<
 {
@@ -26,6 +27,7 @@ const test = base.extend<
 	},
   	loginFormLocators: async ({ page }, use) => {
 	  const locators = getLoginFormLocators(page);
+
 	  await use(locators);
   	},
 });
@@ -40,10 +42,13 @@ test.describe('login', () => {
 	test('Login using valid email and password', async ({ page, user, loginFormLocators }) => {
 		await fillLoginForm(page, user);
 
+		const { userMenu } = getNavbarLocators(page);
+
 		await Promise.all([
 			loginFormLocators.submitButton.click(),
 			loginUserResponsePromise(page),
-			expect(page).toHaveURL(`${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}${pages.Home.path}`)
+			expect(page).toHaveURL(`${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}${pages.Home.path}`),
+			expect(userMenu).toContainText(user.name)
 		]);
 	});
 

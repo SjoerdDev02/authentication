@@ -11,6 +11,10 @@ export async function getAllEmails() {
 export function getMessageByRecipient(emailResponse: MailpitResponse, recipient: string) {
 	const message = emailResponse.data.messages.filter((message) => message.To[0].Address === recipient)[0];
 
+	if (!message) {
+		throw new Error("Could not get message");
+	}
+
 	return message;
 }
 
