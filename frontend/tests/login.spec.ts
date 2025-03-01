@@ -47,9 +47,10 @@ test.describe('login', () => {
 		await Promise.all([
 			loginFormLocators.submitButton.click(),
 			loginUserResponsePromise(page),
-			expect(page).toHaveURL(`${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}${pages.Home.path}`),
-			expect(userMenu).toContainText(user.name)
 		]);
+
+		await expect(page).toHaveURL(`${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}${pages.Home.path}`);
+		await expect(userMenu).toContainText(user.name);
 	});
 
 	test('Login using invalid password returns an error', async ({ page, user, loginFormLocators }) => {

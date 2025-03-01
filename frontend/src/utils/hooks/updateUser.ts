@@ -7,7 +7,7 @@ import { getEmailFeedbackMessage, getPasswordFeedbackMessage, getPhoneNumberFeed
 import { useHasChanges } from "./useHasChanges";
 
 export type UpdateUser = User & {
-	password?: string;
+	newPassword?: string;
 	confirmEmail?: string;
 	confirmPassword?: string
 }
@@ -18,7 +18,7 @@ export function useUpdateUser(initialUser: Defined<User>) {
 
 	const resetUser = () => {
 		// eslint-disable-next-line no-unused-vars
-		const { password, confirmEmail, confirmPassword, ...baseUser } = user;
+		const { newPassword, confirmEmail, confirmPassword, ...baseUser } = user;
 
 		initialUserRef.current = baseUser;
 		setUser(baseUser);
@@ -26,14 +26,12 @@ export function useUpdateUser(initialUser: Defined<User>) {
 
 	const hasChanges = useHasChanges(initialUserRef.current, user);
 
-	const updateErrors: Record<string, string | null> = useMemo(() => {
-		return {
-			name: null,
-			phone: null,
-			email: null,
-			password: null,
-		};
-	}, []);
+	const [updateErrors, setUpdateErrors] = useState<Record<string, string | null>>({
+		name: null,
+		phone: null,
+		email: null,
+		password: null,
+	});
 
 	const hasUpdateErrors = useMemo(() => {
 		return Object.values(updateErrors).some(error => error !== null);
@@ -47,11 +45,16 @@ export function useUpdateUser(initialUser: Defined<User>) {
 
 		setUser(newUser);
 
+		let errorMessage = null;
+
 		if (!newName) {
-			updateErrors.name = 'Name cannot be empty';
-		} else {
-			updateErrors.name = null;
+			errorMessage = 'Name cannot be empty';
 		}
+
+		setUpdateErrors((prev) => ({
+			...prev,
+			name: errorMessage
+		}));
 	}
 
 	function updatePhone(newPhone: string) {
@@ -62,13 +65,20 @@ export function useUpdateUser(initialUser: Defined<User>) {
 
 		setUser(newUser);
 
+		let errorMessage = null;
+
 		if (!newPhone) {
-			updateErrors.phone = 'Phone number cannot be empty';
+			errorMessage = 'Phone number cannot be empty';
 		} else if (!isValidPhoneNumber(newPhone)) {
-			updateErrors.phone = getPhoneNumberFeedbackMessage(newPhone);
+			errorMessage = getPhoneNumberFeedbackMessage(newPhone);
 		} else {
-			updateErrors.phone = null;
+			errorMessage = null;
 		}
+
+		setUpdateErrors((prev) => ({
+			...prev,
+			phone: errorMessage
+		}));
 	}
 
 	function updateEmail(newEmail: string, confirmEmail?: string) {
@@ -80,20 +90,25 @@ export function useUpdateUser(initialUser: Defined<User>) {
 
 		setUser(newUser);
 
+		let errorMessage = null;
+
 		if (!newEmail) {
-			updateErrors.email = 'New email cannot be empty';
+			errorMessage = 'New email cannot be empty';
 		} else if (!isValidEmail(newEmail)) {
-			updateErrors.email = getEmailFeedbackMessage(newEmail);
+			errorMessage = getEmailFeedbackMessage(newEmail);
 		} else if (!confirmEmail) {
-			updateErrors.email = 'Confirm email cannot be empty';
+			errorMessage = 'Confirm email cannot be empty';
 		} else if (newEmail !== confirmEmail) {
-			updateErrors.email = 'Emails do not match';
-		} else {
-			updateErrors.email = null;
+			errorMessage = 'Emails do not match';
 		}
+
+		setUpdateErrors((prev) => ({
+			...prev,
+			email: errorMessage
+		}));
 	}
 
-	function updatePassword(newPassword?: string, confirmPassword?: string) {
+	function updatePassword(newPassword: string | undefined, confirmPassword: string | undefined) {
 		const newUser = {
 			...user,
 			newPassword,
@@ -102,17 +117,22 @@ export function useUpdateUser(initialUser: Defined<User>) {
 
 		setUser(newUser);
 
+		let errorMessage = null;
+
 		if (!newPassword) {
-			updateErrors.password = 'New password cannot be empty';
+			errorMessage = 'New password cannot be empty';
 		} else if (!isValidPassword(newPassword)) {
-			updateErrors.password = getPasswordFeedbackMessage(newPassword);
+			errorMessage = getPasswordFeedbackMessage(newPassword);
 		} else if (!confirmPassword) {
-			updateErrors.password = 'Confirm password cannot be empty';
+			errorMessage = 'Confirm password cannot be empty';
 		} else if (newPassword !== confirmPassword) {
-			updateErrors.password = 'Passwords do not match';
-		} else {
-			updateErrors.password = null;
+			errorMessage = 'Passwords do not match';
 		}
+
+		setUpdateErrors((prev) => ({
+			...prev,
+			password: errorMessage
+		}));
 	}
 
 	return {

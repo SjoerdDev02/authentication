@@ -43,6 +43,4 @@ node_modules/
 /playwright/.cache/
 
 # Ignore Mailpit database files
-mailpit.db
-mailpit.db-wal
-mailpit.db-shm
+data/*.db*

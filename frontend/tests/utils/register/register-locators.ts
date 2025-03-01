@@ -15,6 +15,6 @@ export function getRegisterFormLocators(page: Page) {
 		passwordInput,
 		passwordConfirmInput,
 		message,
-		submitButton
+		submitButton,
 	};
 }

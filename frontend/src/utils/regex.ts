@@ -58,8 +58,8 @@ export function isValidPhoneNumber(phone: string) {
 	// This regex validates a phone number format with the following rules:
 	// - Optional '+' followed by country code (1-3 digits).
 	// - Optional spaces, dashes, or parentheses.
-	// - A sequence of 10 digits with optional separators.
-	const regex = /^\+?\d{1,3}?[\s-]?(\(\d{3}\)|\d{3})[\s-]?\d{3}[\s-]?\d{4}$/;
+	// - A sequence of 6 to 15 digits with optional separators.
+	const regex = /^\+?\d{1,3}[\s-]?(\(\d{2,4}\)|\d{2,4})[\s-]?\d{2,4}[\s-]?\d{2,6}$/;
 
 	return regex.test(phone);
 }

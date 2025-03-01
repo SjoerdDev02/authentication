@@ -44,7 +44,7 @@ export async function updateUser(user: UpdateUser): Promise<ApiResult<AuthData>>
 		const phone = user.phone ? sanitize(user.phone) : null;
 		const email = sanitize(user.email);
 		const emailConfirm = user.confirmEmail ? sanitize(user.confirmEmail) : null;
-		const password = user.password ? sanitize(user.password) : null;
+		const password = user.newPassword ? sanitize(user.newPassword) : null;
 		const passwordConfirm = user.confirmPassword ? sanitize(user.confirmPassword) : null;
 
 		const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/update`, {

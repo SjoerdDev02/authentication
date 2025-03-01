@@ -398,20 +398,20 @@ pub async fn otc_user(
                     &new_jwt,
                     Some(BEARER_EXPIRATION_SECONDS),
                 )?;
-
-                response.headers_mut().insert(
-                    header::CONTENT_TYPE,
-                    HeaderValue::from_str("application/json")
-                        .map_err(|_| AppError::format_internal_error(&translations))?,
-                );
-
-                response_data = Some(AuthResponse {
-                    id: user_id,
-                    name: token_payload.name,
-                    email: token_payload.email.clone(),
-                    phone: token_payload.phone,
-                });
             }
+
+            response.headers_mut().insert(
+                header::CONTENT_TYPE,
+                HeaderValue::from_str("application/json")
+                    .map_err(|_| AppError::format_internal_error(&translations))?,
+            );
+
+            response_data = Some(AuthResponse {
+                id: user_id,
+                name: token_payload.name,
+                email: token_payload.email.clone(),
+                phone: token_payload.phone,
+            });
         }
         OtcPayloadAction::DeleteAccount => {
             confirm_mail_type = "delete_account";

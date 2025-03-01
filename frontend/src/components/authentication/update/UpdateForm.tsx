@@ -2,15 +2,13 @@
 
 import { IconUserCheck } from "@tabler/icons-react";
 import classNames from "classnames";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { deleteUser, updateUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/update/UpdateForm.module.scss';
 import Button from "@/components/common/buttons/Button";
-import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
-import { User } from "@/stores/userStore";
+import userStore, { User } from "@/stores/userStore";
 import { Defined } from "@/types/helpers";
 import { useUpdateUser } from "@/utils/hooks/updateUser";
 
@@ -26,7 +24,6 @@ type UpdateFormProps = {
 
 const UpdateForm = (props: UpdateFormProps) => {
 	const getTranslation = useTranslationsContext();
-	const router = useRouter();
 
 	const {
 		user,
@@ -55,18 +52,27 @@ const UpdateForm = (props: UpdateFormProps) => {
 		setIsPending(false);
 
 		if (result.success) {
+			if (result.data) {
+				userStore.user = result.data;
+			}
+
 			resetUser();
 		}
 	};
 
 	const handleDeleteUser = async () => {
+		setIsPending(true);
+
 		const result = await deleteUser();
 
-		if (result.success) {
-			router.push(pages.Otc.path);
-		}
+		setIsError(!result.success);
+		setMessage(result.message);
 
-		return result;
+		setIsPending(false);
+
+		if (result.success) {
+			resetUser();
+		}
 	};
 
 	const FormHeader = (
@@ -131,23 +137,23 @@ const UpdateForm = (props: UpdateFormProps) => {
 
 	const passwordInputs = [
 		{
-			label: 'Current password',
+			label: 'New password',
 			element: (
 				<TextInput
 					dataTest="update-password-input"
 					onChange={(e) => updatePassword(e, user.confirmPassword)}
 					placeholder={getTranslation('Authentication.passwordPlaceholder')}
 					type="password"
-					value={user.password || null}
+					value={user.newPassword || null}
 				/>
 			)
 		},
 		{
-			label: 'New password',
+			label: 'Confirm password',
 			element: (
 				<TextInput
 					dataTest="update-password-confirm-input"
-					onChange={(e) => updatePassword(user.password, e)}
+					onChange={(e) => updatePassword(user.newPassword, e)}
 					placeholder={getTranslation('Authentication.passwordConfirmPlaceholder')}
 					type="password"
 					value={user.confirmPassword || null}
@@ -168,9 +174,7 @@ const UpdateForm = (props: UpdateFormProps) => {
 				flexDirection="column"
 				gap={2}
 			>
-				<AuthFormWrapper
-					header={FormHeader}
-				>
+				<AuthFormWrapper header={FormHeader}>
 					<Flex
 						className={styles['update-user__input-wrapper']}
 						flexDirection="column"
@@ -186,6 +190,7 @@ const UpdateForm = (props: UpdateFormProps) => {
 							/>
 
 							<AuthFormInput
+								dataTest="update-phone-input-wrapper"
 								error={updateErrors.phone}
 								header="Phone number"
 								inputElements={phoneInput}
@@ -195,6 +200,7 @@ const UpdateForm = (props: UpdateFormProps) => {
 						<hr />
 
 						<AuthFormInput
+							dataTest="update-email-inputs-wrapper"
 							error={updateErrors.email}
 							header="Email address"
 							inputElements={emailInputs}
@@ -203,6 +209,7 @@ const UpdateForm = (props: UpdateFormProps) => {
 						<hr />
 
 						<AuthFormInput
+							dataTest="update-password-inputs-wrapper"
 							error={updateErrors.password}
 							header="Password"
 							inputElements={passwordInputs}
@@ -223,6 +230,16 @@ const UpdateForm = (props: UpdateFormProps) => {
 						</span>
 					</Button>
 
+					<Button
+						color="error"
+						dataTest="delete-button"
+						onClick={handleDeleteUser}
+					>
+						<span>
+							{getTranslation('Authentication.deleteLabel')}
+						</span>
+					</Button>
+
 					{!!message && (
 						<div
 							className={classNames('label', `label--${isError ? 'medium-error' : 'medium-success'}`)}
@@ -234,15 +251,6 @@ const UpdateForm = (props: UpdateFormProps) => {
 					)}
 				</AuthFormWrapper>
 
-				<Button
-					color="error"
-					dataTest="delete-button"
-					onClick={handleDeleteUser}
-				>
-					<span>
-						{getTranslation('Authentication.deleteLabel')}
-					</span>
-				</Button>
 			</Flex>
 		</Flex>
 	);

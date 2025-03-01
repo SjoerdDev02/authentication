@@ -12,11 +12,13 @@ type AuthFormInputProps = {
     header: string;
     inputElements: InputElementProps[];
 	error?: string | null;
+	dataTest?: string;
 }
 
 const AuthFormInput = (props: AuthFormInputProps) => {
 	return (
 		<Flex
+			dataTest={props.dataTest}
 			flexDirection="column"
 			gap={2}
 		>
@@ -44,7 +46,10 @@ const AuthFormInput = (props: AuthFormInputProps) => {
 			</Flex>
 
 			{props.error && (
-				<div className="label medium-error">
+				<div
+					className="label medium-error"
+					data-test="auth-form-input-error-message"
+				>
 					{props.error}
 				</div>
 			)}
