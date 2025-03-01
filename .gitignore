@@ -1,0 +1,2 @@
+# Ignore Mailpit database files
+data/*.db*

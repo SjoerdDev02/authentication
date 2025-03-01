@@ -41,6 +41,3 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
-
-# Ignore Mailpit database files
-data/*.db*
