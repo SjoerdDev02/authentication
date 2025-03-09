@@ -31,7 +31,10 @@
             "missingUppercase": "Password must contain at least one uppercase letter.",
             "missingNumber": "Password must contain at least one number.",
             "missingSpecialCharacter": "Password must contain at least one special character ('-' or '!').",
-            "invalidPasswordCharacters": "Password contains invalid characters. Only letters, numbers, '-', and '!' are allowed."
+            "invalidPasswordCharacters": "Password contains invalid characters. Only letters, numbers, '-', and '!' are allowed.",
+            "invalidPhoneCountryCode": "Phone number must contain a valid country code",
+            "invalidPhoneLength": "Phone number must have at least 10 digits",
+            "invalidPhoneCharacters": "Phone number contains invalid characters"
         }
     }
 }

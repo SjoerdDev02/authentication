@@ -8,3 +8,4 @@ pub mod redis;
 pub mod responses;
 pub mod templates;
 pub mod translations;
+pub mod validation;

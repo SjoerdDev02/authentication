@@ -19,6 +19,7 @@ use crate::utils::emails::{send_otc_email, send_otc_success_email, send_password
 use crate::utils::jwt::{encode_jwt, format_refresh_token_key, generate_refresh_token};
 use crate::utils::redis::{get_token, remove_token, set_token};
 use crate::utils::responses::{ApiResponse, AppError};
+use crate::utils::validation::{validate_password_reset_user_data, validate_register_user_data, validate_update_user_data};
 use axum::response::IntoResponse;
 use axum::{
     body::Body,
@@ -34,13 +35,14 @@ pub async fn register_user(
     Extension(translations): Extension<Arc<Translations>>,
     Json(user_data): Json<RegisterUser>,
 ) -> Result<impl IntoResponse, AppError> {
-    if user_data.password != user_data.password_confirm {
-        return Err(AppError::format_error(
-            &translations,
-            StatusCode::BAD_REQUEST,
-            "auth.errors.password_mismatch",
-        ));
-    }
+    match validate_register_user_data(&user_data) {
+        Some(validation_error) => return Err(AppError::format_error(
+            &translations, 
+            StatusCode::BAD_REQUEST, 
+            validation_error
+        )),
+        None => ()
+    };
 
     let existing_user = get_user_by_email(&state, &user_data.email).await;
 
@@ -214,28 +216,19 @@ pub async fn update_user(
         ));
     }
 
+    match validate_update_user_data(&user_data) {
+        Some(validation_error) => return Err(AppError::format_error(
+            &translations, 
+            StatusCode::BAD_REQUEST, 
+            validation_error
+        )),
+        None => ()
+    };
+
     let needs_otc = user_data.email_confirm.is_some()
         || user_data.password.is_some() && user_data.password_confirm.is_some();
 
     if needs_otc {
-        if user_data.password != user_data.password_confirm {
-            return Err(AppError::format_error(
-                &translations,
-                StatusCode::BAD_REQUEST,
-                "auth.errors.password_mismatch",
-            ));
-        }
-
-        if let Some(email_confirm) = user_data.email_confirm {
-            if user_data.email != email_confirm {
-                return Err(AppError::format_error(
-                    &translations,
-                    StatusCode::BAD_REQUEST,
-                    "auth.errors.email_mismatch",
-                ));
-            }
-        }
-
         let password_hash = match user_data.password {
             Some(password) => Some(
                 hash_password(&password)
@@ -503,13 +496,14 @@ pub async fn reset_password_with_token(
     Query(params): Query<PasswordResetToken>,
     Json(user_data): Json<PasswordResetUser>,
 ) -> Result<impl IntoResponse, AppError> {
-    if user_data.password != user_data.password_confirm {
-        return Err(AppError::format_error(
-            &translations,
-            StatusCode::BAD_REQUEST,
-            "auth.errors.password_mismatch",
-        ));
-    }
+    match validate_password_reset_user_data(&user_data) {
+        Some(validation_error) => return Err(AppError::format_error(
+            &translations, 
+            StatusCode::BAD_REQUEST, 
+            validation_error
+        )),
+        None => ()
+    };
 
     let reset_token_key = format_reset_token_key(&params.token);
 

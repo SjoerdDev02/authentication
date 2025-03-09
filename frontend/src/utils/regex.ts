@@ -66,11 +66,11 @@ export function isValidPhoneNumber(phone: string) {
 
 export function getPhoneNumberFeedbackMessage(phone: string) {
 	if (!/^\+?\d{1,3}?/.test(phone)) {
-		return 'Authentication.Errors.invalidCountryCode';
+		return 'Authentication.Errors.invalidPhoneCountryCode';
 	} else if (!/\d{10,}/.test(phone.replace(/\D/g, ''))) {
-		return 'Authentication.Errors.invalidLength';
+		return 'Authentication.Errors.invalidPhoneLength';
 	} else if (/[^0-9\s()+-]/.test(phone)) {
-		return 'Authentication.Errors.invalidCharacters';
+		return 'Authentication.Errors.invalidPhoneCharacters';
 	} else {
 		return '';
 	}
