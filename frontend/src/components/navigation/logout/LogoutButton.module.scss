@@ -1,0 +1,15 @@
+.logout-button {
+    padding: var(--padding-100) var(--padding-200);
+    align-items: center;
+    display: flex;
+    color: var(--color-grayscale-700);
+    justify-content: space-between;
+    gap: var(--gap-300);
+    background-color: transparent;
+    border: none;
+
+    &--active,
+    &:hover {
+        background-color: var(--color-grayscale-100);
+    }
+}

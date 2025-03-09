@@ -22,6 +22,7 @@ export type LinkDropdownItemType = {
 type LinkDropdownProps = {
 	children: ReactNode;
 	items: LinkDropdownItemType[];
+	listAddition?: ReactNode;
 };
 
 const LinkDropdown = (props: LinkDropdownProps) => {
@@ -77,6 +78,10 @@ const LinkDropdown = (props: LinkDropdownProps) => {
 							<item.icon />
 						</Link>
 					))}
+
+					{!!props.listAddition && (
+						props.listAddition
+					)}
 				</Flex>
 			)}
 		</article>

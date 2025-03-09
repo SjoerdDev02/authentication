@@ -2,7 +2,7 @@
 
 import { IconUserCheck } from "@tabler/icons-react";
 import classNames from "classnames";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { deleteUser, updateUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/update/UpdateForm.module.scss';
@@ -161,6 +161,11 @@ const UpdateForm = (props: UpdateFormProps) => {
 			)
 		}
 	];
+
+	useEffect(() => {
+		setIsError(false);
+		setMessage(null);
+	}, [user]);
 
 	const submitDisabled = isPending || !hasChanges || hasUpdateErrors;
 

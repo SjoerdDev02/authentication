@@ -3,7 +3,7 @@
 import { IconBrandInertia } from "@tabler/icons-react";
 import classNames from "classnames";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { loginUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/login/LoginForm.module.scss';
@@ -73,6 +73,11 @@ const LoginForm = () => {
 			linkText={getTranslation('Authentication.signUp')}
 		/>
 	);
+
+	useEffect(() => {
+		setIsError(false);
+		setMessage(null);
+	}, [email, password]);
 
 	const submitDisabled = !email || !password || isError;
 

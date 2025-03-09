@@ -2,7 +2,7 @@
 
 import classNames from "classnames";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { otcUser } from "@/app/actions/authentication";
 import styles from '@/components/authentication/otc/OTCForm.module.scss';
@@ -106,6 +106,11 @@ const OTCForm = () => {
 			inputRefs.current[index + 1]?.focus();
 		}
 	};
+
+	useEffect(() => {
+		setIsError(false);
+		setMessage(null);
+	}, [characterOne, characterTwo, characterThree, characterFour, characterFive, characterSix]);
 
 	return (
 		<Flex

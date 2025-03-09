@@ -12,8 +12,8 @@ use crate::{
     middleware::{jwt::jwt_middleware, language::language_middleware},
     models::auth_models::AuthState,
     services::auth::{
-        delete_user, login_user, otc_user, password_reset_request_token, refresh, register_user,
-        reset_password_with_token, update_user,
+        delete_user, login_user, logout_user, otc_user, password_reset_request_token, refresh,
+        register_user, reset_password_with_token, update_user,
     },
 };
 
@@ -22,6 +22,7 @@ pub fn app(state: AuthState) -> Router {
         .route("/refresh", post(refresh))
         .route("/register", post(register_user))
         .route("/login", post(login_user))
+        .route("/logout", post(logout_user))
         .route("/update", patch(update_user))
         // .route(
         //     "/update",

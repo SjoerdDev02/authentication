@@ -17,6 +17,7 @@ import { LanguageType, ThemeType } from '@/utils/preferences/preferences';
 import Logo from '../../../public/logo.svg';
 import Button from '../common/buttons/Button';
 import { Flex } from "../common/Flex";
+import LogoutButton from './logout/LogoutButton';
 
 const LinkDropdown = dynamic(() => import('../common/dropdowns/LinkDropdown'));
 
@@ -127,7 +128,10 @@ const Navigation = (props: NavigationPropsType) => {
 					<>
 						<div className={styles['navigation__divider']} />
 
-						<LinkDropdown items={linkDropdownItems}>
+						<LinkDropdown
+							items={linkDropdownItems}
+							listAddition={<LogoutButton />}
+						>
 							<Flex
 								alignItems="center"
 								className={styles['navigation__dropdown-toggle']}

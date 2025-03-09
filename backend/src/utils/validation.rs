@@ -36,7 +36,7 @@ pub fn get_password_feedback_message(password: &str) -> Option<&str> {
 
 pub fn get_phone_number_feedback_message(phone: &str) -> Option<&str> {
     let digits_only = phone.chars().filter(|c| c.is_digit(10)).count();
-    
+
     if !Regex::new(r"^\+?\d{1,3}?").ok()?.is_match(phone) {
         Some("authentication.errors.invalid_phone_country_code")
     } else if digits_only < 10 {
@@ -60,7 +60,7 @@ pub fn validate_register_user_data(user: &RegisterUser) -> Option<&str> {
     if let Some(error) = get_name_feedback_message(&user.name) {
         return Some(error);
     }
-    
+
     if let Some(error) = get_email_feedback_message(&user.email) {
         return Some(error);
     }
@@ -100,7 +100,7 @@ pub fn validate_update_user_data(user: &UpdateUser) -> Option<&str> {
             return Some("auth.errors.password_mismatch");
         }
     }
-    
+
     if let Some(phone) = &user.phone {
         if let Some(error) = get_phone_number_feedback_message(phone) {
             return Some(error);

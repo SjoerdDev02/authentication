@@ -14,12 +14,14 @@ use crate::utils::auth::{
     format_reset_token_key, get_user_by_email, get_user_by_id, hash_password,
     update_non_sensitive_user_fields, update_user_email, update_user_password, verify_password,
 };
-use crate::utils::cookie::{get_cookie, set_cookie};
+use crate::utils::cookie::{delete_cookie, get_cookie, set_cookie};
 use crate::utils::emails::{send_otc_email, send_otc_success_email, send_password_reset_email};
 use crate::utils::jwt::{encode_jwt, format_refresh_token_key, generate_refresh_token};
 use crate::utils::redis::{get_token, remove_token, set_token};
 use crate::utils::responses::{ApiResponse, AppError};
-use crate::utils::validation::{validate_password_reset_user_data, validate_register_user_data, validate_update_user_data};
+use crate::utils::validation::{
+    validate_password_reset_user_data, validate_register_user_data, validate_update_user_data,
+};
 use axum::response::IntoResponse;
 use axum::{
     body::Body,
@@ -36,12 +38,14 @@ pub async fn register_user(
     Json(user_data): Json<RegisterUser>,
 ) -> Result<impl IntoResponse, AppError> {
     match validate_register_user_data(&user_data) {
-        Some(validation_error) => return Err(AppError::format_error(
-            &translations, 
-            StatusCode::BAD_REQUEST, 
-            validation_error
-        )),
-        None => ()
+        Some(validation_error) => {
+            return Err(AppError::format_error(
+                &translations,
+                StatusCode::BAD_REQUEST,
+                validation_error,
+            ))
+        }
+        None => (),
     };
 
     let existing_user = get_user_by_email(&state, &user_data.email).await;
@@ -201,6 +205,39 @@ pub async fn login_user(
     Ok(response)
 }
 
+pub async fn logout_user(
+    State(state): State<AuthState>,
+    Extension(translations): Extension<Arc<Translations>>,
+    req: Request<Body>,
+) -> Result<impl IntoResponse, AppError> {
+    let refresh_token = match get_cookie(&req, "RefreshToken") {
+        Some(payload) => payload,
+        None => return Err(AppError::format_internal_error(&translations)),
+    };
+
+    let formatted_refresh_token_key = format_refresh_token_key(&refresh_token);
+
+    remove_token(&state, &formatted_refresh_token_key)
+        .await
+        .map_err(|_| AppError::format_internal_error(&translations))?;
+
+    let mut response = Response::new(Body::empty());
+
+    response = delete_cookie(&translations, response, "Bearer")?;
+    response = delete_cookie(&translations, response, "RefreshToken")?;
+
+    let content_type_header_value = match "application/json".parse() {
+        Ok(header) => header,
+        Err(_) => return Err(AppError::format_internal_error(&translations)),
+    };
+
+    response
+        .headers_mut()
+        .insert(header::CONTENT_TYPE, content_type_header_value);
+
+    Ok(response)
+}
+
 pub async fn update_user(
     State(state): State<AuthState>,
     Extension(translations): Extension<Arc<Translations>>,
@@ -217,12 +254,14 @@ pub async fn update_user(
     }
 
     match validate_update_user_data(&user_data) {
-        Some(validation_error) => return Err(AppError::format_error(
-            &translations, 
-            StatusCode::BAD_REQUEST, 
-            validation_error
-        )),
-        None => ()
+        Some(validation_error) => {
+            return Err(AppError::format_error(
+                &translations,
+                StatusCode::BAD_REQUEST,
+                validation_error,
+            ))
+        }
+        None => (),
     };
 
     let needs_otc = user_data.email_confirm.is_some()
@@ -497,12 +536,14 @@ pub async fn reset_password_with_token(
     Json(user_data): Json<PasswordResetUser>,
 ) -> Result<impl IntoResponse, AppError> {
     match validate_password_reset_user_data(&user_data) {
-        Some(validation_error) => return Err(AppError::format_error(
-            &translations, 
-            StatusCode::BAD_REQUEST, 
-            validation_error
-        )),
-        None => ()
+        Some(validation_error) => {
+            return Err(AppError::format_error(
+                &translations,
+                StatusCode::BAD_REQUEST,
+                validation_error,
+            ))
+        }
+        None => (),
     };
 
     let reset_token_key = format_reset_token_key(&params.token);

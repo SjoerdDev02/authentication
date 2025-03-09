@@ -4,6 +4,7 @@
         "registerLabel": "Register",
         "signIn": "Sign in",
         "signUp": "Sign up",
+        "logout": "Logout",
         "dontHaveAnAccount": "Dont have an account?",
         "alreadyHaveAnAccount": "Already have an account?",
         "dontNeedToResetPassword": "Dont need to reset your password?",

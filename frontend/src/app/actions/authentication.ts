@@ -37,6 +37,22 @@ export async function registerUser(
 	});
 }
 
+export async function logoutUser(): Promise<ApiResult<AuthData>> {
+	return gracefulFunction(async () => {
+		const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/logout`,
+			{},
+			{
+				withCredentials: true
+			}
+		);
+
+	  return {
+			message: response.data.message,
+			data: response.data.data,
+	  };
+	});
+}
+
 export async function updateUser(user: UpdateUser): Promise<ApiResult<AuthData>> {
 	return gracefulFunction(async () => {
 		const id = user.id;
