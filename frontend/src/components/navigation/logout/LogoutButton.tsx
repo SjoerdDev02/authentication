@@ -2,7 +2,7 @@ import { IconLogout } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { logoutUser } from "@/app/actions/authentication";
+import { AuthService } from "@/app/services/auth-service";
 import styles from '@/components/navigation/logout/LogoutButton.module.scss';
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
@@ -12,12 +12,14 @@ const LogoutButton = () => {
 	const getTranslation = useTranslationsContext();
 	const router = useRouter();
 
+	const authService = new AuthService();
+
 	const [isPending, setIsPending] = useState(false);
 
 	const handleLogoutUser = async () => {
 		setIsPending(true);
 
-		const result = await logoutUser();
+		const result = await authService.logoutUser();
 
 		if (result.success) {
 			userStore.user = null;

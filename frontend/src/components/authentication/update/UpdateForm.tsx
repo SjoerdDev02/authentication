@@ -2,9 +2,9 @@
 
 import { IconUserCheck } from "@tabler/icons-react";
 import classNames from "classnames";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { deleteUser, updateUser } from "@/app/actions/authentication";
+import { UserService } from "@/app/services/user-service";
 import styles from '@/components/authentication/update/UpdateForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { useTranslationsContext } from "@/stores/translationsStore";
@@ -25,6 +25,8 @@ type UpdateFormProps = {
 const UpdateForm = (props: UpdateFormProps) => {
 	const getTranslation = useTranslationsContext();
 
+	const userService = new UserService();
+
 	const {
 		user,
 		resetUser,
@@ -41,10 +43,12 @@ const UpdateForm = (props: UpdateFormProps) => {
 	const [isError, setIsError] = useState(false);
 	const [message, setMessage] = useState<string | null>(null);
 
+	const preventMessageResetRef = useRef(false);
+
 	const handleUpdateUser = async () => {
 		setIsPending(true);
 
-		const result = await updateUser(user);
+		const result = await userService.updateUser(user);
 
 		setIsError(!result.success);
 		setMessage(result.message);
@@ -56,6 +60,8 @@ const UpdateForm = (props: UpdateFormProps) => {
 				userStore.user = result.data;
 			}
 
+			preventMessageResetRef.current = true;
+
 			resetUser();
 		}
 	};
@@ -63,7 +69,7 @@ const UpdateForm = (props: UpdateFormProps) => {
 	const handleDeleteUser = async () => {
 		setIsPending(true);
 
-		const result = await deleteUser();
+		const result = await userService.deleteUser();
 
 		setIsError(!result.success);
 		setMessage(result.message);
@@ -71,6 +77,8 @@ const UpdateForm = (props: UpdateFormProps) => {
 		setIsPending(false);
 
 		if (result.success) {
+			preventMessageResetRef.current = true;
+
 			resetUser();
 		}
 	};
@@ -163,6 +171,12 @@ const UpdateForm = (props: UpdateFormProps) => {
 	];
 
 	useEffect(() => {
+		if (preventMessageResetRef.current) {
+			preventMessageResetRef.current = false;
+
+			return;
+		}
+
 		setIsError(false);
 		setMessage(null);
 	}, [user]);

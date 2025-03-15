@@ -4,7 +4,7 @@ import classNames from "classnames";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-import { otcUser } from "@/app/actions/authentication";
+import { OTCService } from "@/app/services/otc-service";
 import styles from '@/components/authentication/otc/OTCForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { pages } from "@/constants/routes";
@@ -19,6 +19,8 @@ const OTCForm = () => {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const getTranslation = useTranslationsContext();
+
+	const otcService = new OTCService();
 
 	const otcCode = searchParams.get('otc');
 	const initialCodeCharacters = otcCode ? otcCode.split('') : null;
@@ -37,7 +39,7 @@ const OTCForm = () => {
 	const handleOtcUser = async () => {
 		setIsPending(true);
 
-		const result = await otcUser(
+		const result = await otcService.otcUser(
 			characterOne,
 			characterTwo,
 			characterThree,

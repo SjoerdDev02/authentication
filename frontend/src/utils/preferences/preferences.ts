@@ -58,6 +58,5 @@ export async function getTranslations(lang: string) {
 		return JSON.parse(fileContents);
 	} catch (error) {
 		console.error("Error reading translation file:", error);
-		// return {};
 	}
 }

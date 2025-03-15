@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { loginUser } from "@/app/actions/authentication";
+import { AuthService } from "@/app/services/auth-service";
 import styles from '@/components/authentication/login/LoginForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { Flex } from "@/components/common/Flex";
@@ -29,6 +29,8 @@ const LoginForm = () => {
 	const getTranslation = useTranslationsContext();
 	const router = useRouter();
 
+	const authService = new AuthService();
+
 	const [isPending, setIsPending] = useState(false);
 	const [isError, setIsError] = useState(false);
 	const [message, setMessage] = useState<string | null>(null);
@@ -39,7 +41,7 @@ const LoginForm = () => {
 	const handleLoginUser = async () => {
 		setIsPending(true);
 
-		const result = await loginUser({
+		const result = await authService.loginUser({
 			email,
 			password
 		});

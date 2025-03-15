@@ -1,10 +1,17 @@
-use backend::{models::auth_models::AuthState, utils::env::get_environment_variable};
+use axum::{error_handling::HandleErrorLayer, middleware, BoxError, Router};
+use backend::{
+    middleware::language::language_middleware,
+    models::auth_models::AppState,
+    routes::{auth::auth_routes, otc::otc_routes, user::user_routes},
+    utils::env::get_environment_variable,
+};
 use dotenv::dotenv;
-use http::{header, HeaderValue, Method};
+use http::{header, HeaderValue, Method, StatusCode};
 use redis::Client;
 use sqlx::mysql::MySqlPoolOptions;
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 use tokio::{net::TcpListener, sync::Mutex};
+use tower::{buffer::BufferLayer, limit::RateLimitLayer, ServiceBuilder};
 use tower_http::cors::CorsLayer;
 
 #[tokio::main]
@@ -50,12 +57,10 @@ async fn main() {
 
     let redis_connection = Arc::new(Mutex::new(redis_connection));
 
-    let state = AuthState {
+    let state = AppState {
         db_pool: pool,
         redis: redis_connection,
     };
-
-    let app = backend::routes::auth::app(state);
 
     let allow_origin = match get_environment_variable("CLIENT_BASE_URL") {
         Ok(allow_origin_url) => allow_origin_url,
@@ -92,7 +97,28 @@ async fn main() {
         ])
         .allow_credentials(true);
 
-    let app = app.layer(cors);
+    let app = Router::new()
+        .nest("/api/user", user_routes())
+        .nest("/api/auth", auth_routes())
+        .nest("/api/otc", otc_routes())
+        .layer(middleware::from_fn(language_middleware))
+        // .layer(middleware::from_fn_with_state(
+        //     state.clone(),
+        //     jwt_middleware,
+        // ))
+        .with_state(state)
+        .layer(
+            ServiceBuilder::new()
+                .layer(HandleErrorLayer::new(|err: BoxError| async move {
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        eprintln!("Error creating ServiceBuilder: {}", err),
+                    )
+                }))
+                .layer(BufferLayer::new(1024))
+                .layer(RateLimitLayer::new(5, Duration::from_secs(1))),
+        )
+        .layer(cors);
 
     let listener = match TcpListener::bind("0.0.0.0:8080").await {
         Ok(listner) => listner,

@@ -104,7 +104,7 @@ pub struct AuthResponse {
 }
 
 #[derive(Clone)]
-pub struct AuthState {
+pub struct AppState {
     pub db_pool: MySqlPool,
     pub redis: Arc<Mutex<Connection>>,
 }

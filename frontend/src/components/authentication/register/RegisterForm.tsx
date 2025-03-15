@@ -4,7 +4,7 @@ import { IconBrandZapier } from "@tabler/icons-react";
 import classNames from "classnames";
 import { useEffect, useState } from "react";
 
-import { registerUser } from "@/app/actions/authentication";
+import { UserService } from "@/app/services/user-service";
 import styles from '@/components/authentication/register/RegisterForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { Flex } from "@/components/common/Flex";
@@ -26,6 +26,9 @@ export type RegisterUser = {
 
 const Register = () => {
 	const getTranslation = useTranslationsContext();
+
+	const userService = new UserService();
+
 	const [isPending, setIsPending] = useState(false);
 	const [isError, setIsError] = useState(false);
 	const [message, setMessage] = useState<string | null>(null);
@@ -35,10 +38,10 @@ const Register = () => {
 	const [password, setPassword] = useState('');
 	const [passwordConfirm, setPasswordConfirm] = useState('');
 
-	const handleRegsterUser = async () => {
+	const handleRegisterUser = async () => {
 		setIsPending(true);
 
-		const result = await registerUser({
+		const result = await userService.registerUser({
 			name,
 			email,
 			password,
@@ -159,7 +162,7 @@ const Register = () => {
 					color="primary"
 					disabled={submitDisabled}
 					loading={isPending}
-					onClick={handleRegsterUser}
+					onClick={handleRegisterUser}
 				>
 					<span>
 						{getTranslation('Authentication.registerLabel')}

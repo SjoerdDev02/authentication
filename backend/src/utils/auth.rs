@@ -1,5 +1,5 @@
 use crate::{
-    models::auth_models::AuthState,
+    models::auth_models::AppState,
     queries::auth::{
         CONFIRM_USER, CREATE_USER, DELETE_USER, GET_USER_BY_EMAIL, GET_USER_BY_ID,
         UPDATE_NON_SENSITIVE_USER_FIELDS, UPDATE_USER_EMAIL, UPDATE_USER_PASSWORD,
@@ -44,7 +44,7 @@ pub fn create_otc() -> String {
 }
 
 pub async fn get_user_by_email(
-    state: &AuthState,
+    state: &AppState,
     email: &str,
 ) -> Result<(i32, String, String, String, Option<String>, bool), StatusCode> {
     let user =
@@ -58,7 +58,7 @@ pub async fn get_user_by_email(
 }
 
 pub async fn get_user_by_id(
-    state: &AuthState,
+    state: &AppState,
     id: &i32,
 ) -> Result<(i32, String, String), StatusCode> {
     let user = sqlx::query_as::<_, (i32, String, String)>(GET_USER_BY_ID)
@@ -71,7 +71,7 @@ pub async fn get_user_by_id(
 }
 
 pub async fn create_user(
-    state: &AuthState,
+    state: &AppState,
     name: &str,
     email: &str,
     password: &str,
@@ -93,7 +93,7 @@ pub async fn create_user(
 }
 
 pub async fn update_non_sensitive_user_fields(
-    state: &AuthState,
+    state: &AppState,
     id: &i32,
     name: &str,
     phone: Option<&str>,
@@ -110,7 +110,7 @@ pub async fn update_non_sensitive_user_fields(
 }
 
 pub async fn update_user_email(
-    state: &AuthState,
+    state: &AppState,
     id: &i32,
     email: &str,
 ) -> Result<MySqlQueryResult, StatusCode> {
@@ -125,7 +125,7 @@ pub async fn update_user_email(
 }
 
 pub async fn update_user_password(
-    state: &AuthState,
+    state: &AppState,
     id: &i32,
     password_hash: &str,
 ) -> Result<MySqlQueryResult, StatusCode> {
@@ -139,10 +139,7 @@ pub async fn update_user_password(
     update_user_result
 }
 
-pub async fn delete_user_by_id(
-    state: &AuthState,
-    id: &i32,
-) -> Result<MySqlQueryResult, StatusCode> {
+pub async fn delete_user_by_id(state: &AppState, id: &i32) -> Result<MySqlQueryResult, StatusCode> {
     let delete_user_result = sqlx::query(DELETE_USER)
         .bind(id)
         .execute(&state.db_pool)
@@ -152,7 +149,7 @@ pub async fn delete_user_by_id(
     delete_user_result
 }
 
-pub async fn confirm_user(state: &AuthState, id: &i32) -> Result<MySqlQueryResult, StatusCode> {
+pub async fn confirm_user(state: &AppState, id: &i32) -> Result<MySqlQueryResult, StatusCode> {
     let confirm_user_result = sqlx::query(CONFIRM_USER)
         .bind(id)
         .execute(&state.db_pool)

@@ -69,6 +69,9 @@ test.describe('update user details', () => {
 		await Promise.all([
 			updateFormLocators.submitButton.click(),
 			updateUserResponsePromise(page),
+		]);
+
+		await Promise.all([
 			expect(updateFormLocators.submitButton).toBeDisabled(),
 			expect(updateFormLocators.message).toHaveAttribute('data-error', 'false')
 		]);
@@ -127,8 +130,11 @@ test.describe('update user password', () => {
 		await Promise.all([
 			updateFormLocators.submitButton.click(),
 			updateUserResponsePromise(page),
-			expect(updateFormLocators.submitButton).toBeDisabled(),
-			expect(updateFormLocators.message).toHaveAttribute('data-error', 'false')
+		]);
+
+		await Promise.all([
+		 expect(updateFormLocators.submitButton).toBeDisabled(),
+		 expect(updateFormLocators.message).toHaveAttribute('data-error', 'false')
 		]);
 
 		const allEmails = await getAllEmails();
@@ -185,6 +191,9 @@ test.describe('delete user', () => {
 		await Promise.all([
 			updateFormLocators.deleteButton.click(),
 			deleteUserResponsePromise(page),
+		]);
+
+		await Promise.all([
 			expect(updateFormLocators.submitButton).toBeDisabled(),
 			expect(updateFormLocators.message).toHaveAttribute('data-error', 'false')
 		]);

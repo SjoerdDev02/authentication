@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { requestResetPasswordToken, resetPasswordUnprotected } from "@/app/actions/authentication";
+import { UserService } from "@/app/services/user-service";
 import styles from '@/components/authentication/password-reset/PasswordResetForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { Flex } from "@/components/common/Flex";
@@ -23,6 +23,8 @@ const PasswordResetForm = () => {
 	const getTranslation = useTranslationsContext();
 	const router = useRouter();
 	const searchParams = useSearchParams();
+
+	const userService = new UserService();
 
 	const passwordResetToken = searchParams.get("password-reset-token");
 
@@ -43,7 +45,7 @@ const PasswordResetForm = () => {
 	const handleRequestPasswordToken = async () => {
 		setIsPending(true);
 
-		const result = await requestResetPasswordToken(user);
+		const result = await userService.requestResetPasswordToken(user);
 
 		setIsError(!result.success);
 		setMessage(result.message);
@@ -58,7 +60,7 @@ const PasswordResetForm = () => {
 	const handleResetPassword = async () => {
 		setIsPending(true);
 
-		const result = await resetPasswordUnprotected(user, passwordResetToken);
+		const result = await userService.resetPasswordWithToken(user, passwordResetToken);
 
 		setIsError(!result.success);
 		setMessage(result.message);

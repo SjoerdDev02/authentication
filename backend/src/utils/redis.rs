@@ -1,9 +1,9 @@
-use crate::models::auth_models::AuthState;
+use crate::models::auth_models::AppState;
 use axum::http::StatusCode;
 use redis::{AsyncCommands, RedisError};
 
 pub async fn set_token(
-    state: &AuthState,
+    state: &AppState,
     key: &str,
     value: &str,
     expiration_seconds: i32,
@@ -20,7 +20,7 @@ pub async fn set_token(
     result
 }
 
-pub async fn get_token(state: &AuthState, key: &str) -> Result<Option<String>, redis::RedisError> {
+pub async fn get_token(state: &AppState, key: &str) -> Result<Option<String>, redis::RedisError> {
     let mut redis_con = state.redis.lock().await;
 
     let token_json: Option<String> = redis_con.get(key).await?;
@@ -28,7 +28,7 @@ pub async fn get_token(state: &AuthState, key: &str) -> Result<Option<String>, r
     Ok(token_json)
 }
 
-pub async fn remove_token(state: &AuthState, key: &str) -> Result<(), redis::RedisError> {
+pub async fn remove_token(state: &AppState, key: &str) -> Result<(), redis::RedisError> {
     let mut redis_con = state.redis.lock().await;
 
     let _: () = redis_con.del(key).await?;
@@ -36,7 +36,7 @@ pub async fn remove_token(state: &AuthState, key: &str) -> Result<(), redis::Red
     Ok(())
 }
 
-pub async fn verify_token(state: &AuthState, key: &str, id: &i32) -> Result<(), StatusCode> {
+pub async fn verify_token(state: &AppState, key: &str, id: &i32) -> Result<(), StatusCode> {
     let token = get_token(state, key)
         .await
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;

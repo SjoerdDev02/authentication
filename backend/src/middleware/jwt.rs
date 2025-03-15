@@ -1,6 +1,9 @@
 use crate::{
-    constants::auth::{BEARER_EXPIRATION_SECONDS, REFRESH_EXPIRATION_SECONDS},
-    models::{auth_models::AuthState, translations_models::Translations},
+    constants::{
+        auth::{BEARER_EXPIRATION_SECONDS, REFRESH_EXPIRATION_SECONDS},
+        routes::PROTECTED_ROUTES,
+    },
+    models::{auth_models::AppState, translations_models::Translations},
     utils::{
         cookie::{delete_cookie, get_cookie, set_cookie},
         jwt::{decode_jwt, encode_jwt, format_refresh_token_key, generate_refresh_token},
@@ -12,21 +15,24 @@ use axum::{
     body::Body,
     extract::State,
     http::{Request, Response, StatusCode},
-    middleware::Next,
+    // middleware::Next,
     response::IntoResponse,
 };
-use http::Method;
 
 pub async fn jwt_middleware(
-    State(state): State<AuthState>,
+    State(state): State<AppState>,
     req: Request<Body>,
-    next: Next,
+    // next: Next,
 ) -> Result<impl IntoResponse, AppError> {
     let mut response = Response::new(Body::empty());
 
     if let Some(translations) = req.extensions().get::<Translations>() {
-        if req.method() == Method::OPTIONS {
-            return Ok(next.run(req).await);
+        let path = req.uri().path();
+        let method = req.method();
+
+        if !PROTECTED_ROUTES.contains(&(path, method)) {
+            // return Ok(next.run(req).await);
+            return Ok(response);
         }
 
         let jwt_cookie = get_cookie(&req, "Bearer");
