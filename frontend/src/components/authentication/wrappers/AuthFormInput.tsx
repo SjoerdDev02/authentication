@@ -9,7 +9,7 @@ type InputElementProps = {
 }
 
 type AuthFormInputProps = {
-    header: string;
+    header?: string;
     inputElements: InputElementProps[];
 	error?: string | null;
 	dataTest?: string;
@@ -22,9 +22,11 @@ const AuthFormInput = (props: AuthFormInputProps) => {
 			flexDirection="column"
 			gap={2}
 		>
-			<h2 className="label label--big">
-				{props.header}
-			</h2>
+			{!!props.header && (
+				<h2 className="label label--big">
+					{props.header}
+				</h2>
+			)}
 
 			<Flex
 				className={styles['auth-form-input__input-wrapper']}
@@ -35,6 +37,7 @@ const AuthFormInput = (props: AuthFormInputProps) => {
 						flexDirection="column"
 						gap={1}
 						key={`input-element-${inputElement.label}-${index}`}
+						width="fill"
 					>
 						<span className="label label--dark-grayscale">
 							{inputElement.label}

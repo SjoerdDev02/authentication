@@ -1,54 +1,76 @@
 'use client';
 
 import { IconLock } from "@tabler/icons-react";
-// import classNames from "classnames";
-import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import classNames from "classnames";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
-// import { requestResetPasswordToken, resetPasswordUnprotected } from "@/app/actions/authentication";
+import { requestResetPasswordToken, resetPasswordUnprotected } from "@/app/actions/authentication";
 import styles from '@/components/authentication/password-reset/PasswordResetForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { Flex } from "@/components/common/Flex";
 import TextInput from "@/components/common/input/text/TextInput";
-// import { initialAuthFormState } from "@/constants/auth";
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
+import { useResetUserPassword } from "@/utils/hooks/useResetUserPassword";
 
 import AuthFormFooter from "../wrappers/AuthFormFooter";
 import AuthFormHeader from "../wrappers/AuthFormHeader";
+import AuthFormInput from "../wrappers/AuthFormInput";
 import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
 const PasswordResetForm = () => {
 	const getTranslation = useTranslationsContext();
-	// const router = useRouter();
+	const router = useRouter();
 	const searchParams = useSearchParams();
 
 	const passwordResetToken = searchParams.get("password-reset-token");
 
-	const [email, setEmail] = useState('');
-	const [newPassword, setNewPassword] = useState('');
-	const [confirmPassword, setConfirmPassword] = useState('');
+	const [isPending, setIsPending] = useState(false);
+	const [isError, setIsError] = useState(false);
+	const [message, setMessage] = useState<string | null>(null);
+
+	const {
+		user,
+		resetUser,
+		fieldErrors,
+		hasUpdateErrors,
+		isMissingRequiredFields,
+		updateEmail,
+		updatePassword
+	} = useResetUserPassword();
 
 	const handleRequestPasswordToken = async () => {
-		// const result = await requestResetPasswordToken(prevState, formData);
+		setIsPending(true);
 
-		// return result;
+		const result = await requestResetPasswordToken(user);
+
+		setIsError(!result.success);
+		setMessage(result.message);
+
+		setIsPending(false);
+
+		if (result.success) {
+			resetUser();
+		}
 	};
 
 	const handleResetPassword = async () => {
-		// const result = await resetPasswordUnprotected(prevState, formData, passwordResetToken);
+		setIsPending(true);
 
-		// if (result.success) {
-		// 	router.push(pages.Login.path);
-		// }
+		const result = await resetPasswordUnprotected(user, passwordResetToken);
 
-		// return result;
+		setIsError(!result.success);
+		setMessage(result.message);
+
+		setIsPending(false);
+
+		if (result.success) {
+			router.push(pages.Login.path);
+		}
+
+		return result;
 	};
-
-	// const [state, formAction, isPending] = useActionState(
-	// 	passwordResetToken ? handleResetPassword : handleRequestPasswordToken,
-	// 	initialAuthFormState
-	// );
 
 	const FormHeader = (
 		<AuthFormHeader
@@ -65,6 +87,55 @@ const PasswordResetForm = () => {
 		/>
 	);
 
+	const emailInput = [{
+		label: 'New email',
+		element: (
+			<TextInput
+				dataTest="password-reset-email-input"
+				onChange={(e) => updateEmail(e)}
+				placeholder={getTranslation('Authentication.emailPlaceholder')}
+				type="email"
+				value={user.email}
+			/>
+		)
+	}];
+
+	const passwordInputs = [
+		{
+			label: 'New password',
+			element: (
+				<TextInput
+					dataTest="new-password-reset-input"
+					onChange={(e) => updatePassword(e, user.confirmPassword)}
+					placeholder={getTranslation('Authentication.passwordPlaceholder')}
+					type="password"
+					value={user.newPassword}
+				/>
+			)
+		},
+		{
+			label: 'Confirm password',
+			element: (
+				<TextInput
+					dataTest="confirm-password-reset-input"
+					onChange={(e) => updatePassword(user.newPassword, e)}
+					placeholder={getTranslation('Authentication.passwordConfirmPlaceholder')}
+					type="password"
+					value={user.confirmPassword}
+				/>
+			)
+		}
+	];
+
+	useEffect(() => {
+		if (!!user.email || !!user.newPassword || !!user.confirmPassword) {
+			setIsError(false);
+			setMessage(null);
+		}
+	}, [user]);
+
+	const submitDisabled = isPending || isError || isMissingRequiredFields || hasUpdateErrors;
+
 	return (
 		<Flex
 			className={styles['password-reset-form']}
@@ -72,51 +143,38 @@ const PasswordResetForm = () => {
 			gap={5}
 		>
 			<AuthFormWrapper
-				// action={formAction}
 				footer={FormFooter}
 				header={FormHeader}
 			>
 				{passwordResetToken ? (
-					<Flex
-						flexDirection="column"
-						gap={3}
-					>
-						<TextInput
-							name="newPassword"
-							onChange={(e) => setNewPassword(e)}
-							placeholder={getTranslation('Authentication.passwordPlaceholder')}
-							type="password"
-							value={newPassword}
-						/>
-
-						<TextInput
-							name="newPasswordConfirmation"
-							onChange={(e) => setConfirmPassword(e)}
-							placeholder={getTranslation('Authentication.passwordConfirmPlaceholder')}
-							type="password"
-							value={confirmPassword}
-						/>
-					</Flex>
+					<AuthFormInput
+						error={fieldErrors.password}
+						header="Password"
+						inputElements={passwordInputs}
+					/>
 				) : (
-					<TextInput
-						name="email"
-						onChange={(e) => setEmail(e)}
-						placeholder={getTranslation('Authentication.emailPlaceholder')}
-						type="email"
-						value={email}
+					<AuthFormInput
+						error={fieldErrors.email}
+						header="Email address"
+						inputElements={emailInput}
 					/>
 				)}
 
-				{/* {state.message && (
-					<div className={classNames('label', `label--${state.success ? 'medium-success' : 'medium-error'}`)}>
-						{state.message}
+				{!!message && (
+					<div
+						className={classNames('label', `label--${isError ? 'medium-error' : 'medium-success'}`)}
+						data-error={isError}
+						data-test="password-reset-message"
+					>
+						{message}
 					</div>
-				)} */}
+				)}
 
 				<Button
 					color="primary"
+					disabled={submitDisabled}
+					loading={isPending}
 					onClick={passwordResetToken ? handleResetPassword : handleRequestPasswordToken}
-					// Pending here
 					type="submit"
 				>
 					<span>

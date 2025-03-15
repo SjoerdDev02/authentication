@@ -2,6 +2,7 @@
 
 import { IconBrandInertia } from "@tabler/icons-react";
 import classNames from "classnames";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -16,6 +17,7 @@ import userStore from "@/stores/userStore";
 
 import AuthFormFooter from "../wrappers/AuthFormFooter";
 import AuthFormHeader from "../wrappers/AuthFormHeader";
+import AuthFormInput from "../wrappers/AuthFormInput";
 import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
 export type LoginUser = {
@@ -74,9 +76,54 @@ const LoginForm = () => {
 		/>
 	);
 
+	const loginInputs = [
+		{
+			label: getTranslation('Authentication.emailPlaceholder'),
+			element: (
+				<TextInput
+					dataTest="login-email-input"
+					name="email"
+					onChange={(e) => setEmail(e)}
+					placeholder={getTranslation('Authentication.emailPlaceholder')}
+					type="email"
+					value={email}
+			 />
+			)
+		},
+		{
+			label: getTranslation('Authentication.passwordPlaceholder'),
+			element: (
+				<Flex
+					alignItems="flex-end"
+					flexDirection="column"
+					gap={2}
+				>
+					<TextInput
+						dataTest="login-password-input"
+						name="password"
+						onChange={(e) => setPassword(e)}
+						placeholder={getTranslation('Authentication.passwordPlaceholder')}
+						type="password"
+						value={password}
+				 	/>
+
+					<Link
+						className="label label--light-weight label--dark-grayscale"
+						href={pages.ResetPassword.path}
+						prefetch={false}
+					>
+						{getTranslation('Authentication.forgotPassword')}
+					</Link>
+				</Flex>
+			)
+		}
+	];
+
 	useEffect(() => {
-		setIsError(false);
-		setMessage(null);
+		if (!!email || !!password) {
+			setIsError(false);
+			setMessage(null);
+		}
 	}, [email, password]);
 
 	const submitDisabled = !email || !password || isError;
@@ -91,28 +138,9 @@ const LoginForm = () => {
 				footer={FormFooter}
 				header={FormHeader}
 			>
-				<Flex
-					flexDirection="column"
-					gap={3}
-				>
-					<TextInput
-						dataTest="login-email-input"
-						name="email"
-						onChange={(e) => setEmail(e)}
-						placeholder={getTranslation('Authentication.emailPlaceholder')}
-						type="email"
-						value={email}
-				 	/>
-
-					<TextInput
-						dataTest="login-password-input"
-						name="password"
-						onChange={(e) => setPassword(e)}
-						placeholder={getTranslation('Authentication.passwordPlaceholder')}
-						type="password"
-						value={password}
-				 	/>
-				</Flex>
+				<AuthFormInput
+					inputElements={loginInputs}
+				/>
 
 				{!!message && (
 					<div

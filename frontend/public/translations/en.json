@@ -5,6 +5,7 @@
         "signIn": "Sign in",
         "signUp": "Sign up",
         "logout": "Logout",
+        "forgotPassword": "Forgot Password?",
         "dontHaveAnAccount": "Dont have an account?",
         "alreadyHaveAnAccount": "Already have an account?",
         "dontNeedToResetPassword": "Dont need to reset your password?",

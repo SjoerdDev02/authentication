@@ -523,7 +523,7 @@ pub async fn password_reset_request_token(
 
     Ok(ApiResponse::<()>::format_success(
         &translations,
-        StatusCode::NO_CONTENT,
+        StatusCode::OK,
         "auth.success.otc_processed",
         None,
     ))
@@ -577,6 +577,10 @@ pub async fn reset_password_with_token(
         .map_err(|_| AppError::format_internal_error(&translations))?;
 
     update_user_password(&state, &user_id, &password_hash)
+        .await
+        .map_err(|_| AppError::format_internal_error(&translations))?;
+
+    remove_token(&state, &reset_token_key)
         .await
         .map_err(|_| AppError::format_internal_error(&translations))?;
 

@@ -5,6 +5,7 @@ import { RegisterUser } from '@/components/authentication/register/RegisterForm'
 import { AuthData } from '@/types/authentication';
 import { ApiResult } from '@/types/response';
 import { UpdateUser } from '@/utils/hooks/updateUser';
+import { PasswordResetUser } from '@/utils/hooks/useResetUserPassword';
 import { gracefulFunction } from '@/utils/response';
 import { sanitize } from '@/utils/strings';
 
@@ -83,13 +84,9 @@ export async function updateUser(user: UpdateUser): Promise<ApiResult<AuthData>>
 	});
 }
 
-export async function requestResetPasswordToken(prevState: any, formData: FormData): Promise<ApiResult<AuthData>> {
+export async function requestResetPasswordToken(user: PasswordResetUser): Promise<ApiResult<AuthData>> {
 	return gracefulFunction(async () => {
-		let email = formData.get('email');
-
-		if (!!email) {
-			email = sanitize(email);
-		} else {
+		if (!user.email) {
 			return {
 				success: false,
 				message: 'Invalid credentials',
@@ -97,8 +94,10 @@ export async function requestResetPasswordToken(prevState: any, formData: FormDa
 			};
 		}
 
+		const sanitizedEmail = sanitize(user.email);
+
 		const response = await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/password_reset/request_token`, {
-			email
+			email: sanitizedEmail
 		}, {
 			withCredentials: true
 		});
@@ -111,17 +110,9 @@ export async function requestResetPasswordToken(prevState: any, formData: FormDa
 	});
 }
 
-export async function resetPasswordUnprotected(prevState: any, formData: FormData, token: string | null): Promise<ApiResult<AuthData>> {
+export async function resetPasswordUnprotected(user: PasswordResetUser, token: string | null): Promise<ApiResult<AuthData>> {
 	return gracefulFunction(async () => {
-		let resetToken = token;
-		let password = formData.get('newPassword');
-		let passwordConfirm = formData.get('newPasswordConfirmation');
-
-		if (!!resetToken && !!password && !!passwordConfirm) {
-			resetToken = sanitize(resetToken);
-			password = sanitize(password);
-			passwordConfirm = sanitize(passwordConfirm);
-		} else {
+		if (!user.newPassword || !user.confirmPassword || !token) {
 			return {
 				success: false,
 				message: 'Invalid credentials',
@@ -129,9 +120,13 @@ export async function resetPasswordUnprotected(prevState: any, formData: FormDat
 			};
 		}
 
+		let resetToken = sanitize(token);
+		const sanitizedPassword = sanitize(user.newPassword);
+		const sanitizedPasswordConfirm = sanitize(user.confirmPassword);
+
 		const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/password_reset?token=${resetToken}`, {
-			password,
-			passwordConfirm
+			password: sanitizedPassword,
+			passwordConfirm: sanitizedPasswordConfirm
 		}, {
 			withCredentials: true
 		});

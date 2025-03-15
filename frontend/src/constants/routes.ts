@@ -1,4 +1,4 @@
-export type Route = '/' | '/login' | '/register' | '/update' | '/otc' | 'reset-password';
+export type Route = '/' | '/login' | '/register' | '/update' | '/otc' | '/reset-password';
 export type Page = 'Home' | 'Login' | 'Register' | 'Update' | 'Otc' | 'ResetPassword';
 
 export const pages = {
@@ -23,7 +23,7 @@ export const pages = {
 		protected: false
 	},
 	'ResetPassword': {
-		path: 'reset-password',
+		path: '/reset-password',
 		protected: false
 	}
 } satisfies Record<Page, { path: Route, protected: boolean }>;
@@ -49,7 +49,7 @@ export const routeUrlToPageMap = {
 		page: 'Otc',
 		protected: false
 	 },
-	 'reset-password': {
+	 '/reset-password': {
 		page: 'ResetPassword',
 		protected: false
 	 }

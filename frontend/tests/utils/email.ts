@@ -23,3 +23,9 @@ export function extractOtcFromMessage(message: MailpitResponseMessage) {
 
 	return otc;
 }
+
+export function extractPasswordResetTokenFromMessage(message: MailpitResponseMessage) {
+	const passwordResetToken = message.Snippet.match(/\b[A-Z0-9]{6}\b(?!.*password-reset-token=)/)?.[0];
+
+	return passwordResetToken;
+}
