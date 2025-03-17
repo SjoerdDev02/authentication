@@ -4,7 +4,7 @@ use axum::{
 };
 use http::Request;
 
-use crate::models::translations_models::Translations;
+use crate::models::translations::Translations;
 
 use super::responses::AppError;
 

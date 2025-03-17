@@ -1,2 +1,5 @@
-pub mod auth_models;
-pub mod translations_models;
+pub mod auth;
+pub mod translations;
+pub mod user;
+pub mod otc;
+pub mod general;

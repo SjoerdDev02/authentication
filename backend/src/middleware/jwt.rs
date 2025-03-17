@@ -3,7 +3,7 @@ use crate::{
         auth::{BEARER_EXPIRATION_SECONDS, REFRESH_EXPIRATION_SECONDS},
         routes::PROTECTED_ROUTES,
     },
-    models::{auth_models::AppState, translations_models::Translations},
+    models::{general::AppState, translations::Translations},
     utils::{
         cookie::{delete_cookie, get_cookie, set_cookie},
         jwt::{decode_jwt, encode_jwt, format_refresh_token_key, generate_refresh_token},

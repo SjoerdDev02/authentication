@@ -1,4 +1,4 @@
-use crate::models::auth_models::AppState;
+use crate::models::general::AppState;
 use axum::http::StatusCode;
 use redis::{AsyncCommands, RedisError};
 

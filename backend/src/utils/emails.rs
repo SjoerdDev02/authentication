@@ -1,4 +1,4 @@
-use crate::models::translations_models::Translations;
+use crate::models::translations::Translations;
 use crate::templates::auth::{
     PASSWORD_RESET_CODE_TEMPLATE, VERIFICATION_CODE_SUCCESS_TEMPLATE, VERIFICATION_CODE_TEMPLATE,
 };

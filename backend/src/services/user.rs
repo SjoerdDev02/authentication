@@ -10,24 +10,16 @@ use http::StatusCode;
 use crate::{
     constants::auth::{OTC_EXPIRATION_SECONDS, PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS},
     models::{
-        auth_models::{
-            AppState, AuthResponse, JwtClaims, OtcPayload, OtcPayloadAction, PasswordResetToken,
-            PasswordResetUser, RegisterUser, ResetPasswordTokenUser, UpdateUser,
-        },
-        translations_models::Translations,
+        auth::{AuthResponse, JwtClaims, ResetPasswordTokenUser}, general::AppState, otc::{OtcPayload, OtcPayloadAction}, translations::Translations, user::{PasswordResetToken, PasswordResetUser, RegisterUser, UpdateUser}
     },
     utils::{
-        auth::{
-            create_otc, create_user, format_otc_key, format_reset_token_key, get_user_by_email,
-            get_user_by_id, hash_password, update_non_sensitive_user_fields, update_user_password,
-        },
-        emails::{send_otc_email, send_otc_success_email, send_password_reset_email},
-        redis::{get_token, remove_token, set_token},
-        responses::{ApiResponse, AppError},
-        validation::{
+        auth::hash_password, emails::{send_otc_email, send_otc_success_email, send_password_reset_email}, otc::{create_otc, format_otc_key}, redis::{get_token, remove_token, set_token}, responses::{ApiResponse, AppError}, user::{
+            create_user, format_reset_token_key, get_user_by_email,
+            get_user_by_id, update_non_sensitive_user_fields, update_user_password,
+        }, validation::{
             validate_password_reset_user_data, validate_register_user_data,
             validate_update_user_data,
-        },
+        }
     },
 };
 

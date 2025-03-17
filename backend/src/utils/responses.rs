@@ -3,7 +3,7 @@ use http::StatusCode;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
-use crate::models::translations_models::Translations;
+use crate::models::translations::Translations;
 use crate::utils::translations::get_translation_by_key;
 
 #[derive(Debug, Serialize, Deserialize)]

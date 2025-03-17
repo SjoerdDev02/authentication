@@ -1,7 +1,7 @@
 use http::StatusCode;
 
 use crate::{
-    models::translations_models::Translations,
+    models::translations::Translations,
     translations::{
         DE_TRANSLATIONS, EN_TRANSLATIONS, ES_TRANSLATIONS, FR_TRANSLATIONS, NL_TRANSLATIONS,
     },

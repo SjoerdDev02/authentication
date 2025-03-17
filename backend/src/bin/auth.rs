@@ -1,7 +1,7 @@
 use axum::{error_handling::HandleErrorLayer, middleware, BoxError, Router};
 use backend::{
     middleware::language::language_middleware,
-    models::auth_models::AppState,
+    models::general::AppState,
     routes::{auth::auth_routes, otc::otc_routes, user::user_routes},
     utils::env::get_environment_variable,
 };

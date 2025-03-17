@@ -1,4 +1,4 @@
-use crate::models::auth_models::JwtClaims;
+use crate::models::auth::JwtClaims;
 use crate::utils::env::get_environment_variable;
 use axum::http::StatusCode;
 use chrono::{Duration, Utc};

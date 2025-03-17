@@ -11,19 +11,13 @@ use http::{header, HeaderValue, StatusCode};
 use crate::{
     constants::auth::BEARER_EXPIRATION_SECONDS,
     models::{
-        auth_models::{AppState, AuthResponse, Otc, OtcPayload, OtcPayloadAction},
-        translations_models::Translations,
+        auth::AuthResponse, general::AppState, otc::{Otc, OtcPayload, OtcPayloadAction}, translations::Translations
     },
     utils::{
-        auth::{
-            confirm_user, delete_user_by_id, format_otc_key, update_user_email,
+        cookie::set_cookie, emails::send_otc_success_email, jwt::{encode_jwt, format_refresh_token_key}, otc::format_otc_key, redis::{get_token, remove_token}, responses::{ApiResponse, AppError}, user::{
+            confirm_user, delete_user_by_id, update_user_email,
             update_user_password,
-        },
-        cookie::set_cookie,
-        emails::send_otc_success_email,
-        jwt::{encode_jwt, format_refresh_token_key},
-        redis::{get_token, remove_token},
-        responses::{ApiResponse, AppError},
+        }
     },
 };
 
