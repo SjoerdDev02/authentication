@@ -10,7 +10,7 @@ use http::StatusCode;
 use crate::{
     constants::auth::{OTC_EXPIRATION_SECONDS, PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS},
     models::{
-        auth::{AuthResponse, JwtClaims, ResetPasswordTokenUser}, general::AppState, otc::{OtcPayload, OtcPayloadAction}, translations::Translations, user::{PasswordResetToken, PasswordResetUser, RegisterUser, UpdateUser}
+        auth::models::{AuthResponse, JwtClaims, ResetPasswordTokenUser}, general::AppState, otc::models::{OtcPayload, OtcPayloadAction}, translations::Translations, user::models::{PasswordResetToken, PasswordResetUser, RegisterUser, UpdateUser}
     },
     utils::{
         auth::hash_password, emails::{send_otc_email, send_otc_success_email, send_password_reset_email}, otc::{create_otc, format_otc_key}, redis::{get_token, remove_token, set_token}, responses::{ApiResponse, AppError}, user::{

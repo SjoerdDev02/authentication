@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::constants::auth::{BEARER_EXPIRATION_SECONDS, REFRESH_EXPIRATION_SECONDS};
-use crate::models::auth::{AuthResponse, LoginUser};
+use crate::models::auth::models::{AuthResponse, LoginUser};
 use crate::models::general::AppState;
 use crate::models::translations::Translations;
 use crate::utils::auth::verify_password;

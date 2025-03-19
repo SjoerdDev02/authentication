@@ -1,32 +1,33 @@
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
+use crate::models::user::aliases::{Id, Name, Phone, Email, IsConfirmed, Password};
 
 #[derive(Serialize, Deserialize)]
 pub struct User {
-    pub id: i32,
-    pub name: String,
-    pub phone: Option<String>,
-    pub email: String,
+    pub id: Id,
+    pub name: Name,
+    pub phone: Option<Phone>,
+    pub email: Email,
     pub password_hash: String,
-    pub is_confirmed: bool,
+    pub is_confirmed: IsConfirmed,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct RegisterUser {
-    pub name: String,
-    pub email: String,
-    pub password: String,
+    pub name: Name,
+    pub email: Email,
+    pub password: Password,
     #[serde(rename = "passwordConfirm")]
-    pub password_confirm: String,
+    pub password_confirm: Password,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct PasswordResetUser {
-    pub password: String,
+    pub password: Password,
     #[serde(rename = "passwordConfirm")]
-    pub password_confirm: String,
+    pub password_confirm: Password,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -36,13 +37,13 @@ pub struct PasswordResetToken {
 
 #[derive(Serialize, Deserialize)]
 pub struct UpdateUser {
-    pub id: i32,
-    pub name: String,
-    pub phone: Option<String>,
-    pub email: String,
+    pub id: Id,
+    pub name: Name,
+    pub phone: Option<Phone>,
+    pub email: Email,
     #[serde(rename = "emailConfirm")]
-    pub email_confirm: Option<String>,
-    pub password: Option<String>,
+    pub email_confirm: Option<Email>,
+    pub password: Option<Password>,
     #[serde(rename = "passwordConfirm")]
-    pub password_confirm: Option<String>,
+    pub password_confirm: Option<Password>,
 }

@@ -1,14 +1,15 @@
 use serde::{Deserialize, Serialize};
+use crate::models::user::aliases::{Id, Name, Phone, Email, Password};
 
 #[derive(Serialize, Deserialize)]
 pub struct LoginUser {
-    pub email: String,
-    pub password: String,
+    pub email: Email,
+    pub password: Password,
 }
 
 #[derive(Serialize, Deserialize)]
 pub struct ResetPasswordTokenUser {
-    pub email: String,
+    pub email: Email,
 }
 
 // Structure for holding JwtClaims data used in JWT tokens
@@ -16,15 +17,15 @@ pub struct ResetPasswordTokenUser {
 pub struct JwtClaims {
     pub exp: usize, // Expiry time of the token
     pub iat: usize, // Issued at time of the token
-    pub id: i32,
-    pub name: String,
-    pub email: String,
+    pub id: Id,
+    pub name: Name,
+    pub email: Email,
 }
 
 #[derive(Serialize)]
 pub struct AuthResponse {
-    pub id: i32,
-    pub name: String,
-    pub phone: Option<String>,
-    pub email: String,
+    pub id: Id,
+    pub name: Name,
+    pub phone: Option<Phone>,
+    pub email: Email,
 }

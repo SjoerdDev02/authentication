@@ -11,7 +11,7 @@ use http::{header, HeaderValue, StatusCode};
 use crate::{
     constants::auth::BEARER_EXPIRATION_SECONDS,
     models::{
-        auth::AuthResponse, general::AppState, otc::{Otc, OtcPayload, OtcPayloadAction}, translations::Translations
+        auth::models::AuthResponse, general::AppState, otc::models::{OtcRequest, OtcPayload, OtcPayloadAction}, translations::Translations
     },
     utils::{
         cookie::set_cookie, emails::send_otc_success_email, jwt::{encode_jwt, format_refresh_token_key}, otc::format_otc_key, redis::{get_token, remove_token}, responses::{ApiResponse, AppError}, user::{
@@ -24,7 +24,7 @@ use crate::{
 pub async fn otc_user(
     State(state): State<AppState>,
     Extension(translations): Extension<Arc<Translations>>,
-    Query(params): Query<Otc>,
+    Query(params): Query<OtcRequest>,
 ) -> Result<impl IntoResponse, AppError> {
     let otc_key = format_otc_key(&params.otc);
 

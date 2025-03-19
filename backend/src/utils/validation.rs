@@ -1,6 +1,6 @@
 use regex::Regex;
 
-use crate::models::user::{PasswordResetUser, RegisterUser, UpdateUser};
+use crate::models::user::models::{PasswordResetUser, RegisterUser, UpdateUser};
 
 pub fn get_email_feedback_message(email: &str) -> Option<&str> {
     if !Regex::new(r"^[A-Za-z0-9.-]{2,20}").ok()?.is_match(email) {
