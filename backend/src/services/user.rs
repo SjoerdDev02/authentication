@@ -8,11 +8,9 @@ use axum::{
 use http::StatusCode;
 
 use crate::{
-    constants::auth::{OTC_EXPIRATION_SECONDS, PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS},
-    models::{
+    constants::{otc::OTC_EXPIRATION_SECONDS, user::PASSWORD_RESET_TOKEN_EXPIRATION_SECONDS}, models::{
         auth::models::{AuthResponse, JwtClaims, ResetPasswordTokenUser}, general::AppState, otc::models::{OtcPayload, OtcPayloadAction}, translations::Translations, user::models::{PasswordResetToken, PasswordResetUser, RegisterUser, UpdateUser}
-    },
-    utils::{
+    }, utils::{
         auth::hash_password, emails::{send_otc_email, send_otc_success_email, send_password_reset_email}, otc::{create_otc, format_otc_key}, redis::{get_token, remove_token, set_token}, responses::{ApiResponse, AppError}, user::{
             create_user, format_reset_token_key, get_user_by_email,
             get_user_by_id, update_non_sensitive_user_fields, update_user_password,
@@ -20,7 +18,7 @@ use crate::{
             validate_password_reset_user_data, validate_register_user_data,
             validate_update_user_data,
         }
-    },
+    }
 };
 
 pub async fn register_user(

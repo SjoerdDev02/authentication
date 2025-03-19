@@ -1,6 +1,6 @@
 use crate::{
     models::general::AppState,
-    queries::auth::{
+    queries::user::{
         CONFIRM_USER, CREATE_USER, DELETE_USER, GET_USER_BY_EMAIL, GET_USER_BY_ID,
         UPDATE_NON_SENSITIVE_USER_FIELDS, UPDATE_USER_EMAIL, UPDATE_USER_PASSWORD,
     },

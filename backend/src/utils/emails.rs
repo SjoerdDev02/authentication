@@ -1,7 +1,6 @@
 use crate::models::translations::Translations;
-use crate::templates::auth::{
-    PASSWORD_RESET_CODE_TEMPLATE, VERIFICATION_CODE_SUCCESS_TEMPLATE, VERIFICATION_CODE_TEMPLATE,
-};
+use crate::templates::otc::{VERIFICATION_CODE_SUCCESS_TEMPLATE, VERIFICATION_CODE_TEMPLATE};
+use crate::templates::user::PASSWORD_RESET_CODE_TEMPLATE;
 use crate::utils::env::get_environment_variable;
 use crate::utils::templates::generate_template;
 use axum::http::StatusCode;
