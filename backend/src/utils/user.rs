@@ -4,7 +4,7 @@ use crate::{
         CONFIRM_USER, CREATE_USER, DELETE_USER, GET_USER_BY_EMAIL, GET_USER_BY_ID,
         UPDATE_NON_SENSITIVE_USER_FIELDS, UPDATE_USER_EMAIL, UPDATE_USER_PASSWORD,
     },
-    utils::auth::hash_password
+    utils::auth::hash_password,
 };
 use axum::http::StatusCode;
 use sqlx::mysql::MySqlQueryResult;

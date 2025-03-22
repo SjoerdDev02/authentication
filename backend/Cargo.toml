@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [[bin]]
-name = "auth"
-path = "src/bin/auth.rs"
+name = "api"
+path = "src/bin/api.rs"
 
 [dependencies]
 tokio = { version = "1", features = ["full"] }

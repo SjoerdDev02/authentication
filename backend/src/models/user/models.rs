@@ -1,6 +1,6 @@
+use crate::models::user::aliases::{Email, Id, IsConfirmed, Name, Password, Phone};
 use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
-use crate::models::user::aliases::{Id, Name, Phone, Email, IsConfirmed, Password};
 
 #[derive(Serialize, Deserialize)]
 pub struct User {

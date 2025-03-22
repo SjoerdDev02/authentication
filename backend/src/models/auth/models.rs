@@ -1,5 +1,5 @@
+use crate::models::user::aliases::{Email, Id, Name, Password, Phone};
 use serde::{Deserialize, Serialize};
-use crate::models::user::aliases::{Id, Name, Phone, Email, Password};
 
 #[derive(Serialize, Deserialize)]
 pub struct LoginUser {

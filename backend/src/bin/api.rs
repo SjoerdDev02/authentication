@@ -1,6 +1,6 @@
 use axum::{error_handling::HandleErrorLayer, middleware, BoxError, Router};
 use backend::{
-    middleware::language::language_middleware,
+    middleware::{jwt::jwt_middleware, language::language_middleware},
     models::general::AppState,
     routes::{auth::auth_routes, otc::otc_routes, user::user_routes},
     utils::env::get_environment_variable,
@@ -101,11 +101,11 @@ async fn main() {
         .nest("/api/user", user_routes())
         .nest("/api/auth", auth_routes())
         .nest("/api/otc", otc_routes())
+        .layer(middleware::from_fn_with_state(
+            state.clone(),
+            jwt_middleware,
+        ))
         .layer(middleware::from_fn(language_middleware))
-        // .layer(middleware::from_fn_with_state(
-        //     state.clone(),
-        //     jwt_middleware,
-        // ))
         .with_state(state)
         .layer(
             ServiceBuilder::new()

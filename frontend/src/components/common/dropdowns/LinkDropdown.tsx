@@ -30,11 +30,11 @@ const LinkDropdown = (props: LinkDropdownProps) => {
 
 	const [isOpen, setIsOpen] = useState(false);
 
-	const handleClickOutside = () => {
+	const handleClose = () => {
 		setIsOpen(false);
 	};
 
-	const ref = useOutsideClick(handleClickOutside);
+	const ref = useOutsideClick(handleClose);
 
 	function toggleDropdown() {
 		setIsOpen((prev) => !prev);
@@ -70,6 +70,7 @@ const LinkDropdown = (props: LinkDropdownProps) => {
 							data-test={item.dataTest}
 							href={item.href}
 							key={`link-dropdown-list-item-${index}`}
+							onClick={handleClose}
 						>
 							<label className="label label--clickable">
 								{item.label}

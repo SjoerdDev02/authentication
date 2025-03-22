@@ -55,12 +55,19 @@ impl AppError {
         message_translation_key: &str,
     ) -> AppError {
         let error_message = get_translation_by_key(translations, message_translation_key);
+
         AppError::new(status_code, error_message)
     }
 
     pub fn format_internal_error(translations: &Translations) -> AppError {
         let error_message = get_translation_by_key(translations, "general.errors.internal_error");
+
         AppError::new(StatusCode::INTERNAL_SERVER_ERROR, error_message)
+    }
+
+    // Used for formatting an AppError when translations are not defined
+    pub fn format_raw_error(status_code: StatusCode, error_message: &str) -> AppError {
+        AppError::new(status_code, error_message.to_string())
     }
 }
 

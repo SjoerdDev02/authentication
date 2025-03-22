@@ -4,35 +4,34 @@ use axum::{
 };
 use http::Request;
 
-use crate::models::translations::Translations;
+use crate::{models::translations::Translations, traits::has_headers::HasHeaders};
 
-use super::responses::AppError;
+use crate::utils::responses::AppError;
 
-pub fn set_cookie(
+pub fn set_cookie<T>(
     translations: &Translations,
-    mut response: Response<Body>,
+    mut container: T,
     key: &str,
     value: &str,
     max_age: Option<i32>,
-) -> Result<Response<Body>, AppError> {
-    // Replace the cookie with "{}={}; HttpOnly; SameSite=None; Path=/;" when your frontend and backend are on different domains
+) -> Result<T, AppError>
+where
+    T: HasHeaders,
+{
     let mut cookie = format!("{}={}; HttpOnly; SameSite=Lax; Path=/;", key, value);
-    // let mut cookie = format!("{}={}; HttpOnly; SameSite=None; Path=/;", key, value);
 
     if let Some(seconds) = max_age {
         cookie.push_str(&format!(" Max-Age={};", seconds));
     }
 
-    let cookie_header_value = match HeaderValue::from_str(&cookie) {
-        Ok(val) => val,
-        Err(_) => return Err(AppError::format_internal_error(&translations)),
-    };
+    let cookie_header_value = HeaderValue::from_str(&cookie)
+        .map_err(|_| AppError::format_internal_error(translations))?;
 
-    response
+    container
         .headers_mut()
         .append(header::SET_COOKIE, cookie_header_value);
 
-    Ok(response)
+    Ok(container)
 }
 
 pub fn get_cookie(request: &Request<Body>, key: &str) -> Option<String> {

@@ -1,7 +1,8 @@
 use axum::{routing::post, Router};
 
 use crate::{
-    models::general::AppState, services::auth::{login_user, logout_user, refresh}
+    models::general::AppState,
+    services::auth::{login_user, logout_user, refresh},
 };
 
 pub fn auth_routes() -> Router<AppState> {

@@ -185,9 +185,8 @@ test.describe('update user password', () => {
 	});
 });
 
-// Delete tests work after the jwt middleware in the backend works
 test.describe('delete user', () => {
-	test.skip('Cannot login after deleting your account', async ({ page, user, updateFormLocators, otcFormLocators, loginFormLocators }) => {
+	test('Cannot login after deleting your account', async ({ page, user, updateFormLocators, otcFormLocators, loginFormLocators }) => {
 		await Promise.all([
 			updateFormLocators.deleteButton.click(),
 			deleteUserResponsePromise(page),
@@ -211,7 +210,7 @@ test.describe('delete user', () => {
 		await Promise.all([
 			fillLoginForm(page, user),
 			loginFormLocators.submitButton.click(),
-			expect(loginFormLocators.message).toHaveAttribute('data-error', 'false')
+			expect(loginFormLocators.message).toHaveAttribute('data-error', 'true')
 		]);
 	});
 });

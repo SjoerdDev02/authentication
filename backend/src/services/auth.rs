@@ -5,11 +5,11 @@ use crate::models::auth::models::{AuthResponse, LoginUser};
 use crate::models::general::AppState;
 use crate::models::translations::Translations;
 use crate::utils::auth::verify_password;
-use crate::utils::user::{get_user_by_email, get_user_by_id};
 use crate::utils::cookie::{delete_cookie, get_cookie, set_cookie};
 use crate::utils::jwt::{encode_jwt, format_refresh_token_key, generate_refresh_token};
 use crate::utils::redis::{get_token, remove_token, set_token};
 use crate::utils::responses::{ApiResponse, AppError};
+use crate::utils::user::{get_user_by_email, get_user_by_id};
 use axum::response::IntoResponse;
 use axum::{
     body::Body,

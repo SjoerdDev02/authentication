@@ -5,5 +5,6 @@ pub mod queries;
 pub mod routes;
 pub mod services;
 pub mod templates;
+pub mod traits;
 pub mod translations;
 pub mod utils;

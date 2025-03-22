@@ -1,6 +1,6 @@
-use serde::{Deserialize, Serialize};
-use crate::models::user::aliases::{Id, Name, Phone, Email};
 use crate::models::otc::aliases::Otc;
+use crate::models::user::aliases::{Email, Id, Name, Phone};
+use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
 pub struct OtcRequest {

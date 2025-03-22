@@ -4,10 +4,11 @@ use axum::{
 };
 
 use crate::{
-    models::general::AppState, services::user::{
+    models::general::AppState,
+    services::user::{
         delete_user, register_user, request_password_reset_token, reset_password_with_token,
         update_user,
-    }
+    },
 };
 
 pub fn user_routes() -> Router<AppState> {

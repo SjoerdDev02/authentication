@@ -1,6 +1,6 @@
+use redis::aio::Connection;
 use std::sync::Arc;
 use tokio::sync::Mutex;
-use redis::aio::Connection;
 
 use sqlx::MySqlPool;
 

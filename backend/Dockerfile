@@ -26,7 +26,7 @@ RUN apt-get update && apt-get install -y libssl3 ca-certificates && rm -rf /var/
 RUN update-ca-certificates
 
 # Copy the built binary and migration files from the builder stage
-COPY --from=builder /backend/target/release/auth /app/auth_server
+COPY --from=builder /backend/target/release/api /app/api_server
 COPY --from=builder /backend/migrations /app/migrations
 COPY --from=builder /usr/local/cargo/bin/sqlx /usr/local/bin/sqlx
 COPY src/static/images /app/src/static/images
@@ -36,4 +36,4 @@ COPY src/translations /app/src/translations
 EXPOSE 8080
 
 # Run the Rust binary
-CMD ["sh", "-c", "sqlx migrate run && /app/auth_server"]
+CMD ["sh", "-c", "sqlx migrate run && /app/api_server"]
