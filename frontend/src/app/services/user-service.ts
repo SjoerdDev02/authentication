@@ -8,6 +8,19 @@ import { gracefulFunction } from "@/utils/response";
 import { sanitize } from "@/utils/strings";
 
 export class UserService {
+	getUser(): Promise<ApiResult<AuthData>> {
+		return gracefulFunction(async () => {
+			const response = await apiClient.get(API_ROUTES.user.get)
+				.json<ApiResult<AuthData>>();
+
+			return {
+				success: true,
+				message: response.message,
+				data: response.data
+			};
+		});
+	}
+
 	registerUser(
 		user: RegisterUser,
 	): Promise<ApiResult<AuthData>> {
@@ -22,20 +35,22 @@ export class UserService {
 			const passwordConfirm = sanitize(user.passwordConfirm);
 
 			const response = await apiClient.post(API_ROUTES.user.register, {
-				email,
-				name,
-				password,
-				passwordConfirm
-			});
+				json: {
+					email,
+					name,
+					password,
+					passwordConfirm
+				}
+			}).json<ApiResult<AuthData>>();
 
 			return {
-				message: response.data.message,
-				data: response.data.data,
+				message: response.message,
+				data: response.data,
 			};
 		});
 	}
 
-	updateUser(user: UpdateUser): Promise<ApiResult<AuthData>> {
+	updateUser(user: UpdateUser): Promise<ApiResult<null>> {
 		return gracefulFunction(async () => {
 			const id = user.id;
 			const name = sanitize(user.name);
@@ -46,36 +61,39 @@ export class UserService {
 			const passwordConfirm = user.confirmPassword ? sanitize(user.confirmPassword) : null;
 
 			const response = await apiClient.patch(API_ROUTES.user.update, {
-				id,
-				name,
-				...(phone && { phone }),
-				email,
-				...(emailConfirm && { emailConfirm }),
-				...(password && { password }),
-				...(passwordConfirm && { passwordConfirm })
-			});
+				json: {
+					id,
+					name,
+					...(phone && { phone }),
+					email,
+					...(emailConfirm && { emailConfirm }),
+					...(password && { password }),
+					...(passwordConfirm && { passwordConfirm })
+				}
+			}).json<ApiResult<null>>();
 
 			return {
 				success: true,
-				message: response.data.message,
+				message: response.message,
 				data: null
 			};
 		});
 	}
 
-	deleteUser(): Promise<ApiResult<AuthData>> {
+	deleteUser(): Promise<ApiResult<null>> {
 		return gracefulFunction(async () => {
-			const response = await apiClient.delete(API_ROUTES.user.delete);
+			const response = await apiClient.delete(API_ROUTES.user.delete)
+				.json<ApiResult<null>>();
 
 			return {
 				success: true,
-				message: response.data.message,
+				message: response.message,
 				data: null
 			};
 		});
 	}
 
-	requestResetPasswordToken(user: PasswordResetUser): Promise<ApiResult<AuthData>> {
+	requestResetPasswordToken(user: PasswordResetUser): Promise<ApiResult<null>> {
 		return gracefulFunction(async () => {
 			if (!user.email) {
 				return {
@@ -88,18 +106,20 @@ export class UserService {
 			const sanitizedEmail = sanitize(user.email);
 
 			const response = await apiClient.post(API_ROUTES.user.resetPasswordRequest, {
-				email: sanitizedEmail
-			});
+				json: {
+					email: sanitizedEmail
+				}
+			}).json<ApiResult<null>>();
 
 			return {
 				success: true,
-				message: response.data.message,
+				message: response.message,
 				data: null
 			};
 		});
 	}
 
-	resetPasswordWithToken(user: PasswordResetUser, token: string | null): Promise<ApiResult<AuthData>> {
+	resetPasswordWithToken(user: PasswordResetUser, token: string | null): Promise<ApiResult<null>> {
 		return gracefulFunction(async () => {
 			if (!user.newPassword || !user.confirmPassword || !token) {
 				return {
@@ -114,13 +134,15 @@ export class UserService {
 			const sanitizedPasswordConfirm = sanitize(user.confirmPassword);
 
 			const response = await apiClient.patch(`${API_ROUTES.user.resetPassword}?token=${encodeURIComponent(resetToken)}`, {
-				password: sanitizedPassword,
-				passwordConfirm: sanitizedPasswordConfirm
-			});
+				json: {
+					password: sanitizedPassword,
+					passwordConfirm: sanitizedPasswordConfirm
+				}
+			}).json<ApiResult<null>>();
 
 			return {
 				success: true,
-				message: response.data.message,
+				message: response.message,
 				data: null
 			};
 		});

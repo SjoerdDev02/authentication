@@ -1,30 +1,30 @@
-import axios from "axios";
+import ky from "ky";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export const API_ROUTES = {
 	user: {
-		register: `${API_BASE}/user`,
-		update: `${API_BASE}/user`,
-		delete: `${API_BASE}/user`,
-		get: `${API_BASE}/user`,
-		resetPasswordRequest: `${API_BASE}/user/reset-password/request`,
-		resetPassword: `${API_BASE}/user/reset-password`,
+		register: 'user',
+		update: 'user',
+		delete: 'user',
+		get: 'user',
+		resetPasswordRequest: 'user/reset-password/request',
+		resetPassword: 'user/reset-password',
 	},
 	auth: {
-		login: `${API_BASE}/auth`,
-		logout: `${API_BASE}/auth/logout`,
-		refresh: `${API_BASE}/auth/token`,
+		login: 'auth',
+		logout: 'auth/logout',
+		refresh: 'auth/token',
 	},
 	otc: {
-		verify: `${API_BASE}/otc/verify`,
+		verify: 'otc/verify',
 	},
 };
 
-export const apiClient = axios.create({
-	baseURL: API_BASE,
-	withCredentials: true,
+export const apiClient = ky.create({
+	prefixUrl: API_BASE,
+	credentials: 'include',
 	headers: {
-		"Content-Type": "application/json",
+		'Content-Type': 'application/json',
 	},
 });

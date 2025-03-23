@@ -32,9 +32,9 @@ pub async fn get_user_by_email(
 pub async fn get_user_by_id(
     state: &AppState,
     id: &i32,
-) -> Result<(i32, String, String), StatusCode> {
-    let user = sqlx::query_as::<_, (i32, String, String)>(GET_USER_BY_ID)
-        .bind(&id)
+) -> Result<(i32, String, String, Option<String>, bool), StatusCode> {
+    let user = sqlx::query_as::<_, (i32, String, String, Option<String>, bool)>(GET_USER_BY_ID)
+        .bind(id)
         .fetch_one(&state.db_pool)
         .await
         .map_err(|_| StatusCode::UNAUTHORIZED);

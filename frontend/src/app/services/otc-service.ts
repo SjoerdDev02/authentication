@@ -24,12 +24,13 @@ export class OTCService {
 				sanitize(characterSix)
 			].join('');
 
-			const response = await apiClient.patch(`${API_ROUTES.otc.verify}?otc=${encodeURIComponent(otc)}`);
+			const response = await apiClient.patch(`${API_ROUTES.otc.verify}?otc=${encodeURIComponent(otc)}`)
+				.json<ApiResult<AuthData>>();
 
 			return {
 				success: true,
-				message: response.data.message,
-				data: response.data.data
+				message: response.message,
+				data: response.data
 			};
 		});
 	}

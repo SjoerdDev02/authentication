@@ -1,15 +1,16 @@
-import axios from "axios";
+import ky from "ky";
 
 import { MailpitResponse, MailpitResponseMessage } from "../types/email";
 
 export async function getAllEmails() {
-	const response = await axios.get('http://localhost:8025/api/v1/messages') as MailpitResponse;
+	const response = await ky.get('http://localhost:8025/api/v1/messages')
+		.json<MailpitResponse>();
 
 	return response;
 }
 
 export function getMessageByRecipient(emailResponse: MailpitResponse, recipient: string) {
-	const message = emailResponse.data.messages.filter((message) => message.To[0].Address === recipient)[0];
+	const message = emailResponse.messages.filter((message) => message.To[0].Address === recipient)[0];
 
 	if (!message) {
 		throw new Error("Could not get message");

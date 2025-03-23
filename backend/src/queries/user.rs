@@ -38,9 +38,8 @@ pub const GET_USER_BY_EMAIL: &str = r#"
     WHERE email = ?;
 "#;
 
-// TODO: Also get phone and is_confirmed on this query
 pub const GET_USER_BY_ID: &str = r#"
-    SELECT id, name, email
+    SELECT id, name, email, phone, is_confirmed
     FROM users
     WHERE id = ?;
 "#;

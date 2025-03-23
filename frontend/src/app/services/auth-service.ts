@@ -8,18 +8,19 @@ import { gracefulFunction } from '@/utils/response';
 import { sanitize } from '@/utils/strings';
 
 export class AuthService {
-	   logoutUser(): Promise<ApiResult<AuthData>> {
+	logoutUser(): Promise<ApiResult<null>> {
 		return gracefulFunction(async () => {
-			const response = await apiClient.post(API_ROUTES.auth.logout);
+			const response = await apiClient.post(API_ROUTES.auth.logout)
+				.json<ApiResult<null>>();
 
-		  return {
-				message: response.data.message,
-				data: response.data.data,
-		  };
+			return {
+				message: response.message,
+				data: null,
+			};
 		});
 	}
 
-	 loginUser(user: LoginUser): Promise<ApiResult<AuthData>> {
+	loginUser(user: LoginUser): Promise<ApiResult<AuthData>> {
 		return gracefulFunction(async () => {
 			if (!user.email || !user.password) {
 				return {
@@ -33,14 +34,16 @@ export class AuthService {
 			const password = sanitize(user.password);
 
 			const response = await apiClient.post(API_ROUTES.auth.login, {
-				email,
-				password
-			});
+				json: {
+					email,
+					password
+				}
+			}).json<ApiResult<AuthData>>();
 
 			return {
 				success: true,
-				message: response.data.message,
-				data: response.data.data
+				message: response.message,
+				data: response.data
 			};
 		});
 	}

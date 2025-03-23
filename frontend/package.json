@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,10 +12,10 @@
   },
   "dependencies": {
     "@tabler/icons-react": "^3.29.0",
-    "axios": "^1.7.7",
     "classnames": "^2.5.1",
     "dotenv-flow": "^4.1.0",
     "eslint-plugin-react": "^7.37.2",
+    "ky": "^1.7.5",
     "next": "^15.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

@@ -17,21 +17,41 @@ use crate::{
         user::models::{PasswordResetToken, PasswordResetUser, RegisterUser, UpdateUser},
     },
     utils::{
-        auth::hash_password,
-        emails::{send_otc_email, send_otc_success_email, send_password_reset_email},
-        otc::{create_otc, format_otc_key},
-        redis::{get_token, remove_token, set_token},
-        responses::{ApiResponse, AppError},
-        user::{
+        auth::hash_password, emails::{send_otc_email, send_otc_success_email, send_password_reset_email}, otc::{create_otc, format_otc_key}, redis::{get_token, remove_token, set_token}, responses::{ApiResponse, AppError}, user::{
             create_user, format_reset_token_key, get_user_by_email, get_user_by_id,
             update_non_sensitive_user_fields, update_user_password,
-        },
-        validation::{
+        }, validation::{
             validate_password_reset_user_data, validate_register_user_data,
             validate_update_user_data,
-        },
+        }
     },
 };
+
+pub async fn get_user(
+    State(state): State<AppState>,
+    Extension(translations): Extension<Arc<Translations>>,
+    Extension(claims): Extension<JwtClaims>
+) -> Result<impl IntoResponse, AppError> {
+    
+    let user_data = match get_user_by_id(&state, &claims.id).await {
+        Ok(user) => user,
+        Err(_) => return Err(AppError::format_internal_error(&translations)),
+    };
+
+    let response = AuthResponse {
+        id: user_data.0,
+        name: user_data.1,
+        email: user_data.2,
+        phone: user_data.3
+    };
+
+    Ok(ApiResponse::format_success(
+        &translations,
+        StatusCode::OK,
+        "auth.success.user_fetched",
+        Some(response),
+    ))
+}
 
 pub async fn register_user(
     State(state): State<AppState>,
@@ -171,14 +191,7 @@ pub async fn update_user(
             .await
             .map_err(|_| AppError::format_internal_error(&translations))?;
 
-        let old_user = match get_user_by_id(&state, &user_data.id).await {
-            Ok(user) => user,
-            Err(_) => return Err(AppError::format_internal_error(&translations)),
-        };
-
-        let (_, _, email) = old_user;
-
-        send_otc_email(&translations, "update_account", &otc, &email)
+        send_otc_email(&translations, "update_account", &otc, &claims.email)
             .await
             .map_err(|_| AppError::format_internal_error(&translations))?;
     } else {
