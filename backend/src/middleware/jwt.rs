@@ -40,11 +40,11 @@ pub async fn jwt_middleware(
     if !PROTECTED_ROUTES.contains(&(path.as_str(), &method)) {
         return Ok(next.run(request).await);
     }
-
+    
     match translations {
         Some(translations) => {
             let claims: JwtClaims;
-
+            
             match jwt_cookie {
                 Some(bearer) => {
                     claims = decode_jwt(&bearer)

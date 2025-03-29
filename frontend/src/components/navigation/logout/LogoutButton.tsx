@@ -24,6 +24,7 @@ const LogoutButton = () => {
 		if (result.success) {
 			userStore.user = null;
 
+			router.refresh();
 			router.push(pages.Login.path);
 		}
 

@@ -32,7 +32,6 @@ pub async fn get_user(
     Extension(translations): Extension<Arc<Translations>>,
     Extension(claims): Extension<JwtClaims>
 ) -> Result<impl IntoResponse, AppError> {
-    
     let user_data = match get_user_by_id(&state, &claims.id).await {
         Ok(user) => user,
         Err(_) => return Err(AppError::format_internal_error(&translations)),

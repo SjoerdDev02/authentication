@@ -2,10 +2,13 @@ import "./globals.scss";
 
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { cookies } from "next/headers";
 
 import Navigation from "@/components/navigation/Navigation";
 import { TranslationsProvider } from "@/stores/translationsStore";
 import { getPreferredLanguage, getPreferredTheme, getTranslations } from "@/utils/preferences/preferences";
+
+import { UserService } from "./services/user-service";
 
 const inter = localFont({
 	src: "./fonts/InterVariable.woff2",
@@ -27,6 +30,16 @@ export default async function RootLayout({
 	const initialLanguage = await getPreferredLanguage();
 	const initialTranslations = await getTranslations(initialLanguage);
 
+	const cookieStore = await cookies();
+
+	const bearerToken = cookieStore.get('Bearer');
+	const refreshToken = cookieStore.get('RefreshToken');
+
+	const userService = new UserService();
+	const result = !!bearerToken?.value && refreshToken?.value
+		? await userService.getUser(bearerToken?.value, refreshToken?.value)
+		: null;
+
 	return (
 		<html
 			data-language={initialLanguage}
@@ -38,6 +51,7 @@ export default async function RootLayout({
 					<Navigation
 						initialLanguage={initialLanguage}
 						initialTheme={initialTheme}
+						initialUser={result?.data}
 					/>
 
 					<main>{children}</main>

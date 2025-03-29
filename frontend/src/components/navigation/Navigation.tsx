@@ -9,7 +9,7 @@ import { useSnapshot } from 'valtio';
 import WrapperDropdown from '@/components/common/dropdowns/WrapperDropdown';
 import styles from '@/components/navigation/Navigation.module.scss';
 import { pages } from '@/constants/routes';
-import userStore from '@/stores/userStore';
+import userStore, { User } from '@/stores/userStore';
 import useLanguage from '@/utils/hooks/useLanguage';
 import useTheme from '@/utils/hooks/useTheme';
 import { LanguageType, ThemeType } from '@/utils/preferences/preferences';
@@ -22,6 +22,7 @@ import LogoutButton from './logout/LogoutButton';
 const LinkDropdown = dynamic(() => import('../common/dropdowns/LinkDropdown'));
 
 type NavigationPropsType = {
+	initialUser?: User;
 	initialTheme: ThemeType;
 	initialLanguage: LanguageType
 }
@@ -30,6 +31,10 @@ const Navigation = (props: NavigationPropsType) => {
 	const userStoreSnap = useSnapshot(userStore);
 	const { theme, setTheme } = useTheme();
 	const { language, setLanguage } = useLanguage();
+
+	if (props.initialUser) {
+		userStore.user = props.initialUser;
+	}
 
 	const languageItems = [
 		{
@@ -124,7 +129,7 @@ const Navigation = (props: NavigationPropsType) => {
 					)}
 				</Flex>
 
-				{userStoreSnap.user?.id && (
+				{userStoreSnap.user && (
 					<>
 						<div className={styles['navigation__divider']} />
 

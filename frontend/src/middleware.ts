@@ -2,10 +2,8 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { AuthService } from './app/services/auth-service';
-import { UserService } from './app/services/user-service';
 import { BEARER_EXPIRATION_SECONDS, REFRESH_EXPIRATION_SECONDS } from './constants/auth';
 import { Route, routeUrlToPageMap } from './constants/routes';
-import userStore from './stores/userStore';
 
 export async function middleware(req: NextRequest) {
 	const bearerToken = req.cookies.get('Bearer');
@@ -47,14 +45,6 @@ export async function middleware(req: NextRequest) {
 			} else {
 				return NextResponse.redirect(new URL('/login', req.url));
 			}
-		}
-
-		// TODO: Make user/me call work. This does not work currently because Valtio has no support for NextJS edge runtime middleware
-		if (!userStore.user) {
-			const userService = new UserService();
-			const result = await userService.getUser();
-
-			userStore.user = result.data;
 		}
 	}
 

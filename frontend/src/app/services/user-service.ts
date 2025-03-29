@@ -8,10 +8,17 @@ import { gracefulFunction } from "@/utils/response";
 import { sanitize } from "@/utils/strings";
 
 export class UserService {
-	getUser(): Promise<ApiResult<AuthData>> {
+	getUser(bearerToken?: string, refreshToken?: string): Promise<ApiResult<AuthData>> {
 		return gracefulFunction(async () => {
-			const response = await apiClient.get(API_ROUTES.user.get)
-				.json<ApiResult<AuthData>>();
+			if (!bearerToken || !refreshToken) {
+				throw new Error('Invalid credentials');
+			};
+
+			const response = await apiClient.get(API_ROUTES.user.get, {
+				headers: {
+					'Cookie': `RefreshToken=${refreshToken}; Bearer=${bearerToken}`
+				}
+			}).json<ApiResult<AuthData>>();
 
 			return {
 				success: true,
