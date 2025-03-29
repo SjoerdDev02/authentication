@@ -13,7 +13,7 @@ import { Flex } from "@/components/common/Flex";
 import TextInput from "@/components/common/input/text/TextInput";
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
-import userStore from "@/stores/userStore";
+import { useSetUser } from "@/stores/userStore";
 
 import AuthFormFooter from "../wrappers/AuthFormFooter";
 import AuthFormHeader from "../wrappers/AuthFormHeader";
@@ -28,6 +28,8 @@ export type LoginUser = {
 const LoginForm = () => {
 	const getTranslation = useTranslationsContext();
 	const router = useRouter();
+
+	const setUser = useSetUser();
 
 	const authService = new AuthService();
 
@@ -58,7 +60,7 @@ const LoginForm = () => {
 			router.push(pages.Home.path);
 
 			if (result.data) {
-				userStore.user = result.data;
+				setUser(result.data);
 			}
 		}
 	};

@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 
-import preferencesStore from "@/stores/preferencesStore";
+import usePreferencesStore from "@/stores/preferencesStore";
 import { getClientCookie, setCookie } from "@/utils/preferences/cookies";
 
 import { LanguageType } from "../preferences/preferences";
 
 function useLanguage() {
+	const setPreferences = usePreferencesStore((state) => state.setPreferences);
+
 	const [language, setLanguage] = useState<LanguageType>();
 
 	useEffect(() => {
@@ -19,7 +21,9 @@ function useLanguage() {
 			}
 
 			setLanguage(initialLanguage);
-			preferencesStore.language = initialLanguage;
+			setPreferences({
+				language: initialLanguage
+			});
 
 			return;
 		}
@@ -27,7 +31,9 @@ function useLanguage() {
 		document.documentElement.setAttribute('data-language', language);
 
 		setCookie('language', language, 5);
-		preferencesStore.language = language;
+		setPreferences({
+			language
+		});
 	}, [language]);
 
 	return { language, setLanguage };

@@ -9,7 +9,7 @@ import styles from '@/components/authentication/otc/OTCForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
-import userStore from "@/stores/userStore";
+import { useSetUser, useUser } from "@/stores/userStore";
 
 import { Flex } from "../../common/Flex";
 import TextInput from "../../common/input/text/TextInput";
@@ -21,6 +21,9 @@ const OTCForm = () => {
 	const getTranslation = useTranslationsContext();
 
 	const otcService = new OTCService();
+
+	const user = useUser();
+	const setUser = useSetUser();
 
 	const otcCode = searchParams.get('otc');
 	const initialCodeCharacters = otcCode ? otcCode.split('') : null;
@@ -55,10 +58,10 @@ const OTCForm = () => {
 
 		if (result.success) {
 			if (result.data) {
-				userStore.user = result.data;
+				setUser(result.data);
 			}
 
-			router.push(userStore.user?.name && userStore.user?.email
+			router.push(user?.name && user?.email
 				? pages.Home.path
 				: pages.Login.path
 			);

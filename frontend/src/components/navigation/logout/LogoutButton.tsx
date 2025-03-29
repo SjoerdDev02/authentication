@@ -6,13 +6,15 @@ import { AuthService } from "@/app/services/auth-service";
 import styles from '@/components/navigation/logout/LogoutButton.module.scss';
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
-import userStore from "@/stores/userStore";
+import { useResetUser } from "@/stores/userStore";
 
 const LogoutButton = () => {
 	const getTranslation = useTranslationsContext();
 	const router = useRouter();
 
 	const authService = new AuthService();
+
+	const resetUser = useResetUser();
 
 	const [isPending, setIsPending] = useState(false);
 
@@ -22,7 +24,7 @@ const LogoutButton = () => {
 		const result = await authService.logoutUser();
 
 		if (result.success) {
-			userStore.user = null;
+			resetUser();
 
 			router.refresh();
 			router.push(pages.Login.path);

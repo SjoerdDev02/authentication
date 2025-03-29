@@ -1,16 +1,27 @@
-import { proxy } from "valtio";
+import { create } from "zustand";
 
 import { getClientCookie } from "@/utils/preferences/cookies";
 import { LanguageType } from "@/utils/preferences/preferences";
 
-type PreferencesStoreType = {
+type Preferences = {
     language: LanguageType;
+}
+
+type PreferencesStore = {
+    preferences: Preferences,
+    // eslint-disable-next-line no-unused-vars
+    setPreferences: (preferences: Preferences) => void;
 }
 
 const initialLanguage = getClientCookie('language') as LanguageType | null;
 
-const preferencesStore: PreferencesStoreType = proxy({
+const initialPreferences = {
 	language: initialLanguage || 'EN'
-});
+};
 
-export default preferencesStore;
+const usePreferencesStore = create<PreferencesStore>((set) => ({
+	preferences: initialPreferences,
+	setPreferences: (preferences) => set({ preferences })
+}));
+
+export default usePreferencesStore;

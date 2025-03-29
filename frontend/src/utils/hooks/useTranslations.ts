@@ -1,14 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { subscribeKey } from "valtio/utils";
 
-import preferencesStoreStore from "@/stores/preferencesStore";
+import usePreferencesStore from "@/stores/preferencesStore";
 
 import { getDynamicNestedProperties } from "../objects";
 import { getClientCookie } from "../preferences/cookies";
 
 function useTranslations(initialTranslations = {}) {
+	const languageStoreState = usePreferencesStore((state) => state.preferences.language);
+
 	const initialLanguage = getClientCookie("language") || "EN";
 	const [language, setLanguage] = useState(initialLanguage);
 	const [translations, setTranslations] = useState(initialTranslations);
@@ -33,9 +34,9 @@ function useTranslations(initialTranslations = {}) {
 		}
 	}, []);
 
-	subscribeKey(preferencesStoreStore, "language", (newLanguage) => {
-		setLanguage(newLanguage);
-	});
+	useEffect(() => {
+		setLanguage(languageStoreState);
+	}, [languageStoreState]);
 
 	useEffect(() => {
 		if (language.toLowerCase() !== Object.keys(translations)[0].toLowerCase()) {

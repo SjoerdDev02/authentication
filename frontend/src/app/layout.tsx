@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 
 import Navigation from "@/components/navigation/Navigation";
 import { TranslationsProvider } from "@/stores/translationsStore";
+import { UserStoreProvider } from "@/stores/userStore";
 import { getPreferredLanguage, getPreferredTheme, getTranslations } from "@/utils/preferences/preferences";
 
 import { UserService } from "./services/user-service";
@@ -36,8 +37,9 @@ export default async function RootLayout({
 	const refreshToken = cookieStore.get('RefreshToken');
 
 	const userService = new UserService();
-	const result = !!bearerToken?.value && refreshToken?.value
-		? await userService.getUser(bearerToken?.value, refreshToken?.value)
+
+	const initialUser = !!bearerToken?.value && !!refreshToken?.value
+		? (await userService.getUser(bearerToken?.value, refreshToken?.value)).data
 		: null;
 
 	return (
@@ -48,15 +50,16 @@ export default async function RootLayout({
 		>
 			<body className={inter.variable}>
 				<TranslationsProvider initialTranslations={initialTranslations}>
-					<Navigation
-						initialLanguage={initialLanguage}
-						initialTheme={initialTheme}
-						initialUser={result?.data}
-					/>
+					<UserStoreProvider initialUser={initialUser}>
+						<Navigation
+							initialLanguage={initialLanguage}
+							initialTheme={initialTheme}
+						/>
 
-					<main>{children}</main>
+						<main>{children}</main>
 
-					<div id="modal" />
+						<div id="modal" />
+					</UserStoreProvider>
 				</TranslationsProvider>
 			</body>
 		</html>

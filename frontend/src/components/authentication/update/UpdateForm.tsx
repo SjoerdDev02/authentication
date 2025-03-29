@@ -8,7 +8,7 @@ import { UserService } from "@/app/services/user-service";
 import styles from '@/components/authentication/update/UpdateForm.module.scss';
 import Button from "@/components/common/buttons/Button";
 import { useTranslationsContext } from "@/stores/translationsStore";
-import userStore, { User } from "@/stores/userStore";
+import { User, useSetUser } from "@/stores/userStore";
 import { Defined } from "@/types/helpers";
 import { useUpdateUser } from "@/utils/hooks/updateUser";
 
@@ -26,6 +26,8 @@ const UpdateForm = (props: UpdateFormProps) => {
 	const getTranslation = useTranslationsContext();
 
 	const userService = new UserService();
+
+	const setUser = useSetUser();
 
 	const {
 		user,
@@ -57,7 +59,7 @@ const UpdateForm = (props: UpdateFormProps) => {
 
 		if (result.success) {
 			if (result.data) {
-				userStore.user = result.data;
+				setUser(result.data);
 			}
 
 			preventMessageResetRef.current = true;
