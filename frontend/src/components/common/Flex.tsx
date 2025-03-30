@@ -70,7 +70,7 @@ type FlexProps = {
 	// eslint-disable-next-line no-unused-vars
 	onClick?: (item?: any) => void;
 	style?: CSSProperties;
-	tag?: keyof JSX.IntrinsicElements;
+	tag?: keyof React.JSX.IntrinsicElements;
 	children?: React.ReactNode;
 	className?: string;
 	dataTest?: string;
