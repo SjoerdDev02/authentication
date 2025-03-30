@@ -41,8 +41,6 @@ test.beforeEach(async ({ page }) => {
 	await page.waitForURL(`${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}${pages.ResetPassword.path}`);
 });
 
-// TODO: Maak 'Resetting password with the same token twice returns an error'
-
 test.describe('password reset', () => {
 	test('Reset password using valid email and passwords', async ({ page, user, passwordResetFormLocators }) => {
 		await fillRequestResetPasswordTokenForm(page, user);
@@ -76,10 +74,7 @@ test.describe('password reset', () => {
 			expect(page).toHaveURL(`${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}${pages.Login.path}`)
 		]);
 
-		await Promise.all([
-			loginUser(page, updatedUser),
-			expect(page).toHaveURL(`${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}${pages.Home.path}`)
-		]);
+		await loginUser(page, updatedUser);
 	});
 
 	test('Cannot login with the old password', async ({ page, user, passwordResetFormLocators }) => {

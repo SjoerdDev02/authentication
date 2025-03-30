@@ -1,9 +1,8 @@
 use std::sync::Arc;
 
 use axum::{
-    body::Body,
     extract::{Query, State},
-    response::{IntoResponse, Response},
+    response::IntoResponse,
     Extension,
 };
 use http::{header, HeaderValue, StatusCode};
@@ -17,9 +16,9 @@ use crate::{
         translations::Translations,
     },
     utils::{
-        cookie::set_cookie,
+        cookie::{delete_cookie, set_cookie},
         emails::send_otc_success_email,
-        jwt::{encode_jwt, format_refresh_token_key},
+        jwt::encode_jwt,
         otc::format_otc_key,
         redis::{get_token, remove_token},
         responses::{ApiResponse, AppError},
@@ -63,14 +62,15 @@ pub async fn otc_user(
     let user_id = token_payload.user_id;
 
     let confirm_mail_type: &str;
-
-    let mut response = Response::new(Body::empty());
+    
+    let mut cookies_to_set: Vec<(&str, String, Option<i32>)> = Vec::new();
+    let mut cookies_to_delete: Vec<&str> = Vec::new();
     let mut response_data: Option<AuthResponse> = None;
-
+    
     match action {
         OtcPayloadAction::UpdateAccount => {
             confirm_mail_type = "update_account";
-
+            
             if let Some(password) = &token_payload.password_hash {
                 update_user_password(&state, &user_id, &password)
                     .await
@@ -83,20 +83,12 @@ pub async fn otc_user(
                 let new_jwt = encode_jwt(&user_id, &token_payload.name, &token_payload.email)
                     .map_err(|_| AppError::format_internal_error(&translations))?;
 
-                response = set_cookie(
-                    &translations,
-                    response,
-                    "Bearer",
-                    &new_jwt,
-                    Some(BEARER_EXPIRATION_SECONDS),
-                )?;
+                cookies_to_set.push((
+                    "Bearer", 
+                    new_jwt, 
+                    Some(BEARER_EXPIRATION_SECONDS)
+                ));
             }
-
-            response.headers_mut().insert(
-                header::CONTENT_TYPE,
-                HeaderValue::from_str("application/json")
-                    .map_err(|_| AppError::format_internal_error(&translations))?,
-            );
 
             response_data = Some(AuthResponse {
                 id: user_id,
@@ -108,11 +100,9 @@ pub async fn otc_user(
         OtcPayloadAction::DeleteAccount => {
             confirm_mail_type = "delete_account";
 
-            let refresh_token_key = format_refresh_token_key(&user_id.to_string());
-
-            remove_token(&state, &refresh_token_key)
-                .await
-                .map_err(|_| AppError::format_internal_error(&translations))?;
+            // TODO: Would be good to remove the refresh token from redis here with remove_token, but not sure how yet as otc is not a protected route thus the refresh token is not available in extensions
+            cookies_to_delete.push("Bearer");
+            cookies_to_delete.push("RefreshToken");
 
             delete_user_by_id(&state, &user_id)
                 .await
@@ -139,10 +129,28 @@ pub async fn otc_user(
         )
     })?;
 
-    Ok(ApiResponse::format_success(
+    let api_response = ApiResponse::format_success(
         &translations,
         StatusCode::OK,
         "auth.success.otc_processed",
         response_data,
-    ))
+    );
+    
+    let mut response = api_response.into_response();
+    
+    response.headers_mut().insert(
+        header::CONTENT_TYPE,
+        HeaderValue::from_str("application/json")
+            .map_err(|_| AppError::format_internal_error(&translations))?,
+    );
+    
+    for (key, value, max_age) in cookies_to_set {
+        response = set_cookie(&translations, response, key, &value, max_age)?;
+    }
+    
+    for key in cookies_to_delete {
+        response = delete_cookie(&translations, response, key)?;
+    }
+    
+    Ok(response)
 }

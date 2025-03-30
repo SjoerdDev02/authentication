@@ -20,8 +20,9 @@ export async function fillLoginForm(page: Page, user: LoginUser) {
 export async function loginUser(page: Page, user: LoginUser) {
 	const { submitButton } = getLoginFormLocators(page);
 
+	await fillLoginForm(page, user);
+
 	await Promise.all([
-		fillLoginForm(page, user),
 		submitButton.click(),
 		loginUserResponsePromise(page),
 		page.waitForURL(`${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}${pages.Home.path}`, {
