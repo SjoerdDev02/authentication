@@ -6,7 +6,8 @@ use axum::{
 use crate::{
     models::general::AppState,
     services::user::{
-        delete_user, get_user, register_user, request_password_reset_token, reset_password_with_token, update_user
+        delete_user, get_user, register_user, request_password_reset_token,
+        reset_password_with_token, update_user,
     },
 };
 

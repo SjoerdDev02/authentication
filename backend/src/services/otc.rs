@@ -62,15 +62,15 @@ pub async fn otc_user(
     let user_id = token_payload.user_id;
 
     let confirm_mail_type: &str;
-    
+
     let mut cookies_to_set: Vec<(&str, String, Option<i32>)> = Vec::new();
     let mut cookies_to_delete: Vec<&str> = Vec::new();
     let mut response_data: Option<AuthResponse> = None;
-    
+
     match action {
         OtcPayloadAction::UpdateAccount => {
             confirm_mail_type = "update_account";
-            
+
             if let Some(password) = &token_payload.password_hash {
                 update_user_password(&state, &user_id, &password)
                     .await
@@ -83,11 +83,7 @@ pub async fn otc_user(
                 let new_jwt = encode_jwt(&user_id, &token_payload.name, &token_payload.email)
                     .map_err(|_| AppError::format_internal_error(&translations))?;
 
-                cookies_to_set.push((
-                    "Bearer", 
-                    new_jwt, 
-                    Some(BEARER_EXPIRATION_SECONDS)
-                ));
+                cookies_to_set.push(("Bearer", new_jwt, Some(BEARER_EXPIRATION_SECONDS)));
             }
 
             response_data = Some(AuthResponse {
@@ -135,22 +131,22 @@ pub async fn otc_user(
         "auth.success.otc_processed",
         response_data,
     );
-    
+
     let mut response = api_response.into_response();
-    
+
     response.headers_mut().insert(
         header::CONTENT_TYPE,
         HeaderValue::from_str("application/json")
             .map_err(|_| AppError::format_internal_error(&translations))?,
     );
-    
+
     for (key, value, max_age) in cookies_to_set {
         response = set_cookie(&translations, response, key, &value, max_age)?;
     }
-    
+
     for key in cookies_to_delete {
         response = delete_cookie(&translations, response, key)?;
     }
-    
+
     Ok(response)
 }

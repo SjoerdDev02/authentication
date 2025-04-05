@@ -3,10 +3,11 @@ use crate::templates::otc::{VERIFICATION_CODE_SUCCESS_TEMPLATE, VERIFICATION_COD
 use crate::templates::user::PASSWORD_RESET_CODE_TEMPLATE;
 use crate::utils::env::get_environment_variable;
 use crate::utils::templates::generate_template;
+use crate::utils::translations::get_translation_by_key;
 use axum::http::StatusCode;
 use lettre::message::{header, MultiPart, SinglePart};
-use lettre::transport::smtp::client::Tls;
 use lettre::transport::smtp::authentication::Credentials;
+use lettre::transport::smtp::client::Tls;
 use lettre::{Message, SmtpTransport, Transport};
 use std::collections::HashMap;
 use std::fs::File;
@@ -63,8 +64,8 @@ pub async fn send_email_with_template(
                         .header(header::ContentId::from("cid_image".to_string()))
                         .body(image_data),
                 ),
-        ).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
-
+        )
+        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     let mailer = if env_smtp_host == "mailpit" {
         SmtpTransport::relay(&env_smtp_host)
@@ -84,7 +85,7 @@ pub async fn send_email_with_template(
             .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?
             .credentials(creds)
             .build()
-    };    
+    };
 
     match mailer.send(&email) {
         Ok(_) => Ok(()),
@@ -92,10 +93,9 @@ pub async fn send_email_with_template(
     }
 }
 
-// ? otc_type can be confirm_account, update_account or delete_account
 pub async fn send_otc_email(
     translations: &Translations,
-    otc_type: &str,
+    otc_type: &str, // ? can be confirm_account, update_account or delete_account
     otc_code: &str,
     email: &str,
 ) -> Result<(), StatusCode> {
@@ -104,143 +104,110 @@ pub async fn send_otc_email(
         Err(_) => return Err(StatusCode::BAD_REQUEST),
     };
 
-    if let Some(auth_translations) = &translations.auth {
-        if let Some(emails) = &auth_translations.get("emails") {
-            if let Some(otc_translations) = emails.get("otc") {
-                if let Some(otc_data) = otc_translations.get(&otc_type) {
-                    let mut template_variables: HashMap<&str, &str> = HashMap::new();
+    let mut template_variables: HashMap<&str, &str> = HashMap::new();
 
-                    if let Some(header) = otc_data.get("header").and_then(|str| str.as_str()) {
-                        template_variables.insert("header_title", header);
-                    }
+    let template_name = get_translation_by_key(
+        &translations,
+        &format!("auth.emails.otc.{}.template_name", &otc_type),
+    );
+    let subject = get_translation_by_key(
+        &translations,
+        &format!("auth.emails.otc.{}.subject", &otc_type),
+    );
+    let header = get_translation_by_key(
+        &translations,
+        &format!("auth.emails.otc.{}.header", &otc_type),
+    );
+    let code_description = get_translation_by_key(
+        &translations,
+        &format!("auth.emails.otc.{}.code_description", &otc_type),
+    );
+    let link_description = get_translation_by_key(
+        &translations,
+        &format!("auth.emails.otc.{}.link_description", &otc_type),
+    );
+    let footer_note = get_translation_by_key(
+        &translations,
+        &format!("auth.emails.otc.{}.footer_note", &otc_type),
+    );
 
-                    if let Some(code_description) = otc_data
-                        .get("code_description")
-                        .and_then(|str| str.as_str())
-                    {
-                        template_variables.insert("code_description", code_description);
-                    }
+    let otc_link = format!("{}/otc?otc={}", client_base_url, otc_code);
 
-                    if let Some(link_description) = otc_data
-                        .get("link_description")
-                        .and_then(|str| str.as_str())
-                    {
-                        template_variables.insert("link_title", link_description);
-                    }
-                    if let Some(footer_note) =
-                        otc_data.get("footer_note").and_then(|str| str.as_str())
-                    {
-                        template_variables.insert("footer_note", footer_note);
-                    }
+    template_variables.insert("header_title", &header);
+    template_variables.insert("code_description", &code_description);
+    template_variables.insert("link_title", &link_description);
+    template_variables.insert("footer_note", &footer_note);
+    template_variables.insert("otc", otc_code);
+    template_variables.insert("otc_link", &otc_link);
 
-                    template_variables.insert("otc", otc_code);
-                    let otc_link = format!("{}/otc?otc={}", client_base_url, otc_code);
-                    template_variables.insert("otc_link", otc_link.as_str());
+    let email_body = generate_template(
+        VERIFICATION_CODE_TEMPLATE,
+        &template_name,
+        template_variables,
+    )
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
-                    let mut image_file = File::open("/app/src/static/images/code_image.png")
-                        .expect("Image file not found");
-                    let mut image_data = Vec::new();
-                    image_file
-                        .read_to_end(&mut image_data)
-                        .expect("Failed to read image");
+    let mut image_file =
+        File::open("/app/src/static/images/code_image.png").expect("Image file not found");
 
-                    if let (Some(template_name), Some(subject)) = (
-                        otc_data.get("template_name").and_then(|str| str.as_str()),
-                        otc_data.get("subject").and_then(|str| str.as_str()),
-                    ) {
-                        let email_body = generate_template(
-                            VERIFICATION_CODE_TEMPLATE,
-                            template_name,
-                            template_variables,
-                        )
-                        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let mut image_data = Vec::new();
 
-                        if let Err(_) =
-                            send_email_with_template(&email, &subject, &email_body, image_data)
-                                .await
-                        {
-                            return Err(StatusCode::INTERNAL_SERVER_ERROR);
-                        }
-                    } else {
-                        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-                    }
-                } else {
-                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
-                }
-            } else {
-                return Err(StatusCode::INTERNAL_SERVER_ERROR);
-            }
-        } else {
-            return Err(StatusCode::INTERNAL_SERVER_ERROR);
-        }
-    } else {
-        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-    }
+    image_file
+        .read_to_end(&mut image_data)
+        .expect("Failed to read image");
+
+    send_email_with_template(&email, &subject, &email_body, image_data).await?;
 
     Ok(())
 }
 
-// ? otc_type can be confirm_account, update_account or delete_account
 pub async fn send_otc_success_email(
     translations: &Translations,
-    otc_type: &str,
+    otc_type: &str, // ? can be confirm_account, update_account or delete_account
     email: &str,
 ) -> Result<(), StatusCode> {
-    if let Some(auth_translations) = &translations.auth {
-        if let Some(emails) = &auth_translations.get("emails") {
-            if let Some(otc_translations) = emails.get("otc_success") {
-                if let Some(otc_data) = otc_translations.get(&otc_type) {
-                    let mut template_variables: HashMap<&str, &str> = HashMap::new();
+    let mut template_variables: HashMap<&str, &str> = HashMap::new();
 
-                    if let Some(header) = otc_data.get("header").and_then(|str| str.as_str()) {
-                        template_variables.insert("header_title", header);
-                    }
+    let template_name = get_translation_by_key(
+        &translations,
+        &format!("auth.emails.otc_success.{}.template_name", &otc_type),
+    );
 
-                    if let Some(footer_note) =
-                        otc_data.get("footer_note").and_then(|str| str.as_str())
-                    {
-                        template_variables.insert("footer_note", footer_note);
-                    }
+    let subject = get_translation_by_key(
+        &translations,
+        &format!("auth.emails.otc_success.{}.subject", &otc_type),
+    );
 
-                    let mut image_file = File::open("/app/src/static/images/success_image.png")
-                        .expect("Image file not found");
-                    let mut image_data = Vec::new();
-                    image_file
-                        .read_to_end(&mut image_data)
-                        .expect("Failed to read image");
+    let header = get_translation_by_key(
+        &translations,
+        &format!("auth.emails.otc_success.{}.header", &otc_type),
+    );
 
-                    if let (Some(template_name), Some(subject)) = (
-                        otc_data.get("template_name").and_then(|str| str.as_str()),
-                        otc_data.get("subject").and_then(|str| str.as_str()),
-                    ) {
-                        let email_body = generate_template(
-                            VERIFICATION_CODE_SUCCESS_TEMPLATE,
-                            template_name,
-                            template_variables,
-                        )
-                        .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let footer_note = get_translation_by_key(
+        &translations,
+        &format!("auth.emails.otc_success.{}.footer_note", &otc_type),
+    );
 
-                        if let Err(_) =
-                            send_email_with_template(&email, &subject, &email_body, image_data)
-                                .await
-                        {
-                            return Err(StatusCode::INTERNAL_SERVER_ERROR);
-                        }
-                    } else {
-                        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-                    }
-                } else {
-                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
-                }
-            } else {
-                return Err(StatusCode::INTERNAL_SERVER_ERROR);
-            }
-        } else {
-            return Err(StatusCode::INTERNAL_SERVER_ERROR);
-        }
-    } else {
-        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-    }
+    template_variables.insert("header_title", &header);
+    template_variables.insert("footer_note", &footer_note);
+
+    let email_body = generate_template(
+        VERIFICATION_CODE_SUCCESS_TEMPLATE,
+        &template_name,
+        template_variables,
+    )
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    let mut image_file =
+        File::open("/app/src/static/images/success_image.png").expect("Image file not found");
+
+    let mut image_data = Vec::new();
+
+    image_file
+        .read_to_end(&mut image_data)
+        .expect("Failed to read image");
+
+    send_email_with_template(&email, &subject, &email_body, image_data).await?;
 
     Ok(())
 }
@@ -255,77 +222,53 @@ pub async fn send_password_reset_email(
         Err(_) => return Err(StatusCode::BAD_REQUEST),
     };
 
-    if let Some(auth_translations) = &translations.auth {
-        if let Some(emails) = &auth_translations.get("emails") {
-            if let Some(password_reset_translations) = emails.get("password_reset") {
-                let mut template_variables: HashMap<&str, &str> = HashMap::new();
+    let mut template_variables: HashMap<&str, &str> = HashMap::new();
 
-                if let Some(header) = password_reset_translations
-                    .get("header")
-                    .and_then(|str| str.as_str())
-                {
-                    template_variables.insert("header_title", header);
-                }
+    let template_name =
+        get_translation_by_key(&translations, "auth.emails.password_reset.template_name");
 
-                if let Some(link_description) = password_reset_translations
-                    .get("link_description")
-                    .and_then(|str| str.as_str())
-                {
-                    template_variables.insert("link_title", link_description);
-                }
-                if let Some(footer_note) = password_reset_translations
-                    .get("footer_note")
-                    .and_then(|str| str.as_str())
-                {
-                    template_variables.insert("footer_note", footer_note);
-                }
+    let subject = get_translation_by_key(&translations, "auth.emails.password_reset.subject");
 
-                template_variables.insert("reset_token", reset_password_code);
-                let password_reset_link = format!(
-                    "{}/reset-password?password-reset-token={}",
-                    client_base_url, reset_password_code
-                );
-                template_variables.insert("password_reset_link", password_reset_link.as_str());
+    let header = get_translation_by_key(&translations, "auth.emails.password_reset.header");
 
-                let mut image_file = File::open("/app/src/static/images/code_image.png")
-                    .expect("Image file not found");
-                let mut image_data = Vec::new();
-                image_file
-                    .read_to_end(&mut image_data)
-                    .expect("Failed to read image");
+    let code_description =
+        get_translation_by_key(&translations, "auth.emails.password_reset.code_description");
 
-                if let (Some(template_name), Some(subject)) = (
-                    password_reset_translations
-                        .get("template_name")
-                        .and_then(|str| str.as_str()),
-                    password_reset_translations
-                        .get("subject")
-                        .and_then(|str| str.as_str()),
-                ) {
-                    let email_body = generate_template(
-                        PASSWORD_RESET_CODE_TEMPLATE,
-                        template_name,
-                        template_variables,
-                    )
-                    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+    let link_description =
+        get_translation_by_key(&translations, "auth.emails.password_reset.link_description");
 
-                    if let Err(_) =
-                        send_email_with_template(&email, &subject, &email_body, image_data).await
-                    {
-                        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-                    }
-                } else {
-                    return Err(StatusCode::INTERNAL_SERVER_ERROR);
-                }
-            } else {
-                return Err(StatusCode::INTERNAL_SERVER_ERROR);
-            }
-        } else {
-            return Err(StatusCode::INTERNAL_SERVER_ERROR);
-        }
-    } else {
-        return Err(StatusCode::INTERNAL_SERVER_ERROR);
-    }
+    let footer_note =
+        get_translation_by_key(&translations, "auth.emails.password_reset.footer_note");
+
+    let password_reset_link = format!(
+        "{}/reset-password?password-reset-token={}",
+        client_base_url, reset_password_code
+    );
+
+    template_variables.insert("header_title", &header);
+    template_variables.insert("code_description", &code_description);
+    template_variables.insert("link_title", &link_description);
+    template_variables.insert("footer_note", &footer_note);
+    template_variables.insert("reset_token", reset_password_code);
+    template_variables.insert("password_reset_link", &password_reset_link);
+
+    let email_body = generate_template(
+        PASSWORD_RESET_CODE_TEMPLATE,
+        &template_name,
+        template_variables,
+    )
+    .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+
+    let mut image_file =
+        File::open("/app/src/static/images/code_image.png").expect("Image file not found");
+
+    let mut image_data = Vec::new();
+
+    image_file
+        .read_to_end(&mut image_data)
+        .expect("Failed to read image");
+
+    send_email_with_template(&email, &subject, &email_body, image_data).await?;
 
     Ok(())
 }

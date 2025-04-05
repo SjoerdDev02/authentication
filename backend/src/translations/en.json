@@ -84,7 +84,8 @@
             "authentication.errors.missing_special_character": "Password must contain at least one special character (- or !)",
             "authentication.errors.invalid_phone_country_code": "Invalid phone country code",
             "authentication.errors.invalid_phone_length": "Phone number must have at least 10 digits",
-            "authentication.errors.invalid_phone_characters": "Phone number contains invalid characters"
+            "authentication.errors.invalid_phone_characters": "Phone number contains invalid characters",
+            "authentication.errors.invalid_password_reset_mail": "Email does not exist"
         },
         "success": {
             "user_logged_in": "Successfully logged in",
