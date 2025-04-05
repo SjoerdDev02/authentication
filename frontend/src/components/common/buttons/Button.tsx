@@ -3,8 +3,8 @@
 import classNames from 'classnames';
 import { CSSProperties, ReactNode, useLayoutEffect, useRef, useState } from 'react';
 
-import Loader from '../loaders/Loader';
-import styles from './Button.module.scss';
+import styles from '@/components/common/buttons/Button.module.scss';
+import Loader from '@/components/common/loaders/Loader';
 
 type ButtonColorType = 'primary' | 'grayscale' | 'success' | 'warning' | 'error' | 'blank';
 type ButtonType = 'button' | 'submit';

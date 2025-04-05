@@ -1,9 +1,9 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { AuthService } from './app/services/auth-service';
-import { BEARER_EXPIRATION_SECONDS, REFRESH_EXPIRATION_SECONDS } from './constants/auth';
-import { Route, routeUrlToPageMap } from './constants/routes';
+import { AuthService } from '@/app/services/auth-service';
+import { BEARER_EXPIRATION_SECONDS, REFRESH_EXPIRATION_SECONDS } from '@/constants/auth';
+import { Route, routeUrlToPageMap } from '@/constants/routes';
 
 export async function middleware(req: NextRequest) {
 	const bearerToken = req.cookies.get('Bearer');

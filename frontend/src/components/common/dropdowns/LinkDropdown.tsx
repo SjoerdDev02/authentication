@@ -6,11 +6,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ReactNode, useState } from 'react';
 
+import Button from '@/components/common/buttons/Button';
+import styles from '@/components/common/dropdowns/LinkDropdown.module.scss';
+import { Flex } from '@/components/common/Flex';
 import useOutsideClick from '@/utils/hooks/useOutsideClick';
-
-import Button from '../buttons/Button';
-import { Flex } from '../Flex';
-import styles from './LinkDropdown.module.scss';
 
 export type LinkDropdownItemType = {
 	label: string;

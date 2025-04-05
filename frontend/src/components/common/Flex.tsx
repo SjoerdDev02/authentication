@@ -1,7 +1,7 @@
 import classNames from 'classnames';
 import React, { CSSProperties } from 'react';
 
-import styles from './Flex.module.scss';
+import styles from '@/components/common/Flex.module.scss';
 
 const gapMapping = {
 	0: '0rem',

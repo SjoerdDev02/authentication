@@ -3,9 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 
 import usePreferencesStore from "@/stores/preferencesStore";
-
-import { getDynamicNestedProperties } from "../objects";
-import { getClientCookie } from "../preferences/cookies";
+import { getDynamicNestedProperties } from "@/utils/objects";
+import { getClientCookie } from "@/utils/preferences/cookies";
 
 function useTranslations(initialTranslations = {}) {
 	const languageStoreState = usePreferencesStore((state) => state.preferences.language);

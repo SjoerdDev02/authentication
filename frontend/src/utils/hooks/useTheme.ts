@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { getClientCookie, setCookie } from "@/utils/preferences/cookies";
-
-import { ThemeType } from "../preferences/preferences";
+import { ThemeType } from "@/utils/preferences/preferences";
 
 function useTheme() {
 	const [theme, setTheme] = useState<ThemeType>();

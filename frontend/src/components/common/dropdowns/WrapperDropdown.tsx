@@ -3,10 +3,9 @@
 import classNames from 'classnames';
 import { ReactNode, useState } from 'react';
 
+import Button from '@/components/common/buttons/Button';
+import styles from '@/components/common/dropdowns/WrapperDropdown.module.scss';
 import useOutsideClick from '@/utils/hooks/useOutsideClick';
-
-import Button from '../buttons/Button';
-import styles from './WrapperDropdown.module.scss';
 
 export type WrapperDropdownItemType = {
 	label: string;

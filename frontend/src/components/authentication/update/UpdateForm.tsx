@@ -6,17 +6,16 @@ import { useEffect, useRef, useState } from "react";
 
 import { UserService } from "@/app/services/user-service";
 import styles from '@/components/authentication/update/UpdateForm.module.scss';
+import AuthFormHeader from "@/components/authentication/wrappers/AuthFormHeader";
+import AuthFormInput from "@/components/authentication/wrappers/AuthFormInput";
+import AuthFormWrapper from "@/components/authentication/wrappers/AuthFormWrapper";
 import Button from "@/components/common/buttons/Button";
+import { Flex } from "@/components/common/Flex";
+import TextInput from "@/components/common/input/text/TextInput";
 import { useTranslationsContext } from "@/stores/translationsStore";
 import { User, useSetUser } from "@/stores/userStore";
 import { Defined } from "@/types/helpers";
 import { useUpdateUser } from "@/utils/hooks/updateUser";
-
-import { Flex } from "../../common/Flex";
-import TextInput from "../../common/input/text/TextInput";
-import AuthFormHeader from "../wrappers/AuthFormHeader";
-import AuthFormInput from "../wrappers/AuthFormInput";
-import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
 type UpdateFormProps = {
 	user: Defined<User>

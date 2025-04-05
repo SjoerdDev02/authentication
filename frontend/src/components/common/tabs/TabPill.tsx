@@ -1,8 +1,8 @@
 import classNames from 'classnames';
 import { CSSProperties, useState } from 'react';
 
-import { Flex } from '../Flex';
-import styles from './TabPill.module.scss';
+import { Flex } from '@/components/common/Flex';
+import styles from '@/components/common/tabs/TabPill.module.scss';
 
 export type TabPillItemType = {
 	label: string;

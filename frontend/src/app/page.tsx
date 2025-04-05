@@ -1,6 +1,5 @@
+import styles from "@/app/page.module.scss";
 import Page from "@/components/common/page/Page";
-
-import styles from "./page.module.scss";
 
 export default function Welcome() {
 	return (

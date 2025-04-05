@@ -13,24 +13,24 @@
   "dependencies": {
     "@tabler/icons-react": "^3.31.0",
     "classnames": "^2.5.1",
-    "dotenv-flow": "^4.1.0",
-    "eslint-plugin-react": "^7.37.4",
     "ky": "^1.7.5",
     "next": "^15.2.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "sass": "^1.86.0",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.51.1",
-    "@stylistic/eslint-plugin": "^4.2.0",
+    "@stylistic/eslint-plugin": "^2.7.2",
     "@types/node": "^22.13.14",
     "@types/react": "^19.0.12",
     "@types/react-dom": "^19.0.4",
-    "eslint": "^9.23.0",
+    "dotenv-flow": "^4.1.0",
+    "eslint": "^8",
     "eslint-config-next": "^15.2.4",
+    "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-simple-import-sort": "^12.1.1",
+    "sass": "^1.86.3",
     "typescript": "5.8.2",
     "yarn": "^1.22.22"
   }

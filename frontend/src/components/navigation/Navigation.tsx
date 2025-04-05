@@ -5,18 +5,16 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import Button from '@/components/common/buttons/Button';
 import WrapperDropdown from '@/components/common/dropdowns/WrapperDropdown';
+import { Flex } from "@/components/common/Flex";
+import LogoutButton from '@/components/navigation/logout/LogoutButton';
 import styles from '@/components/navigation/Navigation.module.scss';
 import { pages } from '@/constants/routes';
 import { useUser } from '@/stores/userStore';
 import useLanguage from '@/utils/hooks/useLanguage';
 import useTheme from '@/utils/hooks/useTheme';
 import { LanguageType, ThemeType } from '@/utils/preferences/preferences';
-
-import Logo from '../../../public/logo.svg';
-import Button from '../common/buttons/Button';
-import { Flex } from "../common/Flex";
-import LogoutButton from './logout/LogoutButton';
 
 const LinkDropdown = dynamic(() => import('../common/dropdowns/LinkDropdown'));
 
@@ -89,7 +87,7 @@ const Navigation = (props: NavigationPropsType) => {
 				<Image
 					alt="Logo"
 					priority
-					src={Logo}
+					src="/logo.svg"
 				/>
 			</Link>
 
@@ -97,8 +95,10 @@ const Navigation = (props: NavigationPropsType) => {
 				alignItems="center"
 				gap={5}
 			>
-				<Flex alignItems="center"
-					gap={3}>
+				<Flex
+					alignItems="center"
+					gap={3}
+				>
 					<WrapperDropdown
 						activeValue={language}
 						items={languageItems}

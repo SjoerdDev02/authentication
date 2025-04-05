@@ -1,15 +1,14 @@
-import "./globals.scss";
+import "@/app/globals.scss";
 
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { cookies } from "next/headers";
 
+import { UserService } from "@/app/services/user-service";
 import Navigation from "@/components/navigation/Navigation";
 import { TranslationsProvider } from "@/stores/translationsStore";
 import { UserStoreProvider } from "@/stores/userStore";
 import { getPreferredLanguage, getPreferredTheme, getTranslations } from "@/utils/preferences/preferences";
-
-import { UserService } from "./services/user-service";
 
 const inter = localFont({
 	src: "./fonts/InterVariable.woff2",

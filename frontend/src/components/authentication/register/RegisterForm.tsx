@@ -6,16 +6,15 @@ import { useEffect, useState } from "react";
 
 import { UserService } from "@/app/services/user-service";
 import styles from '@/components/authentication/register/RegisterForm.module.scss';
+import AuthFormFooter from "@/components/authentication/wrappers/AuthFormFooter";
+import AuthFormHeader from "@/components/authentication/wrappers/AuthFormHeader";
+import AuthFormWrapper from "@/components/authentication/wrappers/AuthFormWrapper";
 import Button from "@/components/common/buttons/Button";
 import { Flex } from "@/components/common/Flex";
 import TextInput from "@/components/common/input/text/TextInput";
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
 import { getEmailFeedbackMessage, getPasswordFeedbackMessage, isValidEmail, isValidPassword } from "@/utils/regex";
-
-import AuthFormFooter from "../wrappers/AuthFormFooter";
-import AuthFormHeader from "../wrappers/AuthFormHeader";
-import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
 export type RegisterUser = {
 	name: string;

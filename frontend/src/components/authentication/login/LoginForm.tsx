@@ -8,17 +8,16 @@ import { useEffect, useState } from "react";
 
 import { AuthService } from "@/app/services/auth-service";
 import styles from '@/components/authentication/login/LoginForm.module.scss';
+import AuthFormFooter from "@/components/authentication/wrappers/AuthFormFooter";
+import AuthFormHeader from "@/components/authentication/wrappers/AuthFormHeader";
+import AuthFormInput from "@/components/authentication/wrappers/AuthFormInput";
+import AuthFormWrapper from "@/components/authentication/wrappers/AuthFormWrapper";
 import Button from "@/components/common/buttons/Button";
 import { Flex } from "@/components/common/Flex";
 import TextInput from "@/components/common/input/text/TextInput";
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
 import { useSetUser } from "@/stores/userStore";
-
-import AuthFormFooter from "../wrappers/AuthFormFooter";
-import AuthFormHeader from "../wrappers/AuthFormHeader";
-import AuthFormInput from "../wrappers/AuthFormInput";
-import AuthFormWrapper from "../wrappers/AuthFormWrapper";
 
 export type LoginUser = {
 	email: string;

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { getEmailFeedbackMessage, getPasswordFeedbackMessage, isValidEmail, isValidPassword } from "../regex";
+import { getEmailFeedbackMessage, getPasswordFeedbackMessage, isValidEmail, isValidPassword } from "@/utils/regex";
 
 export type PasswordResetUser = {
     email: string;

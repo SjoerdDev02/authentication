@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 
 import usePreferencesStore from "@/stores/preferencesStore";
 import { getClientCookie, setCookie } from "@/utils/preferences/cookies";
-
-import { LanguageType } from "../preferences/preferences";
+import { LanguageType } from "@/utils/preferences/preferences";
 
 function useLanguage() {
 	const setPreferences = usePreferencesStore((state) => state.setPreferences);

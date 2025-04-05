@@ -1,6 +1,6 @@
 import { CSSProperties } from 'react';
 
-import styles from './Loader.module.scss';
+import styles from '@/components/common/loaders/Loader.module.scss';
 
 type LoaderPropsType = {
     color: 'primary' | 'grayscale';
