@@ -4,22 +4,21 @@ import { CSSProperties, useState } from 'react';
 import { Flex } from '@/components/common/Flex';
 import styles from '@/components/common/tabs/TabPill.module.scss';
 
-export type TabPillItemType = {
+export type TabPillItemType<T> = {
 	label: string;
-	value: any;
+	value: T;
 };
 
-type TabPillProps = {
-	activeValue: any;
-	items: TabPillItemType[];
-	// eslint-disable-next-line no-unused-vars
-	onChangeValue: (value: any) => void;
+type TabPillProps<T> = {
+	activeValue: T;
+	items: TabPillItemType<T>[];
+	onChangeValue: (value: T) => void;
 };
 
-const TabPill = (props: TabPillProps) => {
+const TabPill = <T extends string>(props: TabPillProps<T>) => {
 	const [activeItemIndex, setActiveItemIndex] = useState(0);
 
-	function handleChangeValue(value: string, index: number) {
+	function handleChangeValue(value: T, index: number) {
 		props.onChangeValue(value);
 
 		setActiveItemIndex(index);

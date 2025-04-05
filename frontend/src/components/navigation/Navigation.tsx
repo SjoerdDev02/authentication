@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import Button from '@/components/common/buttons/Button';
-import WrapperDropdown from '@/components/common/dropdowns/WrapperDropdown';
+import WrapperDropdown, { WrapperDropdownItemType } from '@/components/common/dropdowns/WrapperDropdown';
 import { Flex } from "@/components/common/Flex";
 import LogoutButton from '@/components/navigation/logout/LogoutButton';
 import styles from '@/components/navigation/Navigation.module.scss';
@@ -50,7 +50,7 @@ const Navigation = (props: NavigationPropsType) => {
 			label: 'ES',
 			value: 'ES'
 		}
-	];
+	] satisfies WrapperDropdownItemType<LanguageType>[];
 
 	const linkDropdownItems = [
 		{

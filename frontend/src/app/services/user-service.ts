@@ -136,7 +136,7 @@ export class UserService {
 				};
 			}
 
-			let resetToken = sanitize(token);
+			const resetToken = sanitize(token);
 			const sanitizedPassword = sanitize(user.newPassword);
 			const sanitizedPasswordConfirm = sanitize(user.confirmPassword);
 

@@ -102,7 +102,6 @@ const OTCForm = () => {
 		},
 	];
 
-	// eslint-disable-next-line no-unused-vars
 	const handleInputChange = (value: string, updateFunction: (newValue: string) => void, index: number) => {
 		updateFunction(value);
 

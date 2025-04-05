@@ -8,7 +8,6 @@ type TextInputProps = {
     disabled?: boolean;
     name?: string;
 	dataTest?: string;
-	// eslint-disable-next-line no-unused-vars
     onChange?: (value: string) => void;
     placeholder?: string;
     value: string | number | null;

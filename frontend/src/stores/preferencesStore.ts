@@ -9,7 +9,6 @@ type Preferences = {
 
 type PreferencesStore = {
     preferences: Preferences,
-    // eslint-disable-next-line no-unused-vars
     setPreferences: (preferences: Preferences) => void;
 }
 

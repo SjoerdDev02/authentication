@@ -7,21 +7,20 @@ import Button from '@/components/common/buttons/Button';
 import styles from '@/components/common/dropdowns/WrapperDropdown.module.scss';
 import useOutsideClick from '@/utils/hooks/useOutsideClick';
 
-export type WrapperDropdownItemType = {
+export type WrapperDropdownItemType<T> = {
 	label: string;
 	subLabel?: string;
-	value: any;
+	value: T;
 };
 
-type WrapperDropdownProps = {
-	activeValue: any;
+type WrapperDropdownProps<T> = {
+	activeValue: unknown;
     children: ReactNode;
-	items: WrapperDropdownItemType[];
-	// eslint-disable-next-line no-unused-vars
-	onChangeValue: (value: any) => void;
+	items: WrapperDropdownItemType<T>[];
+	onChangeValue: (value: T) => void;
 };
 
-const WrapperDropdown = (props: WrapperDropdownProps) => {
+const WrapperDropdown = <T extends string>(props: WrapperDropdownProps<T>) => {
 	const [isOpen, setIsOpen] = useState(false);
 
 	const handleClickOutside = () => {
@@ -34,7 +33,7 @@ const WrapperDropdown = (props: WrapperDropdownProps) => {
 		setIsOpen((prev) => !prev);
 	}
 
-	function handleChangeValue(value: string) {
+	function handleChangeValue(value: T) {
 		props.onChangeValue(value);
 		setIsOpen(false);
 	}

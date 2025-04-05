@@ -12,7 +12,6 @@ export type User = {
 
 interface UserState {
   user: User
-  // eslint-disable-next-line no-unused-vars
   setUser: (user: User) => void
   resetUser: () => void
 }
@@ -40,7 +39,7 @@ export const UserStoreProvider = ({
 	</UserStoreContext.Provider>;
 };
 
-// eslint-disable-next-line no-unused-vars
+
 export function useUserStore<T>(selector: (state: UserState) => T): T {
 	const store = useContext(UserStoreContext);
 	if (!store) throw new Error("Missing UserStoreProvider in the tree");

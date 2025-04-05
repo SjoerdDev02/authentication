@@ -16,7 +16,7 @@ export function useUpdateUser(initialUser: Defined<User>) {
 	const [user, setUser] = useState<UpdateUser>(initialUser);
 
 	const resetUser = () => {
-		// eslint-disable-next-line no-unused-vars
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { newPassword, confirmEmail, confirmPassword, ...baseUser } = user;
 
 		initialUserRef.current = baseUser;

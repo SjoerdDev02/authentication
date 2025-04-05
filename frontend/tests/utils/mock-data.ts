@@ -29,7 +29,7 @@ export function generatePassword() {
 
 	// Generate remaining characters to reach at least 8 characters
 	const allCharacters = [...uppercaseLetters, ...lowercaseLetters, ...numbers, ...specialCharacters];
-	let password = [upper, number, special];
+	const password = [upper, number, special];
 
 	for (let i = password.length; i < 8; i++) {
 		password.push(randomItemFromArray(allCharacters));

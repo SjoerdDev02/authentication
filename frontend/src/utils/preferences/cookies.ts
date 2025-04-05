@@ -17,7 +17,7 @@ export function getClientCookie(cookieName: string): string | undefined {
 	const allCookies = document.cookie.split(';');
 
 	for (let i = 0; i < allCookies.length; i++) {
-	  let currentCookie = allCookies[i].trim();
+	  const currentCookie = allCookies[i].trim();
 
 	  if (currentCookie.indexOf(cookieNameWithEquals) === 0) {
 			return decodeURIComponent(currentCookie.substring(cookieNameWithEquals.length));
