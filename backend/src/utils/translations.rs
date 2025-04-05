@@ -3,7 +3,7 @@ use http::StatusCode;
 use crate::{
     models::translations::Translations,
     translations::{
-        DE_TRANSLATIONS, EN_TRANSLATIONS, ES_TRANSLATIONS, FR_TRANSLATIONS, NL_TRANSLATIONS,
+        EN_TRANSLATIONS, NL_TRANSLATIONS,
     },
 };
 use serde_json::{from_str, Value};
@@ -14,9 +14,6 @@ pub fn load_translations(lang: &str) -> Result<Translations, StatusCode> {
     let translations = match lang.as_str() {
         "en" => EN_TRANSLATIONS,
         "nl" => NL_TRANSLATIONS,
-        "de" => DE_TRANSLATIONS,
-        "es" => ES_TRANSLATIONS,
-        "fr" => FR_TRANSLATIONS,
         _ => "",
     };
 

@@ -3,7 +3,7 @@ import { cookies, headers } from 'next/headers';
 import path from "path";
 
 export type ThemeType = 'light' | 'dark';
-export type LanguageType = 'NL' | 'EN' | 'FR' | 'DE' | 'ES';
+export type LanguageType = 'EN' | 'NL';
 
 export async function getPreferredTheme(): Promise<ThemeType> {
 	let prefersDarkMode: ThemeType = 'light';
@@ -37,12 +37,6 @@ export async function getPreferredLanguage(): Promise<LanguageType> {
 		if (acceptLanguageHeader) {
 			if (acceptLanguageHeader.toLowerCase().includes('nl')) {
 				preferredLanguage = 'NL';
-			} else if (acceptLanguageHeader.toLowerCase().includes('fr')) {
-				preferredLanguage = 'FR';
-			} else if (acceptLanguageHeader.toLowerCase().includes('de')) {
-				preferredLanguage = 'DE';
-			} else if (acceptLanguageHeader.toLowerCase().includes('es')) {
-				preferredLanguage = 'ES';
 			}
 		}
 	}

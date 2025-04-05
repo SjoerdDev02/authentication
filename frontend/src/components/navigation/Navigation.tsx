@@ -31,25 +31,13 @@ const Navigation = (props: NavigationPropsType) => {
 
 	const languageItems = [
 		{
-			label: 'NL',
-			value: 'NL'
-		},
-		{
 			label: 'EN',
 			value: 'EN'
 		},
 		{
-			label: 'FR',
-			value: 'FR'
+			label: 'NL',
+			value: 'NL'
 		},
-		{
-			label: 'DE',
-			value: 'DE'
-		},
-		{
-			label: 'ES',
-			value: 'ES'
-		}
 	] satisfies WrapperDropdownItemType<LanguageType>[];
 
 	const linkDropdownItems = [

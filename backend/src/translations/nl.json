@@ -1,50 +1,100 @@
 {
-    "emails": {
-        "otc": {
-            "confirm_account": {
-                "template_name": "Bevestig account aanmaken",
-                "subject": "Bevestig uw account",
-                "header": "Uw account is succesvol aangemaakt",
-                "code_description": "Voer deze code in om uw account te bevestigen",
-                "link_description": "U kunt ook deze link invoeren om uw account te bevestigen",
-                "footer_note": "Als u dit account niet heeft aangemaakt, negeer dan deze e-mail."
+    "general": {
+        "errors": {
+            "internal_error": "Er is een onverwachte fout opgetreden. We onderzoeken het en lossen het zo snel mogelijk op. Probeer het later opnieuw."
+        }
+    },
+    "auth": {
+        "emails": {
+            "otc": {
+                "confirm_account": {
+                    "template_name": "Bevestig aanmaak account",
+                    "subject": "Bevestig je account",
+                    "header": "Je account is succesvol aangemaakt",
+                    "code_description": "Voer deze code in om je account te bevestigen",
+                    "link_description": "Je kunt ook deze link gebruiken om je account te bevestigen",
+                    "footer_note": "Als je dit account niet hebt aangemaakt, negeer deze e-mail dan."
+                },
+                "update_account": {
+                    "template_name": "Bevestig accountwijziging",
+                    "subject": "Bevestig je accountwijziging",
+                    "header": "Code voor accountwijziging",
+                    "code_description": "Voer deze code in om te bevestigen dat je je account wilt bijwerken",
+                    "link_description": "Je kunt ook deze link gebruiken om je accountwijziging te bevestigen",
+                    "footer_note": "Als je je account niet wilde bijwerken, negeer deze e-mail dan."
+                },
+                "delete_account": {
+                    "template_name": "Bevestig verwijdering account",
+                    "subject": "Bevestig je accountverwijdering",
+                    "header": "Code voor verwijdering van account",
+                    "code_description": "Voer deze code in om te bevestigen dat je je account wilt verwijderen",
+                    "link_description": "Je kunt ook deze link gebruiken om je account te verwijderen",
+                    "footer_note": "Als je je account niet wilde verwijderen, negeer deze e-mail dan."
+                }
             },
-            "update_account": {
-                "template_name": "Bevestig account update",
-                "subject": "Bevestig uw accountupdate",
-                "header": "Code voor accountupdate",
-                "code_description": "Voer deze code in om te bevestigen dat u uw account wilt updaten",
-                "link_description": "U kunt ook deze link invoeren om uw accountupdate te bevestigen",
-                "footer_note": "Als u niet van plan was uw account te updaten, negeer dan deze e-mail."
+            "otc_success": {
+                "confirm_account": {
+                    "template_name": "Account succesvol bevestigd",
+                    "subject": "Je account is succesvol bevestigd",
+                    "header": "Gefeliciteerd! Je hebt je account succesvol bevestigd",
+                    "footer_note": "Als je dit account niet hebt bevestigd, neem dan contact met ons op."
+                },
+                "update_account": {
+                    "template_name": "Account succesvol bijgewerkt",
+                    "subject": "Je account is succesvol bijgewerkt",
+                    "header": "Je account is succesvol bijgewerkt",
+                    "footer_note": "Als je dit account niet hebt bijgewerkt, neem dan contact met ons op."
+                },
+                "delete_account": {
+                    "template_name": "Account succesvol verwijderd",
+                    "subject": "Je account is succesvol verwijderd",
+                    "header": "Het spijt ons je te zien gaan. Je account is succesvol verwijderd",
+                    "footer_note": "Als je dit account niet hebt verwijderd, neem dan contact met ons op."
+                }
             },
-            "delete_account": {
-                "template_name": "Bevestig account verwijderen",
-                "subject": "Bevestig het verwijderen van uw account",
-                "header": "Code voor accountverwijdering",
-                "code_description": "Voer deze code in om te bevestigen dat u uw account wilt verwijderen",
-                "link_description": "U kunt ook deze link invoeren om uw account te verwijderen",
-                "footer_note": "Als u niet van plan was uw account te verwijderen, negeer dan deze e-mail."
+            "password_reset": {
+                "template_name": "Wachtwoord opnieuw instellen",
+                "subject": "Stel je wachtwoord opnieuw in",
+                "header": "Code voor opnieuw instellen van wachtwoord",
+                "link_description": "Gebruik deze link om je wachtwoord opnieuw in te stellen",
+                "footer_note": "Als je je wachtwoord niet opnieuw wilde instellen, negeer deze e-mail dan."
             }
         },
-        "otc_success": {
-            "confirm_account": {
-                "template_name": "Account succesvol bevestigd",
-                "subject": "Uw account is succesvol bevestigd",
-                "header": "Gefeliciteerd! U heeft uw account succesvol bevestigd",
-                "footer_note": "Als u dit account niet heeft bevestigd, neem dan contact met ons op."
-            },
-            "update_account": {
-                "template_name": "Account succesvol geüpdatet",
-                "subject": "Uw account is succesvol geüpdatet",
-                "header": "Uw account is succesvol geüpdatet",
-                "footer_note": "Als u dit account niet heeft geüpdatet, neem dan contact met ons op."
-            },
-            "delete_account": {
-                "template_name": "Account succesvol verwijderd",
-                "subject": "Uw account is succesvol verwijderd",
-                "header": "Het spijt ons u te zien gaan. Uw account is succesvol verwijderd",
-                "footer_note": "Als u dit account niet heeft verwijderd, neem dan contact met ons op."
-            }
+        "errors": {
+            "password_mismatch": "Wachtwoorden komen niet overeen",
+            "email_mismatch": "E-mails komen niet overeen",
+            "email_already_exists": "E-mailadres bestaat al",
+            "invalid_credentials": "Ongeldige inloggegevens. Controleer je e-mailadres en wachtwoord",
+            "account_not_confirmed": "Bevestig je account met de bevestigingscode die naar je e-mail is gestuurd",
+            "invalid_update_data": "Ongeldige gegevens. Geef je naam en e-mail of wachtwoord op",
+            "invalid_update_data_id": "Ongeldig update-ID. Je kunt andere gebruikers niet wijzigen",
+            "failed_to_read_token_payload": "Kan tokengegevens niet lezen. Probeer het later opnieuw",
+            "failed_to_remove_token": "Kan token niet verwijderen. Probeer het later opnieuw",
+            "invalid_name": "Ongeldige naam",
+            "invalid_email": "Ongeldig e-mailadres",
+            "invalid_password": "Ongeldig wachtwoord",
+            "authentication.errors.invalid_email_start": "E-mailadres moet beginnen met 2-20 alfanumerieke of punttekens",
+            "authentication.errors.missing_at_symbol": "E-mailadres moet het '@'-symbool bevatten",
+            "authentication.errors.invalid_domain_name": "Ongeldige domeinnaam. Zorg dat het het juiste formaat heeft",
+            "authentication.errors.missing_or_invalid_tld": "Ongeldige of ontbrekende top-level domein (bijv. .com, .net)",
+            "authentication.errors.invalid_characters": "E-mailadres bevat ongeldige tekens",
+            "authentication.errors.password_too_short": "Wachtwoord moet minstens 8 tekens lang zijn",
+            "authentication.errors.missing_uppercase": "Wachtwoord moet minstens één hoofdletter bevatten",
+            "authentication.errors.missing_number": "Wachtwoord moet minstens één cijfer bevatten",
+            "authentication.errors.missing_special_character": "Wachtwoord moet minstens één speciaal teken bevatten (- of !)",
+            "authentication.errors.invalid_phone_country_code": "Ongeldige landcode voor telefoonnummer",
+            "authentication.errors.invalid_phone_length": "Telefoonnummer moet minstens 10 cijfers bevatten",
+            "authentication.errors.invalid_phone_characters": "Telefoonnummer bevat ongeldige tekens",
+            "authentication.errors.invalid_password_reset_mail": "E-mailadres bestaat niet"
+        },
+        "success": {
+            "user_logged_in": "Succesvol ingelogd",
+            "user_registered": "Account succesvol aangemaakt. Controleer je e-mail voor een bevestigingscode",
+            "user_fetched": "Gebruikersgegevens succesvol opgehaald",
+            "user_updated": "Nieuwe gebruikersgegevens succesvol opgeslagen. Controleer je e-mail voor een bevestigingscode",
+            "user_updated_to_otc": "Nieuwe gebruikersgegevens succesvol opgeslagen. Controleer je e-mail voor een bevestigingscode",
+            "otc_processed": "OTC succesvol verwerkt",
+            "refresh_processed": "Vernieuwing succesvol verwerkt"
         }
     }
 }

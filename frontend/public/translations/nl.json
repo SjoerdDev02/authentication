@@ -2,13 +2,15 @@
     "Authentication": {
         "loginLabel": "Inloggen",
         "registerLabel": "Registreren",
-        "signIn": "Login",
-        "signUp": "Registreer",
-        "dontHaveAnAccount": "Nog geen account?",
-        "alreadyHaveAnAccount": "Al een account?",
-        "dontNeedToResetPassword": "Niet je wachtwoord aanpassen?",
-        "resetPassword": "Verander password",
-        "resetLabel": "Verander",
+        "signIn": "Aanmelden",
+        "signUp": "Account aanmaken",
+        "logout": "Uitloggen",
+        "forgotPassword": "Wachtwoord vergeten?",
+        "dontHaveAnAccount": "Heb je nog geen account?",
+        "alreadyHaveAnAccount": "Heb je al een account?",
+        "dontNeedToResetPassword": "Wachtwoord niet opnieuw instellen?",
+        "resetPassword": "Wachtwoord opnieuw instellen",
+        "resetLabel": "Opnieuw instellen",
         "updateLabel": "Bijwerken",
         "deleteLabel": "Account verwijderen",
         "sendLabel": "Verzenden",
@@ -18,7 +20,23 @@
         "namePlaceholder": "Naam",
         "passwordPlaceholder": "Wachtwoord",
         "passwordConfirmPlaceholder": "Bevestig wachtwoord",
-        "otcHeader": "Verifieer uw identiteit",
-        "otcSubHeader": "Controleer uw inbox voor de code"
+        "otcHeader": "Verifieer je identiteit",
+        "otcSubHeader": "Controleer je inbox voor de code",
+        "Errors": {
+            "passwordMismatch": "Wachtwoorden komen niet overeen",
+            "invalidEmailStart": "E-mailadres moet beginnen met 2 tot 20 letters of cijfers.",
+            "missingAtSymbol": "E-mailadres moet een '@'-symbool bevatten.",
+            "invalidDomainName": "Domeinnaam moet 2 tot 10 kleine letters bevatten.",
+            "missingOrInvalidTLD": "E-mailadres moet een geldig top-level domein hebben (2 tot 5 kleine letters).",
+            "invalidEmailCharacters": "E-mailadres bevat ongeldige tekens. Alleen letters, cijfers, '.', '@' en '-' zijn toegestaan.",
+            "passwordTooShort": "Wachtwoord moet minstens 8 tekens lang zijn.",
+            "missingUppercase": "Wachtwoord moet minstens één hoofdletter bevatten.",
+            "missingNumber": "Wachtwoord moet minstens één cijfer bevatten.",
+            "missingSpecialCharacter": "Wachtwoord moet minstens één speciaal teken bevatten ('-' of '!').",
+            "invalidPasswordCharacters": "Wachtwoord bevat ongeldige tekens. Alleen letters, cijfers, '-' en '!' zijn toegestaan.",
+            "invalidPhoneCountryCode": "Telefoonnummer moet een geldige landcode bevatten",
+            "invalidPhoneLength": "Telefoonnummer moet minstens 10 cijfers bevatten",
+            "invalidPhoneCharacters": "Telefoonnummer bevat ongeldige tekens"
+        }
     }
 }
