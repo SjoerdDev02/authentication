@@ -1,0 +1,15 @@
+.otc-input {
+    &__input {
+        width: calc(1ch + var(--padding-800));
+        height: calc(1ch + var(--padding-800));
+        text-align: center;
+
+        &::selection {
+            background: transparent;
+        }
+
+        &::-moz-selection {
+            background: transparent;
+        }
+    }
+}

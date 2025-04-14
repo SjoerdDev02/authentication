@@ -1,0 +1,1 @@
+export type KeyboardKeys = 'Enter' | 'Escape' | 'Backspace' | 'Delete' | 'ArrowLeft' | 'ArrowRight';

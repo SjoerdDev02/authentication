@@ -5,9 +5,9 @@ import { gracefulFunction } from "@/utils/response";
 import { sanitize } from "@/utils/strings";
 
 export class OTCService {
-	otcUser(characterOne: string, characterTwo: string, characterThree: string, characterFour: string, characterFive: string, characterSix: string): Promise<ApiResult<AuthData>> {
+	otcUser(otc: string): Promise<ApiResult<AuthData>> {
 		return gracefulFunction(async () => {
-			if (!characterOne || !characterTwo || !characterThree || !characterFour || !characterFive || !characterSix) {
+			if (!otc) {
 				return {
 					success: false,
 					message: 'Invalid credentials',
@@ -15,16 +15,9 @@ export class OTCService {
 				};
 			}
 
-			const otc = [
-				sanitize(characterOne),
-				sanitize(characterTwo),
-				sanitize(characterThree),
-				sanitize(characterFour),
-				sanitize(characterFive),
-				sanitize(characterSix)
-			].join('');
+			const sanitizedOtc = sanitize(otc);
 
-			const response = await apiClient.patch(`${API_ROUTES.otc.verify}?otc=${encodeURIComponent(otc)}`)
+			const response = await apiClient.patch(`${API_ROUTES.otc.verify}?otc=${encodeURIComponent(sanitizedOtc)}`)
 				.json<ApiResult<AuthData>>();
 
 			return {

@@ -1,0 +1,1 @@
+export type ElementType = HTMLDivElement | HTMLInputElement;

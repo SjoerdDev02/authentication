@@ -74,8 +74,10 @@ const Navigation = (props: NavigationPropsType) => {
 			>
 				<Image
 					alt="Logo"
+					height={40}
 					priority
 					src="/logo.svg"
+					width={40}
 				/>
 			</Link>
 

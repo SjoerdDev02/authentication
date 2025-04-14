@@ -7,14 +7,14 @@ type TextInputProps = {
 	className?: string;
     disabled?: boolean;
     name?: string;
-	dataTest?: string;
-    onChange?: (value: string) => void;
     placeholder?: string;
     value: string | number | null;
 	type?: HTMLInputTypeAttribute;
 	maxLength?: number;
     upperCase?: boolean;
+	dataTest?: string;
 	ref?: Ref<HTMLInputElement> | null;
+    onChange?: (value: string) => void;
 }
 
 const TextInput = (props: TextInputProps) => {
