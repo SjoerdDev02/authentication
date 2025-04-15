@@ -1,8 +1,8 @@
 import { Page } from "@playwright/test";
 
-import { generateRandomString } from "../common";
-import { generateEmailAddress, generatePassword, generatePhoneNumber } from "../mock-data";
-import { getUpdateFormLocators } from "./update-locators";
+import { generateRandomString } from "@/e2e/utils/common";
+import { generateEmailAddress, generatePassword, generatePhoneNumber } from "@/e2e/utils/mock-data";
+import { getUpdateFormLocators } from "@/e2e/utils/update/update-locators";
 
 type fillUpdateFormUserDetailsOptions = {
 	preDefinedFields?: {

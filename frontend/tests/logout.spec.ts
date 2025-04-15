@@ -1,21 +1,20 @@
 import { expect } from '@playwright/test';
 import dotenv from 'dotenv-flow';
 
-import { test as base } from './test';
+import { test as base } from '@/e2e/test';
 
 dotenv.config({
 	silent: true
 });
 
 import { pages } from '@/constants/routes';
-
-import { createUser } from './utils/auth';
-import { clickItemFromLinkDropdown } from './utils/dropdowns/link-dropdown-actions';
-import { fillLoginForm } from './utils/login/login-actions';
-import { getLoginFormLocators } from './utils/login/login-locators';
-import { loginUserResponsePromise } from './utils/login/login-requests';
-import { logoutUserResponsePromise } from './utils/logout/logout-requests';
-import { getNavbarLocators } from './utils/navbar/navbar-locators';
+import { createUser } from '@/e2e/utils/auth';
+import { clickItemFromLinkDropdown } from '@/e2e/utils/dropdowns/link-dropdown-actions';
+import { fillLoginForm } from '@/e2e/utils/login/login-actions';
+import { getLoginFormLocators } from '@/e2e/utils/login/login-locators';
+import { loginUserResponsePromise } from '@/e2e/utils/login/login-requests';
+import { logoutUserResponsePromise } from '@/e2e/utils/logout/logout-requests';
+import { getNavbarLocators } from '@/e2e/utils/navbar/navbar-locators';
 
 const test = base.extend<
 {

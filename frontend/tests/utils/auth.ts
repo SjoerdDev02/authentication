@@ -1,12 +1,11 @@
 import { expect, Page } from "@playwright/test";
 
 import { pages } from "@/constants/routes";
-
-import { extractOtcFromMessage, getAllEmails, getMessageByRecipient } from "./email";
-import { getOTCFormLocators } from "./otc/otc-locators";
-import { fillRegisterForm } from "./register/register-actions";
-import { getRegisterFormLocators } from "./register/register-locators";
-import { registerUserResponsePromise } from "./register/register-requests";
+import { extractOtcFromMessage, getAllEmails, getMessageByRecipient } from "@/e2e/utils//email";
+import { getOTCFormLocators } from "@/e2e/utils//otc/otc-locators";
+import { fillRegisterForm } from "@/e2e/utils//register/register-actions";
+import { getRegisterFormLocators } from "@/e2e/utils//register/register-locators";
+import { registerUserResponsePromise } from "@/e2e/utils//register/register-requests";
 
 export async function createUser(page: Page) {
 	await page.waitForLoadState('networkidle');

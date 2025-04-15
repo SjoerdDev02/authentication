@@ -2,9 +2,8 @@ import { Page } from "@playwright/test";
 
 import { LoginUser } from "@/components/authentication/login/LoginForm";
 import { pages } from "@/constants/routes";
-
-import { getLoginFormLocators } from "./login-locators";
-import { loginUserResponsePromise } from "./login-requests";
+import { getLoginFormLocators } from "@/e2e/utils/login/login-locators";
+import { loginUserResponsePromise } from "@/e2e/utils/login/login-requests";
 
 export async function fillLoginForm(page: Page, user: LoginUser) {
 	const {

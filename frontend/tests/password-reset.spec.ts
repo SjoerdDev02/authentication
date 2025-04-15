@@ -1,22 +1,21 @@
 import { expect } from '@playwright/test';
 import dotenv from 'dotenv-flow';
 
-import { test as base } from './test';
+import { test as base } from '@/e2e/test';
 
 dotenv.config({
 	silent: true
 });
 
 import { pages } from '@/constants/routes';
-
-import { createUser } from './utils/auth';
-import { extractPasswordResetTokenFromMessage, getAllEmails, getMessageByRecipient } from './utils/email';
-import { fillLoginForm, loginUser } from './utils/login/login-actions';
-import { getLoginFormLocators } from './utils/login/login-locators';
-import { generateEmailAddress, generatePassword } from './utils/mock-data';
-import { fillRequestResetPasswordTokenForm, fillResetPasswordForm } from './utils/password-reset/password-reset-actions';
-import { getPasswordResetFormLocators } from './utils/password-reset/password-reset-locators';
-import { requestResetPasswordTokenResponsePromise, resetPasswordResponsePromise } from './utils/password-reset/password-reset-requests';
+import { createUser } from '@/e2e/utils/auth';
+import { extractPasswordResetTokenFromMessage, getAllEmails, getMessageByRecipient } from '@/e2e/utils/email';
+import { fillLoginForm, loginUser } from '@/e2e/utils/login/login-actions';
+import { getLoginFormLocators } from '@/e2e/utils/login/login-locators';
+import { generateEmailAddress, generatePassword } from '@/e2e/utils/mock-data';
+import { fillRequestResetPasswordTokenForm, fillResetPasswordForm } from '@/e2e/utils/password-reset/password-reset-actions';
+import { getPasswordResetFormLocators } from '@/e2e/utils/password-reset/password-reset-locators';
+import { requestResetPasswordTokenResponsePromise, resetPasswordResponsePromise } from '@/e2e/utils/password-reset/password-reset-requests';
 
 const test = base.extend<
 {
@@ -116,7 +115,7 @@ test.describe('password reset', () => {
 
 		await fillLoginForm(page, user);
 		await submitButton.click();
-		await expect(message).toHaveAttribute('data-error', 'true'),
+		await expect(message).toHaveAttribute('data-error', 'true');
 		await expect(page).toHaveURL(`${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}${pages.Login.path}`);
 	});
 

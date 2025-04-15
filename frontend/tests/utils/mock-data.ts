@@ -1,6 +1,5 @@
+import { generateRandomNumber, generateRandomString } from "@/e2e/utils/common";
 import { randomItemFromArray } from "@/utils/arrays";
-
-import { generateRandomNumber, generateRandomString } from "./common";
 
 export function generateEmailAddress() {
 	const name = generateRandomString(5);

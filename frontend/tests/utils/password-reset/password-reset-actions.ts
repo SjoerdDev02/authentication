@@ -1,8 +1,7 @@
 import { Page } from "@playwright/test";
 
+import { getPasswordResetFormLocators } from "@/e2e/utils/password-reset/password-reset-locators";
 import { PasswordResetUser } from "@/utils/hooks/useResetUserPassword";
-
-import { getPasswordResetFormLocators } from "./password-reset-locators";
 
 export async function fillRequestResetPasswordTokenForm(page: Page, user: Omit<PasswordResetUser, 'newPassword' | 'confirmPassword'>) {
 	const {

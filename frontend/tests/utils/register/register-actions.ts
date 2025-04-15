@@ -1,8 +1,8 @@
 import { Page } from "@playwright/test";
 
-import { generateRandomString } from "../common";
-import { generateEmailAddress, generatePassword } from "../mock-data";
-import { getRegisterFormLocators } from "./register-locators";
+import { generateRandomString } from "@/e2e/utils/common";
+import { generateEmailAddress, generatePassword } from "@/e2e/utils/mock-data";
+import { getRegisterFormLocators } from "@/e2e/utils/register/register-locators";
 
 type fillRegisterFormOptions = {
 	preDefinedFields?: {

@@ -11,16 +11,16 @@ export function isValidEmail(email: string) {
 }
 
 export function getEmailFeedbackMessage(email: string) {
-	if (!/^[A-Za-z0-9.-]{2,20}/.test(email)) {
-		return 'Authentication.Errors.invalidEmailStart';
+	if (/[^A-Za-z0-9.@-]/.test(email)) {
+		return 'Authentication.Errors.invalidCharacters';
 	} else if (!email.includes('@')) {
 		return 'Authentication.Errors.missingAtSymbol';
-	} else if (!/^.{2,20}@[a-z]{2,10}/.test(email)) {
+	} else if (!/^[A-Za-z0-9.-]{2,20}/.test(email)) {
+		return 'Authentication.Errors.invalidEmailStart';
+	} else if (!/^[A-Za-z0-9.-]{2,20}@[a-z]{2,10}/.test(email)) {
 		return 'Authentication.Errors.invalidDomainName';
 	} else if (!/\.[a-z]{2,5}$/.test(email)) {
 		return 'Authentication.Errors.missingOrInvalidTLD';
-	} else if (/[^A-Za-z0-9.@-]/.test(email)) {
-		return 'Authentication.Errors.invalidCharacters';
 	} else {
 		return '';
 	}

@@ -1,6 +1,6 @@
 import ky from "ky";
 
-import { MailpitResponse, MailpitResponseMessage } from "../types/email";
+import { MailpitResponse, MailpitResponseMessage } from "@/e2e/types/email";
 
 export async function getAllEmails() {
 	const response = await ky.get('http://localhost:8025/api/v1/messages')

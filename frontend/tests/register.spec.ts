@@ -1,21 +1,20 @@
 import { expect } from '@playwright/test';
 import dotenv from 'dotenv-flow';
 
-import { test as base } from './test';
+import { test as base } from '@/e2e/test';
 
 dotenv.config({
 	silent: true
 });
 
 import { pages } from '@/constants/routes';
-
-import { TEST_EMAIL_ADDRESS } from './constants/common';
-import { generateRandomString } from './utils/common';
-import { extractOtcFromMessage, getAllEmails, getMessageByRecipient } from "./utils/email";
-import { getOTCFormLocators } from './utils/otc/otc-locators';
-import { fillRegisterForm } from './utils/register/register-actions';
-import { getRegisterFormLocators } from './utils/register/register-locators';
-import { registerUserResponsePromise } from './utils/register/register-requests';
+import { TEST_EMAIL_ADDRESS } from '@/e2e/constants/common';
+import { generateRandomString } from '@/e2e/utils/common';
+import { extractOtcFromMessage, getAllEmails, getMessageByRecipient } from "@/e2e/utils/email";
+import { getOTCFormLocators } from '@/e2e/utils/otc/otc-locators';
+import { fillRegisterForm } from '@/e2e/utils/register/register-actions';
+import { getRegisterFormLocators } from '@/e2e/utils/register/register-locators';
+import { registerUserResponsePromise } from '@/e2e/utils/register/register-requests';
 
 const test = base.extend<
 {
