@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 import { OTCService } from "@/app/services/otc-service";
 import styles from '@/components/authentication/otc/OTCForm.module.scss';
-import { Otcinput } from "@/components/authentication/otc/OTCInput";
+import { OTCInput } from "@/components/authentication/otc/OTCInput";
 import AuthFormWrapper from "@/components/authentication/wrappers/AuthFormWrapper";
 import Button from "@/components/common/buttons/Button";
 import { Flex } from "@/components/common/Flex";
@@ -14,7 +14,7 @@ import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
 import { useSetUser, useUser } from "@/stores/userStore";
 
-const OTC_LENGTH = 6;
+export const OTC_LENGTH = 6;
 
 const OTCForm = () => {
 	const router = useRouter();
@@ -83,7 +83,7 @@ const OTCForm = () => {
 					gap={2}
 					justifyContent="center"
 				>
-					<Otcinput
+					<OTCInput
 						onChange={(newOtc) => setOtc(newOtc)}
 						otc={otc}
 					/>

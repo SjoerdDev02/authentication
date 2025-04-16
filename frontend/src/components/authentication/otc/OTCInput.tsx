@@ -1,5 +1,4 @@
 import classNames from "classnames";
-import type React from "react";
 import { ChangeEvent, type ClipboardEvent, useState } from "react";
 
 import styles from '@/components/authentication/otc/OTCInput.module.scss';
@@ -8,13 +7,12 @@ import inputStyles from '@/components/common/input/text/TextInput.module.scss';
 import { useRefs } from "@/utils/hooks/useRefs";
 import { useTriggerOnKeydown } from "@/utils/hooks/useTriggerOnKeydown";
 
-type OtcinputProps = {
+type OTCInputProps = {
   otc: string[]
   onChange: (value: string[]) => void
-  className?: string
 }
 
-export function Otcinput(props: OtcinputProps) {
+export function OTCInput(props: OTCInputProps) {
 	const [activeIndex, setActiveIndex] = useState(0);
 
 	const {
@@ -42,40 +40,6 @@ export function Otcinput(props: OtcinputProps) {
 			inputRefs[index + 1]?.focus();
 		}
 	};
-
-	const handleDeleteCharacter = (index: number) => {
-		const newOtc = [...props.otc];
-		newOtc[index] = '';
-		props.onChange(newOtc);
-
-		// Focus previous input if available
-		if (index > 0) {
-			setActiveIndex(index - 1);
-
-			inputRefs[index - 1]?.focus();
-		}
-	};
-
-	const handleArrowLeft = (index: number) => {
-		if (index > 0) {
-			setActiveIndex(index - 1);
-
-			inputRefs[index - 1]?.focus();
-		  }
-	};
-
-	const handleArrowRight = (index: number) => {
-		if (index < props.otc.length - 1) {
-			setActiveIndex(index + 1);
-
-			inputRefs[index + 1]?.focus();
-		  }
-	};
-
-	useTriggerOnKeydown('Backspace', () => handleDeleteCharacter(activeIndex));
-	useTriggerOnKeydown('Delete', () => handleDeleteCharacter(activeIndex));
-	useTriggerOnKeydown('ArrowLeft', () => handleArrowLeft(activeIndex));
-	useTriggerOnKeydown('ArrowRight', () => handleArrowRight(activeIndex));
 
 	const handlePaste = (e: ClipboardEvent<HTMLInputElement>) => {
 		e.preventDefault();
@@ -120,15 +84,47 @@ export function Otcinput(props: OtcinputProps) {
 		inputRefs[index]?.focus();
 	};
 
+	const handleDeleteCharacter = (index: number) => {
+		const newOtc = [...props.otc];
+		newOtc[index] = '';
+		props.onChange(newOtc);
+
+		// Focus previous input if available
+		if (index > 0) {
+			setActiveIndex(index - 1);
+
+			inputRefs[index - 1]?.focus();
+		}
+	};
+
+	const handleArrowLeft = (index: number) => {
+		if (index > 0) {
+			setActiveIndex(index - 1);
+
+			inputRefs[index - 1]?.focus();
+		  }
+	};
+
+	const handleArrowRight = (index: number) => {
+		if (index < props.otc.length - 1) {
+			setActiveIndex(index + 1);
+
+			inputRefs[index + 1]?.focus();
+		  }
+	};
+
+	useTriggerOnKeydown('Backspace', () => handleDeleteCharacter(activeIndex));
+	useTriggerOnKeydown('Delete', () => handleDeleteCharacter(activeIndex));
+	useTriggerOnKeydown('ArrowLeft', () => handleArrowLeft(activeIndex));
+	useTriggerOnKeydown('ArrowRight', () => handleArrowRight(activeIndex));
+
 	return (
-		<Flex
-			className={props.className}
-			gap={2}
-		>
+		<Flex gap={2}>
 			{Array.from({ length: props.otc.length }, (_, index) => (
 				<input
 					autoFocus={index === 0}
 					className={classNames(inputStyles['text-input'], styles['otc-input__input'])}
+					data-test="otc-input"
 					key={index}
 					maxLength={1}
 					onChange={(e) => handleChange(e, index)}
@@ -137,7 +133,7 @@ export function Otcinput(props: OtcinputProps) {
 					onPaste={handlePaste}
 					ref={element => setRef(element, index)}
 					type="text"
-					value={props.otc[index] || ""}
+					value={props.otc[index]}
 				/>
 			))}
 		</Flex>
