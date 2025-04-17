@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import usePreferencesStore from "@/stores/preferencesStore";
+import { TranslationKey } from "@/types/translations";
 import { getDynamicNestedProperties } from "@/utils/objects";
 import { getClientCookie } from "@/utils/preferences/cookies";
 
@@ -13,8 +14,8 @@ function useTranslations(initialTranslations = {}) {
 	const [language, setLanguage] = useState(initialLanguage);
 	const [translations, setTranslations] = useState(initialTranslations);
 
-	const getTranslation = useCallback((translationProperty: string) => {
-		return getDynamicNestedProperties(translationProperty, translations) || "";
+	const getTranslation = useCallback((translationProperty: TranslationKey) => {
+	  return getDynamicNestedProperties(translationProperty, translations);
 	}, [translations]);
 
 	const fetchTranslations = useCallback(async (lang: string) => {

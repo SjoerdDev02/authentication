@@ -2,9 +2,10 @@
 
 import { createContext, type ReactNode, useContext } from "react";
 
+import { TranslationKey } from "@/types/translations";
 import useTranslations from "@/utils/hooks/useTranslations";
 
-const TranslationsContext = createContext<(language: string) => string>(() => '');
+const TranslationsContext = createContext<(translationProperty: TranslationKey) => string>(() => '');
 
 export function TranslationsProvider({
 	children,

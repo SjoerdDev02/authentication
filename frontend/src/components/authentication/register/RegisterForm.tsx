@@ -14,7 +14,7 @@ import { Flex } from "@/components/common/Flex";
 import TextInput from "@/components/common/input/text/TextInput";
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
-import { getEmailFeedbackMessage, getPasswordFeedbackMessage, isValidEmail, isValidPassword } from "@/utils/regex";
+import { getEmailFeedbackMessage, getPasswordFeedbackMessage } from "@/utils/regex";
 
 export type RegisterUser = {
 	name: string;
@@ -76,22 +76,34 @@ const Register = () => {
 	);
 
 	useEffect(() => {
-		if (!!email && !isValidEmail(email)) {
-			setIsError(true);
-			setMessage(getTranslation(getEmailFeedbackMessage(email)));
+		if (email) {
+			const emailFeedback = getEmailFeedbackMessage(email);
 
-			return;
-		} else if (!!password && !isValidPassword(password)) {
-			setIsError(true);
-			setMessage(getTranslation(getPasswordFeedbackMessage(password)));
+			if (emailFeedback) {
+				setIsError(true);
+				setMessage(getTranslation(emailFeedback));
 
-			return;
-		} else if (!!password && !!passwordConfirm && password !== passwordConfirm) {
-			setIsError(true);
-			setMessage(getTranslation('Authentication.Errors.passwordMismatch'));
+				return;
+			}
+		}
 
-			return;
-		} else if (!!message && isError) {
+		if (password) {
+			const passwordFeedback = getPasswordFeedbackMessage(password);
+
+			if (passwordFeedback) {
+				setIsError(true);
+				setMessage(getTranslation(passwordFeedback));
+
+				return;
+			} else if (password !== passwordConfirm) {
+				setIsError(true);
+				setMessage(getTranslation('Authentication.Errors.passwordMismatch'));
+
+				return;
+			}
+		}
+
+		if (!!message && isError) {
 			setIsError(false);
 			setMessage(null);
 		}

@@ -1,3 +1,5 @@
+import { TranslationKey } from "@/types/translations";
+
 export function isValidEmail(email: string) {
 	// This regex validates an email format with the following rules:
 	// - Starts with 2 to 20 uppercase/lowercase letters, numbers, dots (.), or hyphens (-).
@@ -10,9 +12,9 @@ export function isValidEmail(email: string) {
 	return regex.test(email);
 }
 
-export function getEmailFeedbackMessage(email: string) {
+export function getEmailFeedbackMessage(email: string): TranslationKey | null {
 	if (/[^A-Za-z0-9.@-]/.test(email)) {
-		return 'Authentication.Errors.invalidCharacters';
+		return 'Authentication.Errors.invalidEmailCharacters';
 	} else if (!email.includes('@')) {
 		return 'Authentication.Errors.missingAtSymbol';
 	} else if (!/^[A-Za-z0-9.-]{2,20}/.test(email)) {
@@ -22,7 +24,7 @@ export function getEmailFeedbackMessage(email: string) {
 	} else if (!/\.[a-z]{2,5}$/.test(email)) {
 		return 'Authentication.Errors.missingOrInvalidTLD';
 	} else {
-		return '';
+		return null;
 	}
 }
 
@@ -38,7 +40,7 @@ export function isValidPassword(password: string) {
 	return regex.test(password);
 }
 
-export function getPasswordFeedbackMessage(password: string) {
+export function getPasswordFeedbackMessage(password: string): TranslationKey | null {
 	if (password.length < 8) {
 		return 'Authentication.Errors.passwordTooShort';
 	} else if (!/[A-Z]/.test(password)) {
@@ -48,9 +50,9 @@ export function getPasswordFeedbackMessage(password: string) {
 	} else if (!/[-!]/.test(password)) {
 		return 'Authentication.Errors.missingSpecialCharacter';
 	} else if (/[^A-Za-z\d\-!]/.test(password)) {
-		return 'Authentication.Errors.invalidCharacters';
+		return 'Authentication.Errors.invalidPasswordCharacters';
 	} else {
-		return '';
+		return null;
 	}
 }
 
@@ -64,7 +66,7 @@ export function isValidPhoneNumber(phone: string) {
 	return regex.test(phone);
 }
 
-export function getPhoneNumberFeedbackMessage(phone: string) {
+export function getPhoneNumberFeedbackMessage(phone: string): TranslationKey | null {
 	if (!/^\+?\d{1,3}?/.test(phone)) {
 		return 'Authentication.Errors.invalidPhoneCountryCode';
 	} else if (!/\d{10,}/.test(phone.replace(/\D/g, ''))) {
@@ -72,6 +74,6 @@ export function getPhoneNumberFeedbackMessage(phone: string) {
 	} else if (/[^0-9\s()+-]/.test(phone)) {
 		return 'Authentication.Errors.invalidPhoneCharacters';
 	} else {
-		return '';
+		return null;
 	}
 }
