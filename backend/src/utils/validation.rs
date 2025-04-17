@@ -3,16 +3,19 @@ use regex::Regex;
 use crate::models::user::models::{PasswordResetUser, RegisterUser, UpdateUser};
 
 pub fn get_email_feedback_message(email: &str) -> Option<&str> {
-    if !Regex::new(r"^[A-Za-z0-9.-]{2,20}").ok()?.is_match(email) {
-        Some("authentication.errors.invalid_email_start")
+    if Regex::new(r"[^A-Za-z0-9.@-]").ok()?.is_match(email) {
+        Some("authentication.errors.invalid_characters")
     } else if !email.contains('@') {
         Some("authentication.errors.missing_at_symbol")
-    } else if !Regex::new(r"^.{2,20}@[a-z]{2,10}").ok()?.is_match(email) {
+    } else if !Regex::new(r"^[A-Za-z0-9.-]{2,20}").ok()?.is_match(email) {
+        Some("authentication.errors.invalid_email_start")
+    } else if !Regex::new(r"^[A-Za-z0-9.-]{2,20}@[a-z]{2,10}")
+        .ok()?
+        .is_match(email)
+    {
         Some("authentication.errors.invalid_domain_name")
     } else if !Regex::new(r"\.[a-z]{2,5}$").ok()?.is_match(email) {
         Some("authentication.errors.missing_or_invalid_tld")
-    } else if Regex::new(r"[^A-Za-z0-9.@-]").ok()?.is_match(email) {
-        Some("authentication.errors.invalid_characters")
     } else {
         None
     }

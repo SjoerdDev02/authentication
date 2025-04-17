@@ -2,9 +2,7 @@ use http::StatusCode;
 
 use crate::{
     models::translations::Translations,
-    translations::{
-        EN_TRANSLATIONS, NL_TRANSLATIONS,
-    },
+    translations::{EN_TRANSLATIONS, NL_TRANSLATIONS},
 };
 use serde_json::{from_str, Value};
 
