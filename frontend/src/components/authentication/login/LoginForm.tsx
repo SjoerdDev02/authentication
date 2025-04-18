@@ -90,7 +90,7 @@ const LoginForm = () => {
 					placeholder={getTranslation('Authentication.emailPlaceholder')}
 					type="email"
 					value={email}
-			 />
+			 	/>
 			)
 		},
 		{
@@ -102,6 +102,7 @@ const LoginForm = () => {
 					gap={2}
 				>
 					<TextInput
+						className={styles['login-form__input']}
 						dataTest="login-password-input"
 						name="password"
 						onChange={(e) => setPassword(e)}
@@ -141,9 +142,7 @@ const LoginForm = () => {
 				footer={FormFooter}
 				header={FormHeader}
 			>
-				<AuthFormInput
-					inputElements={loginInputs}
-				/>
+				<AuthFormInput inputElements={loginInputs} />
 
 				{!!message && (
 					<div

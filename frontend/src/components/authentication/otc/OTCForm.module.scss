@@ -1,3 +1,5 @@
+@use '@/styles/responsiveness' as responsiveness;
+
 .otc-form {
     background-color: var(--color-grayscale-100);
     padding: var(--padding-700);
@@ -22,9 +24,9 @@
         height: var(--size-700);
         text-align: center;
         vertical-align: middle;
-    }    
+    }
 
-    @include phone {
+    @include responsiveness.small {
         width: calc(100vw - var(--padding-800));
     }
 }

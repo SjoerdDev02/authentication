@@ -1,5 +1,7 @@
+@use '@/styles/responsiveness' as responsiveness;
+
 .auth-form-input {
-    @include phone {
+    @include responsiveness.small {
         &__input-wrapper {
             flex-direction: column;
         }

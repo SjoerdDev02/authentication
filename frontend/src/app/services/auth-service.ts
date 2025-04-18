@@ -1,5 +1,4 @@
 import { LoginUser } from '@/components/authentication/login/LoginForm';
-import { User } from '@/stores/userStore';
 import { AuthData, Tokens } from '@/types/authentication';
 import { ApiResult } from '@/types/response';
 import { API_ROUTES, apiClient } from '@/utils/api';
@@ -48,31 +47,21 @@ export class AuthService {
 		});
 	}
 
-	refreshAccessToken(refreshToken: string): Promise<ApiResult<User & Tokens>> {
+	refreshAccessToken(refreshToken: string): Promise<ApiResult<Tokens>> {
 		return gracefulFunction(async () => {
-			const response = await fetch(
-				API_ROUTES.auth.refresh,
-				{
-					method: 'POST',
-					headers: {
-						'Cookie': `RefreshToken=${refreshToken}` // Needs to be explicitly set as NextJS middleware does not send the RefreshToken automatically when including credentials
-					},
-					credentials: 'include',
+			const response = await apiClient.post(API_ROUTES.auth.refresh, {
+				headers: {
+					'Cookie': `RefreshToken=${refreshToken}` // Needs to be explicitly set as NextJS middleware does not send the RefreshToken automatically when including credentials
 				}
-			);
+			});
 
 			const tokens = extractSetCookieTokens(response.headers.getSetCookie());
 
-			if (!response.ok) {
-				throw new Error('Failed to refresh token');
-			}
-
-			const data = await response.json();
+			const data = await response.json<ApiResult<null>>();
 
 			return {
 				message: data.message,
 				data: {
-					...data.data,
 					...tokens
 				}
 			};

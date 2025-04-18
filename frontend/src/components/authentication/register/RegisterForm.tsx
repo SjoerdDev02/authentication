@@ -8,6 +8,7 @@ import { UserService } from "@/app/services/user-service";
 import styles from '@/components/authentication/register/RegisterForm.module.scss';
 import AuthFormFooter from "@/components/authentication/wrappers/AuthFormFooter";
 import AuthFormHeader from "@/components/authentication/wrappers/AuthFormHeader";
+import AuthFormInput from "@/components/authentication/wrappers/AuthFormInput";
 import AuthFormWrapper from "@/components/authentication/wrappers/AuthFormWrapper";
 import Button from "@/components/common/buttons/Button";
 import { Flex } from "@/components/common/Flex";
@@ -75,6 +76,64 @@ const Register = () => {
 		/>
 	);
 
+	const nameAndEmailInputs = [
+		{
+			label: getTranslation('Authentication.namePlaceholder'),
+			element: (
+				<TextInput
+					dataTest="register-name-input"
+					name="name"
+					onChange={(e) => setName(e)}
+					placeholder={getTranslation('Authentication.namePlaceholder')}
+					type="text"
+					value={name}
+		 		/>
+			)
+		},
+		{
+			label: getTranslation('Authentication.emailPlaceholder'),
+			element: (
+				<TextInput
+					dataTest="register-email-input"
+					name="email"
+					onChange={(e) => setEmail(e)}
+					placeholder={getTranslation('Authentication.emailPlaceholder')}
+					type="email"
+					value={email}
+	 			/>
+			)
+		}
+	];
+
+	const passwordInputs = [
+		{
+			label: getTranslation('Authentication.passwordPlaceholder'),
+			element: (
+				<TextInput
+					dataTest="register-password-input"
+					name="password"
+					onChange={(e) => setPassword(e)}
+					placeholder={getTranslation('Authentication.passwordPlaceholder')}
+					type="password"
+					value={password}
+			 	/>
+			)
+		},
+		{
+			label: getTranslation('Authentication.passwordConfirmPlaceholder'),
+			element: (
+				<TextInput
+					dataTest="register-password-confirm-input"
+					name="passwordConfirmation"
+					onChange={(e) => setPasswordConfirm(e)}
+					placeholder={getTranslation('Authentication.passwordConfirmPlaceholder')}
+					type="password"
+					value={passwordConfirm}
+				/>
+			)
+		}
+	];
+
 	useEffect(() => {
 		if (email) {
 			const emailFeedback = getEmailFeedbackMessage(email);
@@ -121,43 +180,14 @@ const Register = () => {
 				footer={FormFooter}
 				header={FormHeader}
 			>
-				<div className={styles['register-form__input-wrapper']}>
-					<TextInput
-						dataTest="register-name-input"
-						name="name"
-						onChange={(e) => setName(e)}
-						placeholder={getTranslation('Authentication.namePlaceholder')}
-						type="text"
-						value={name}
-				 	/>
+				<Flex
+					flexDirection="column"
+					gap={4}
+				>
+					<AuthFormInput inputElements={nameAndEmailInputs} />
 
-					<TextInput
-						dataTest="register-email-input"
-						name="email"
-						onChange={(e) => setEmail(e)}
-						placeholder={getTranslation('Authentication.emailPlaceholder')}
-						type="email"
-						value={email}
-				 	/>
-
-					<TextInput
-						dataTest="register-password-input"
-						name="password"
-						onChange={(e) => setPassword(e)}
-						placeholder={getTranslation('Authentication.passwordPlaceholder')}
-						type="password"
-						value={password}
-				 	/>
-
-					<TextInput
-						dataTest="register-password-confirm-input"
-						name="passwordConfirmation"
-						onChange={(e) => setPasswordConfirm(e)}
-						placeholder={getTranslation('Authentication.passwordConfirmPlaceholder')}
-						type="password"
-						value={passwordConfirm}
-				 	/>
-				</div>
+					<AuthFormInput inputElements={passwordInputs} />
+				</Flex>
 
 				{!!message && (
 					<div

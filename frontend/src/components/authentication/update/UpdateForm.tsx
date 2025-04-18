@@ -196,13 +196,15 @@ const UpdateForm = (props: UpdateFormProps) => {
 			>
 				<AuthFormWrapper header={FormHeader}>
 					<Flex
-						className={styles['update-user__input-wrapper']}
 						flexDirection="column"
 						gap={5}
 					>
 						<hr />
 
-						<Flex gap={4}>
+						<Flex
+							className={styles['update-user__input-wrapper']}
+							gap={4}
+						>
 							<AuthFormInput
 								error={updateErrors.name}
 								header="Full name"

@@ -1,3 +1,5 @@
+@use '@/styles/responsiveness' as responsiveness;
+
 .register-form {
     background-color: var(--color-grayscale-100);
     padding: var(--padding-700);
@@ -10,12 +12,7 @@
         grid-template-columns: repeat(2, 1fr);
     }
 
-    @include phone {
+    @include responsiveness.small {
         width: calc(100vw - var(--padding-800));
-        
-        &__input-wrapper {
-            display: flex;
-            flex-direction: column;
-        }
     }
 }

@@ -155,12 +155,12 @@ describe('getEmailFeedbackMessage', () => {
 	});
 
 	it('returns invalidCharacters if special characters are present', () => {
-		expect(getEmailFeedbackMessage('user+name@domain.com')).toBe('Authentication.Errors.invalidCharacters');
-		expect(getEmailFeedbackMessage('user!name@domain.com')).toBe('Authentication.Errors.invalidCharacters');
+		expect(getEmailFeedbackMessage('user+name@domain.com')).toBe('Authentication.Errors.invalidEmailCharacters');
+		expect(getEmailFeedbackMessage('user!name@domain.com')).toBe('Authentication.Errors.invalidEmailCharacters');
 	});
 
-	it('returns empty string for valid email', () => {
-		expect(getEmailFeedbackMessage('test.test@domain.com')).toBe('');
+	it('returns null for valid email', () => {
+		expect(getEmailFeedbackMessage('test.test@domain.com')).toBe(null);
 	});
 });
 
@@ -210,11 +210,11 @@ describe('getPasswordFeedbackMessage', () => {
 	});
 
 	it('returns invalidCharacters if invalid chars included', () => {
-		expect(getPasswordFeedbackMessage('Password1!*')).toBe('Authentication.Errors.invalidCharacters');
+		expect(getPasswordFeedbackMessage('Password1!*')).toBe('Authentication.Errors.invalidPasswordCharacters');
 	});
 
-	it('returns empty string if password is valid', () => {
-		expect(getPasswordFeedbackMessage('Password1!')).toBe('');
+	it('returns null if password is valid', () => {
+		expect(getPasswordFeedbackMessage('Password1!')).toBe(null);
 	});
 });
 
@@ -246,8 +246,8 @@ describe('getPhoneNumberFeedbackMessage', () => {
 		expect(getPhoneNumberFeedbackMessage('+1 123-456-78x0')).toBe('Authentication.Errors.invalidPhoneCharacters');
 	});
 
-	it('returns empty string if phone is valid', () => {
-		expect(getPhoneNumberFeedbackMessage('+1 123-456-7890')).toBe('');
-		expect(getPhoneNumberFeedbackMessage('001234567890')).toBe('');
+	it('returns null if phone is valid', () => {
+		expect(getPhoneNumberFeedbackMessage('+1 123-456-7890')).toBe(null);
+		expect(getPhoneNumberFeedbackMessage('001234567890')).toBe(null);
 	});
 });

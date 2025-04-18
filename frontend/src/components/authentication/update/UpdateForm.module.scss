@@ -1,10 +1,16 @@
+@use '@/styles/responsiveness' as responsiveness;
+
 .update-user {
     background-color: var(--color-grayscale-100);
     padding: var(--padding-700);
     border-radius: var(--border-radius-200);
     box-shadow: var(--box-shadow-sm);
 
-    @include phone {
+    @include responsiveness.small {
         width: calc(100vw - var(--padding-800));
+
+        &__input-wrapper {
+            flex-direction: column;
+        }
     }
 }

@@ -6,6 +6,8 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import tseslint from 'typescript-eslint';
 
+import pluginNext from '@next/eslint-plugin-next'
+
 export default [
 	// Base recommended ESLint rules
 	js.configs.recommended,
@@ -19,6 +21,7 @@ export default [
 			'simple-import-sort': simpleImportSort,
 			'react': react,
 			'react-hooks': reactHooks,
+			'@next/next': pluginNext
 		},
 		languageOptions: {
 			ecmaVersion: 'latest',
@@ -34,6 +37,8 @@ export default [
 			},
 		},
 		rules: {
+			...pluginNext.configs.recommended.rules,
+			
 			// General rules
 			'no-unused-vars': 'error',
 			'semi': 'error',
@@ -69,6 +74,7 @@ export default [
 			'react': react,
 			'react-hooks': reactHooks,
 			'@typescript-eslint': tseslint.plugin,
+			'@next/next': pluginNext
 		},
 		languageOptions: {
 			parser: tseslint.parser,
@@ -86,6 +92,8 @@ export default [
 			},
 		},
 		rules: {
+			...pluginNext.configs.recommended.rules,
+			
 			// Disable JS rule in favor of TS rule
 			'no-unused-vars': 'off',
 			'@typescript-eslint/no-unused-vars': 'error',
