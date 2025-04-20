@@ -13,6 +13,7 @@ import { Flex } from "@/components/common/Flex";
 import { pages } from "@/constants/routes";
 import { useTranslationsContext } from "@/stores/translationsStore";
 import { useSetUser, useUser } from "@/stores/userStore";
+import { isOfTypeUser } from "@/types/typeguards/user";
 
 export const OTC_LENGTH = 6;
 
@@ -51,7 +52,7 @@ const OTCForm = () => {
 		setIsPending(false);
 
 		if (result.success) {
-			if (result.data) {
+			if (isOfTypeUser(result.data)) {
 				setUser(result.data);
 			}
 

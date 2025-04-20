@@ -1,34 +1,30 @@
 import { LoginUser } from '@/components/authentication/login/LoginForm';
-import { AuthData, Tokens } from '@/types/authentication';
-import { ApiResult } from '@/types/response';
+import { noDataFieldSchema } from "@/schemas/response";
+import { userSchema } from '@/schemas/user';
+import { ApiResult, NoDataApiResult } from '@/types/response';
+import { User } from '@/types/user';
 import { API_ROUTES, apiClient } from '@/utils/api';
-import { extractSetCookieTokens } from '@/utils/preferences/cookies';
 import { gracefulFunction } from '@/utils/response';
 import { sanitize } from '@/utils/strings';
 
 export class AuthService {
-	logoutUser(): Promise<ApiResult<null>> {
+	logoutUser() {
 		return gracefulFunction(async () => {
 			const response = await apiClient.post(API_ROUTES.auth.logout)
-				.json<ApiResult<null>>();
+				.json<NoDataApiResult>();
 
 			return {
 				message: response.message,
 				data: null,
 			};
-		});
+		}, noDataFieldSchema);
 	}
 
-	loginUser(user: LoginUser): Promise<ApiResult<AuthData>> {
+	loginUser(user: LoginUser) {
 		return gracefulFunction(async () => {
 			if (!user.email || !user.password) {
-				return {
-					success: false,
-					message: 'Invalid credentials',
-					data: null
-				};
+				throw new Error('Invalid credentials');
 			}
-
 			const email = sanitize(user.email);
 			const password = sanitize(user.password);
 
@@ -37,34 +33,32 @@ export class AuthService {
 					email,
 					password
 				}
-			}).json<ApiResult<AuthData>>();
+			}).json<ApiResult<User>>();
 
 			return {
-				success: true,
-				message: response.message,
+				message: response.message || 'Login successful',
 				data: response.data
 			};
-		});
+		}, userSchema);
 	}
 
-	refreshAccessToken(refreshToken: string): Promise<ApiResult<Tokens>> {
-		return gracefulFunction(async () => {
-			const response = await apiClient.post(API_ROUTES.auth.refresh, {
-				headers: {
-					'Cookie': `RefreshToken=${refreshToken}` // Needs to be explicitly set as NextJS middleware does not send the RefreshToken automatically when including credentials
-				}
-			});
+	// TODO: Uncomment this and use it in middleware when Zod Mini had fixed dynamic code evaluation in Edge Runtime environments
+	// refreshAccessToken(refreshToken: string) {
+	// 	return gracefulFunction(async () => {
+	// 		const response = await apiClient.post(API_ROUTES.auth.refresh, {
+	// 			headers: {
+	// 				'Cookie': `RefreshToken=${refreshToken}` // Needs to be explicitly set as NextJS middleware does not send the RefreshToken automatically when including credentials
+	// 			}
+	// 		});
 
-			const tokens = extractSetCookieTokens(response.headers.getSetCookie());
+	// 		const tokens = extractSetCookieTokens(response.headers.getSetCookie());
 
-			const data = await response.json<ApiResult<null>>();
+	// 		const data = await response.json<NoDataApiResult>();
 
-			return {
-				message: data.message,
-				data: {
-					...tokens
-				}
-			};
-		});
-	}
+	// 		return {
+	// 			message: data.message,
+	// 			data: tokens
+	// 		};
+	// 	}, tokensSchema);
+	// }
 }

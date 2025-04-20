@@ -89,6 +89,7 @@
         },
         "success": {
             "user_logged_in": "Succesvol ingelogd",
+            "user_logged_out": "Succesvol uitgelogd",
             "user_registered": "Account succesvol aangemaakt. Controleer je e-mail voor een bevestigingscode",
             "user_fetched": "Gebruikersgegevens succesvol opgehaald",
             "user_updated": "Nieuwe gebruikersgegevens succesvol opgeslagen. Controleer je e-mail voor een bevestigingscode",

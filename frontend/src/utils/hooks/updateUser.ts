@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 
-import { User } from "@/stores/userStore";
 import { Defined } from "@/types/helpers";
+import { User } from "@/types/user";
 import { useHasChanges } from "@/utils/hooks/useHasChanges";
 import { getEmailFeedbackMessage, getPasswordFeedbackMessage, getPhoneNumberFeedbackMessage, isValidEmail, isValidPassword, isValidPhoneNumber } from "@/utils/regex";
 

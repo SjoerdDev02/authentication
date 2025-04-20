@@ -1,6 +1,8 @@
 import { RegisterUser } from "@/components/authentication/register/RegisterForm";
-import { AuthData } from "@/types/authentication";
-import { ApiResult } from "@/types/response";
+import { noDataFieldSchema } from "@/schemas/response";
+import { userSchema } from "@/schemas/user";
+import { ApiResult, NoDataApiResult } from "@/types/response";
+import { User } from "@/types/user";
 import { API_ROUTES, apiClient } from "@/utils/api";
 import { UpdateUser } from "@/utils/hooks/updateUser";
 import { PasswordResetUser } from "@/utils/hooks/useResetUserPassword";
@@ -8,7 +10,7 @@ import { gracefulFunction } from "@/utils/response";
 import { sanitize } from "@/utils/strings";
 
 export class UserService {
-	getUser(bearerToken?: string, refreshToken?: string): Promise<ApiResult<AuthData>> {
+	getUser(bearerToken?: string, refreshToken?: string) {
 		return gracefulFunction(async () => {
 			if (!bearerToken || !refreshToken) {
 				throw new Error('Invalid credentials');
@@ -18,19 +20,17 @@ export class UserService {
 				headers: {
 					'Cookie': `RefreshToken=${refreshToken}; Bearer=${bearerToken}`
 				}
-			}).json<ApiResult<AuthData>>();
+			}).json<ApiResult<User>>();
 
 			return {
 				success: true,
 				message: response.message,
 				data: response.data
 			};
-		});
+		}, userSchema);
 	}
 
-	registerUser(
-		user: RegisterUser,
-	): Promise<ApiResult<AuthData>> {
+	registerUser(user: RegisterUser) {
 		return gracefulFunction(async () => {
 			if (!user.email || !user.name || !user.password || !user.passwordConfirm) {
 				throw new Error('Invalid credentials');
@@ -48,16 +48,16 @@ export class UserService {
 					password,
 					passwordConfirm
 				}
-			}).json<ApiResult<AuthData>>();
+			}).json<ApiResult<User>>();
 
 			return {
 				message: response.message,
 				data: response.data,
 			};
-		});
+		}, userSchema);
 	}
 
-	updateUser(user: UpdateUser): Promise<ApiResult<null>> {
+	updateUser(user: UpdateUser) {
 		return gracefulFunction(async () => {
 			const id = user.id;
 			const name = sanitize(user.name);
@@ -77,30 +77,30 @@ export class UserService {
 					...(password && { password }),
 					...(passwordConfirm && { passwordConfirm })
 				}
-			}).json<ApiResult<null>>();
+			}).json<NoDataApiResult>();
 
 			return {
 				success: true,
 				message: response.message,
 				data: null
 			};
-		});
+		}, noDataFieldSchema);
 	}
 
-	deleteUser(): Promise<ApiResult<null>> {
+	deleteUser() {
 		return gracefulFunction(async () => {
 			const response = await apiClient.delete(API_ROUTES.user.delete)
-				.json<ApiResult<null>>();
+				.json<NoDataApiResult>();
 
 			return {
 				success: true,
 				message: response.message,
 				data: null
 			};
-		});
+		}, noDataFieldSchema);
 	}
 
-	requestResetPasswordToken(user: PasswordResetUser): Promise<ApiResult<null>> {
+	requestResetPasswordToken(user: PasswordResetUser) {
 		return gracefulFunction(async () => {
 			if (!user.email) {
 				return {
@@ -116,17 +116,17 @@ export class UserService {
 				json: {
 					email: sanitizedEmail
 				}
-			}).json<ApiResult<null>>();
+			}).json<NoDataApiResult>();
 
 			return {
 				success: true,
 				message: response.message,
 				data: null
 			};
-		});
+		}, noDataFieldSchema);
 	}
 
-	resetPasswordWithToken(user: PasswordResetUser, token: string | null): Promise<ApiResult<null>> {
+	resetPasswordWithToken(user: PasswordResetUser, token: string | null) {
 		return gracefulFunction(async () => {
 			if (!user.newPassword || !user.confirmPassword || !token) {
 				return {
@@ -145,13 +145,13 @@ export class UserService {
 					password: sanitizedPassword,
 					passwordConfirm: sanitizedPasswordConfirm
 				}
-			}).json<ApiResult<null>>();
+			}).json<NoDataApiResult>();
 
 			return {
 				success: true,
 				message: response.message,
 				data: null
 			};
-		});
+		}, noDataFieldSchema);
 	}
 }

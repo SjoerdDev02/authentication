@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@tabler/icons-react": "^3.31.0",
+    "@zod/mini": "^4.0.0-beta.20250418T202744",
     "classnames": "^2.5.1",
     "ky": "^1.7.5",
     "next": "^15.2.4",

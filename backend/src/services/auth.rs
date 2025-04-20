@@ -15,7 +15,7 @@ use axum::{
     body::Body,
     extract::{Json, State},
     http::StatusCode,
-    http::{header, Request, Response},
+    http::{header, Request},
     Extension,
 };
 use http::HeaderValue;
@@ -127,7 +127,14 @@ pub async fn logout_user(
         .await
         .map_err(|_| AppError::format_internal_error(&translations))?;
 
-    let mut response = Response::new(Body::empty());
+    let response_body = ApiResponse::<()>::format_success(
+        &translations,
+        StatusCode::OK,
+        "auth.success.user_logged_out",
+        None,
+    );
+
+    let mut response = response_body.into_response();
 
     response = delete_cookie(&translations, response, "Bearer")?;
     response = delete_cookie(&translations, response, "RefreshToken")?;

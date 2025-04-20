@@ -3,14 +3,9 @@
 import { createContext, type ReactNode, useContext, useState } from "react";
 import { createStore, type StoreApi, useStore } from "zustand";
 
-export type User = {
-  id: number
-  name: string
-  email: string
-  phone: string | null
-} | null
+import { User } from "@/types/user";
 
-interface UserState {
+type UserState = {
   user: User
   setUser: (user: User) => void
   resetUser: () => void
@@ -38,7 +33,6 @@ export const UserStoreProvider = ({
 		{children}
 	</UserStoreContext.Provider>;
 };
-
 
 export function useUserStore<T>(selector: (state: UserState) => T): T {
 	const store = useContext(UserStoreContext);
