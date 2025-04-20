@@ -1,4 +1,9 @@
 {
+    "NotFound": {
+        "header": "Oeps!",
+        "subHeader": "Deze pagina bestaat niet of is verplaatst",
+        "cta": "Terug naar de homepage"
+    },
     "Authentication": {
         "loginLabel": "Inloggen",
         "registerLabel": "Registreren",

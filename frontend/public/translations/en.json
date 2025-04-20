@@ -1,4 +1,9 @@
 {
+    "NotFound": {
+        "header": "Uh-oh!",
+        "subHeader": "Looks like this page doesn't exist or has moved",
+        "cta": "Take me home"
+    },
     "Authentication": {
         "loginLabel": "Login",
         "registerLabel": "Register",

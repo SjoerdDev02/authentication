@@ -1,0 +1,24 @@
+.not-found-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &__header {
+        color: var(--color-primary-300);
+        font: var(--font-900);
+    }
+
+    &__link {
+        background-color: var(--color-primary-500);
+        font-size: var(--font-size-200);
+        color: var(--color-grayscale-50);
+        font-weight: var(--font-weight-500);
+        border-radius: var(--border-radius-100);
+        padding: var(--padding-200) var(--padding-400);
+        transition: all var(--transition-duration-short) ease-in;
+
+        &:hover {
+            background-color: var(--color-primary-600);
+        }
+    }
+}
